@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.MSBuild;
 
-namespace Generator.Shared.Analysis
+namespace Generator.Shared.Transformation
 {
 	public class SolutionCrawler
 	{

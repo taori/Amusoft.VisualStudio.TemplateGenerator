@@ -12,8 +12,8 @@ using System.Windows.Input;
 using System.Windows.Threading;
 using Generator.Client.Desktop.Utility;
 using Generator.Client.Desktop.Views;
-using Generator.Shared.Analysis;
 using Generator.Shared.Configuration;
+using Generator.Shared.Transformation;
 using MahApps.Metro.Controls;
 using MahApps.Metro.Controls.Dialogs;
 using Microsoft.Xaml.Behaviors;
@@ -66,7 +66,6 @@ namespace Generator.Client.Desktop.ViewModels
 						await Task.Delay(1000, cts.Token);
 						progress.SetIndeterminate();
 						await rewriter.RewriteAsync(arg.OutputFolders, cts.Token, new Progress<string>(p => progress.SetMessage(p)));
-
 					}
 					catch (TaskCanceledException)
 					{

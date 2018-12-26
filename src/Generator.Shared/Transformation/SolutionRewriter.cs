@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Generator.Shared.Analysis
+namespace Generator.Shared.Transformation
 {
 	public class SolutionRewriter
 	{
