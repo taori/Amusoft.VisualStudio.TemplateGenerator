@@ -24,7 +24,7 @@ namespace Generator.Client.Desktop.ViewModels
 				new []
 				{
 					new TextCommand("New configuration", new TaskCommand(NewConfigurationExecute, d => ConfigurationManager.CanOperate())), 
-					new TextCommand("Reload configurations", new TaskCommand(ReloadConfigurationsExecute, d => ConfigurationManager.CanOperate())), 
+					new TextCommand("Open Configuration folder", new TaskCommand(OpenConfigurationFolderExecute, d => ConfigurationManager.CanOperate())), 
 					new TextCommand("Change configuration store", new TaskCommand(SetConfigurationStoreExecute)), 
 				}
 			);
@@ -33,7 +33,14 @@ namespace Generator.Client.Desktop.ViewModels
 			DeleteConfigurationCommand = new TaskCommand<ConfigurationViewModel>(DeleteConfigurationExecute);
 			BuildTemplateCommand = new TaskCommand<ConfigurationViewModel>(BuildTemplateExecute, d => d?.CanBuild() ?? false);
 			
-			ReloadConfigurationsExecute(null);
+			ReloadConfigurationsAsync(null);
+		}
+
+		private Task OpenConfigurationFolderExecute(object arg)
+		{
+			if (ConfigurationManager.GetConfigurationFolder() is var folder && Directory.Exists(folder))
+				Process.Start(folder);
+			return Task.CompletedTask;
 		}
 
 		private Task BuildTemplateExecute(ConfigurationViewModel arg)
@@ -45,7 +52,7 @@ namespace Generator.Client.Desktop.ViewModels
 		{
 			if (System.Windows.MessageBox.Show("Delete for sure?", "Question", MessageBoxButton.YesNo) == MessageBoxResult.Yes 
 			    && await ConfigurationManager.DeleteConfigurationAsync(arg.Id))
-				await ReloadConfigurationsExecute(null);
+				await ReloadConfigurationsAsync(null);
 		}
 
 		private Task EditConfigurationExecute(ConfigurationViewModel arg)
@@ -69,11 +76,11 @@ namespace Generator.Client.Desktop.ViewModels
 			if (await ConfigurationManager.UpdateConfigurationAsync(obj.Model))
 			{
 				Debug.WriteLine($"Update successful.");
-				await ReloadConfigurationsExecute(null);
+				await ReloadConfigurationsAsync(null);
 			}
 		}
 
-		private async Task ReloadConfigurationsExecute(object arg)
+		private async Task ReloadConfigurationsAsync(object arg)
 		{
 			var configurations = await ConfigurationManager.LoadConfigurationsAsync();
 			Items = ConvertItems(configurations);
@@ -109,7 +116,7 @@ namespace Generator.Client.Desktop.ViewModels
 			var configurations = new List<Configuration>(await ConfigurationManager.LoadConfigurationsAsync());
 			configurations.Add(new Configuration(){Id = Guid.NewGuid(), ConfigurationName = "New configuration"});
 			await ConfigurationManager.SaveConfigurationsAsync(configurations);
-			await ReloadConfigurationsExecute(null);
+			await ReloadConfigurationsAsync(null);
 		}
 
 		private ObservableCollection<ConfigurationViewModel> _items;
