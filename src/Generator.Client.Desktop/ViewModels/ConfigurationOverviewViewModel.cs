@@ -61,7 +61,7 @@ namespace Generator.Client.Desktop.ViewModels
 					var progress = await window.ShowProgressAsync($"Building templates", "loading...", true);
 					try
 					{
-						var rewriter = new SolutionRewriter(arg.SolutionPath);
+						var rewriter = new SolutionRewriterRunner(arg.SolutionPath);
 						progress.Canceled += ProgressOnCanceled(cts);
 						await Task.Delay(1000, cts.Token);
 						progress.SetIndeterminate();
