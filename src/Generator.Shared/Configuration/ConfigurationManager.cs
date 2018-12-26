@@ -4,6 +4,10 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Generator.Client.Desktop;
+using Microsoft.Build.Construction;
+using Microsoft.Build.Evaluation;
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.MSBuild;
 using Newtonsoft.Json;
 
 namespace Generator.Shared.Configuration

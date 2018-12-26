@@ -15,6 +15,8 @@ namespace Generator.Shared.Configuration
 
 		public List<string> OpenInEditorReferences { get; set; } = new List<string>();
 
+		public List<string> OutputFolders { get; set; } = new List<string>();
+
 		public bool CreateInPlace { get; set; }
 
 		public bool CreateNewFolder { get; set; }

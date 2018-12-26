@@ -7,13 +7,23 @@
              StartupUri="Views\MainWindow.xaml">
     <Application.Resources>
 
-		<DataTemplate DataType="{x:Type viewModels:ConfigurationOverviewViewModel}">
-			<view:ConfigurationOverviewView/>
-		</DataTemplate>
+	    <ResourceDictionary>
+		    <ResourceDictionary.MergedDictionaries>
+			    <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.xaml" />
+			    <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Fonts.xaml" />
+			    <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/colors.xaml" />
+			    <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Accents/cobalt.xaml" />
+			    <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Accents/baselight.xaml" />
+		    </ResourceDictionary.MergedDictionaries>
 
-		<Style TargetType="{x:Type Label}" x:Key="LabelSmallStyle">
-			<Setter Property="FontWeight" Value="Bold"/>
-			<Setter Property="FontSize" Value="10"/>
-		</Style>
+		    <DataTemplate DataType="{x:Type viewModels:ConfigurationOverviewViewModel}">
+			    <view:ConfigurationOverviewView/>
+		    </DataTemplate>
+
+		    <Style TargetType="{x:Type Label}" x:Key="LabelSmallStyle">
+			    <Setter Property="FontWeight" Value="Bold"/>
+			    <Setter Property="FontSize" Value="10"/>
+		    </Style>
+		</ResourceDictionary>
     </Application.Resources>
 </Application>

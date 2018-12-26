@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Reactive.Subjects;
 using System.Threading.Tasks;
@@ -36,8 +38,35 @@ namespace Generator.Client.Desktop.ViewModels
 		public ConfigurationViewModel(Configuration model)
 		{
 			SelectSolutionCommand = new TaskCommand(SelectSolutionExecute);
+			AddOutputFolderCommand = new TaskCommand(AddOutputFolderExecute);
+			RemoveOutputFolderCommand = new TaskCommand(RemoveOutputFolderExecute);
 			Model = model;
 			UpdateFromModel();
+		}
+
+		private Task RemoveOutputFolderExecute(object arg)
+		{
+			if (arg is string folder)
+			{
+				OutputFolders.Remove(folder);
+			} 
+
+			return Task.CompletedTask;
+		}
+
+		private Task AddOutputFolderExecute(object arg)
+		{
+			using (var dialog = new FolderBrowserDialog())
+			{
+				dialog.Description = "Select an output folder";
+				dialog.ShowNewFolderButton = true;
+				if (dialog.ShowDialog() == DialogResult.OK)
+				{
+					OutputFolders.Add(dialog.SelectedPath);
+				}
+			}
+
+			return Task.CompletedTask;
 		}
 
 		private Task SelectSolutionExecute(object arg)
@@ -68,6 +97,14 @@ namespace Generator.Client.Desktop.ViewModels
 		{
 			get => _solutionPath;
 			set => SetValue(ref _solutionPath, value, nameof(SolutionPath));
+		}
+
+		private ObservableCollection<string> _outputFolders;
+
+		public ObservableCollection<string> OutputFolders
+		{
+			get => _outputFolders ?? (_outputFolders = new ObservableCollection<string>());
+			set => SetValue(ref _outputFolders, value, nameof(OutputFolders));
 		}
 
 		private IconViewModel _icon = new IconViewModel();
@@ -186,6 +223,31 @@ namespace Generator.Client.Desktop.ViewModels
 			set => SetValue(ref _selectSolutionCommand, value, nameof(SelectSolutionCommand));
 		}
 
+		private ICommand _addOutputFolderCommand;
+
+		public ICommand AddOutputFolderCommand
+		{
+			get => _addOutputFolderCommand;
+			set => SetValue(ref _addOutputFolderCommand, value, nameof(AddOutputFolderCommand));
+		}
+
+		private ICommand _removeOutputFolderCommand;
+
+		public ICommand RemoveOutputFolderCommand
+		{
+			get => _removeOutputFolderCommand;
+			set => SetValue(ref _removeOutputFolderCommand, value, nameof(RemoveOutputFolderCommand));
+		}
+
+		private ObservableCollection<string> _openInEditorReferences;
+
+		public ObservableCollection<string> OpenInEditorReferences
+		{
+			get => _openInEditorReferences ?? (_openInEditorReferences = new ObservableCollection<string>());
+			set => SetValue(ref _openInEditorReferences, value, nameof(OpenInEditorReferences));
+		}
+
+
 		public void UpdateModel()
 		{
 			if (Model.IconPackageReference == null)
@@ -203,6 +265,8 @@ namespace Generator.Client.Desktop.ViewModels
 			Model.ProjectType = ProjectType;
 			Model.ProvideDefaultName = ProvideDefaultName;
 			Model.Name = Name;
+			Model.OutputFolders = new List<string>(OutputFolders);
+			Model.OpenInEditorReferences = new List<string>(OpenInEditorReferences);
 		}
 
 		public void UpdateFromModel()
@@ -222,6 +286,8 @@ namespace Generator.Client.Desktop.ViewModels
 			ProjectType = Model.ProjectType;
 			ProvideDefaultName = Model.ProvideDefaultName;
 			Name = Model.Name;
+			OutputFolders = new ObservableCollection<string>(Model.OutputFolders);
+			OpenInEditorReferences = new ObservableCollection<string>(Model.OpenInEditorReferences);
 		}
 
 		public bool CanBuild()

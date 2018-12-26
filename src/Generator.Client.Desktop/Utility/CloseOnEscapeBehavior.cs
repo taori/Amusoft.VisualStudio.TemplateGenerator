@@ -5,7 +5,7 @@ using Microsoft.Xaml.Behaviors;
 
 namespace Generator.Client.Desktop.Utility
 {
-	public class CloseOnDoubleEscapeBehavior : Behavior<Window>, ICommand
+	public class CloseOnEscapeBehavior : Behavior<Window>, ICommand
 	{
 		/// <inheritdoc />
 		protected override void OnAttached()
