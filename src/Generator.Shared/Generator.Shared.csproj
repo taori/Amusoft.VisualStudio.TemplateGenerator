@@ -1,0 +1,33 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>netstandard2.0</TargetFramework>
+		<LangVersion>latest</LangVersion>
+	</PropertyGroup>
+
+	<ItemGroup>
+	  <Compile Update="ApplicationSettings.Designer.cs">
+	    <DependentUpon>ApplicationSettings.settings</DependentUpon>
+	    <DesignTime>True</DesignTime>
+	    <AutoGen>True</AutoGen>
+	  </Compile>
+	</ItemGroup>
+
+	<ItemGroup>
+	  <None Update="ApplicationSettings.settings">
+	    <LastGenOutput>ApplicationSettings.Designer.cs</LastGenOutput>
+	    <Generator>PublicSettingsSingleFileGenerator</Generator>
+	  </None>
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Folder Include="Entities\" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <PackageReference Include="Newtonsoft.Json" Version="12.0.1" />
+	  <PackageReference Include="System.Configuration.ConfigurationManager" Version="4.5.0" />
+	  <PackageReference Include="System.IO" Version="4.3.0" />
+	</ItemGroup>
+
+</Project>

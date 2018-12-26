@@ -1,0 +1,77 @@
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
+using Generator.Client.Desktop;
+using Newtonsoft.Json;
+
+namespace Generator.Shared.Configuration
+{
+	public static class ConfigurationManager
+	{
+		public static string ConfigurationStorePath => Path.Combine(ApplicationSettings.Default.ConfigurationStorePath, "storage.json");
+
+		public static async Task<Configuration[]> LoadConfigurationsAsync()
+		{
+			if (string.IsNullOrEmpty(ApplicationSettings.Default.ConfigurationStorePath) || !File.Exists(ConfigurationStorePath))
+				return Array.Empty<Configuration>();
+
+			using (var stream = new StreamReader(new FileStream(ConfigurationStorePath, FileMode.Open)))
+			{
+				var items = JsonConvert.DeserializeObject<Configuration[]>(await stream.ReadToEndAsync());
+				return items;
+			}
+		}
+
+		public static async Task SaveConfigurationsAsync(IEnumerable<Configuration> configurations)
+		{
+			var serialized = JsonConvert.SerializeObject(configurations, Formatting.Indented);
+			using (var stream = new StreamWriter(new FileStream(ConfigurationStorePath, FileMode.Create)))
+			{
+				await stream.WriteAsync(serialized);
+			}
+		}
+
+		public static void SetConfigurationStore(string path)
+		{
+			ApplicationSettings.Default.ConfigurationStorePath = path;
+			ApplicationSettings.Default.Save();
+		}
+
+		public static string GetConfigurationFolder()
+		{
+			return ApplicationSettings.Default.ConfigurationStorePath;
+		}
+
+		public static async Task<bool> DeleteConfigurationAsync(Guid id)
+		{
+			var configurations = await LoadConfigurationsAsync();
+			var filtered = configurations.Where(d => d.Id != id).ToArray();
+			await SaveConfigurationsAsync(filtered);
+			return configurations.Length != filtered.Length;
+		}
+
+		public static async Task<bool> UpdateConfigurationAsync(Configuration configuration)
+		{
+			var configurations = (await LoadConfigurationsAsync()).ToList();
+			var index = configurations.FindIndex(d => d.Id == configuration.Id);
+
+			if(index >= 0)
+			{
+				configurations.RemoveAt(index);
+				configurations.Insert(index, configuration);
+				await SaveConfigurationsAsync(configurations);
+				return true;
+			}
+
+			return false;
+		}
+
+		public static bool CanOperate()
+		{
+			return !string.IsNullOrEmpty(ApplicationSettings.Default.ConfigurationStorePath)
+			       && Directory.Exists(ApplicationSettings.Default.ConfigurationStorePath);
+		}
+	}
+}
