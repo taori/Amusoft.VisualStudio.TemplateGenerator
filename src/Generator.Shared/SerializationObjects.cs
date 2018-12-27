@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.ObjectModel;
 using System.Xml.Serialization;
 
 namespace Generator.Shared
@@ -82,42 +83,95 @@ namespace Generator.Shared
 	[XmlType(TypeName = "TemplateContent", Namespace = "http://schemas.microsoft.com/developer/vstemplate/2005")]
 	public class TemplateContent
 	{
-		/// <remarks/>
-		[XmlArrayItem(IsNullable = false)]
-		public SolutionFolder[] ProjectCollection { get; set; }
+		[XmlElement(typeof(ProjectTemplateLink))]
+		[XmlElement(typeof(SolutionFolder))]
+		[XmlElement(typeof(ProjectCollection))]
+		public NestableContent[] Children { get; set; }
+	}
+
+	/// <remarks/>
+	[Serializable]
+	[System.ComponentModel.DesignerCategory("code")]
+	[XmlType(TypeName = "ProjectCollection", Namespace = "http://schemas.microsoft.com/developer/vstemplate/2005")]
+	public class ProjectCollection : NestableContent
+	{
+		/// <inheritdoc />
+		public ProjectCollection(NestableContent[] children)
+		{
+			Children = children;
+		}
+
+		/// <inheritdoc />
+		public ProjectCollection()
+		{
+		}
+
+		[XmlElement(typeof(ProjectTemplateLink))]
+		[XmlElement(typeof(SolutionFolder))]
+		public NestableContent[] Children { get; set; }
+	}
+
+	[Serializable]
+	[System.ComponentModel.DesignerCategory("code")]
+	[XmlType(TypeName = "ProjectTemplateLink", Namespace = "http://schemas.microsoft.com/developer/vstemplate/2005")]
+	public class ProjectTemplateLink : NestableContent
+	{
+		/// <inheritdoc />
+		public ProjectTemplateLink(string projectName, string relativeTemplatePath, bool copyParameters = true)
+		{
+			ProjectName = projectName;
+			CopyParameters = copyParameters;
+			RelativeTemplatePath = relativeTemplatePath;
+		}
+
+		/// <inheritdoc />
+		public ProjectTemplateLink()
+		{
+		}
+
+		/**
+		 *	<ProjectTemplateLink ProjectName="$safeprojectname$.Models" CopyParameters="true">
+				Content\Company.Desktop.Models\MyTemplate.vstemplate
+			</ProjectTemplateLink>
+		 */
+		[XmlAttribute]
+		public string ProjectName { get; set; }
+
+		[XmlAttribute]
+		public bool CopyParameters { get; set; }
+
+		[XmlText]
+		public string RelativeTemplatePath { get; set; }
 	}
 
 	/// <remarks/>
 	[Serializable]
 	[System.ComponentModel.DesignerCategory("code")]
 	[XmlType(TypeName = "SolutionFolder", Namespace = "http://schemas.microsoft.com/developer/vstemplate/2005")]
-	public class SolutionFolder
+	public class SolutionFolder : NestableContent
 	{
-		/// <remarks/>
-		[XmlElement("ProjectTemplateLink")]
-		public ProjectLink[] ProjectTemplateLink { get; set; }
+		/// <inheritdoc />
+		public SolutionFolder(string name, NestableContent[] children)
+		{
+			Children = children;
+			Name = name;
+		}
+
+		/// <inheritdoc />
+		public SolutionFolder()
+		{
+		}
+
+		[XmlElement(typeof(ProjectTemplateLink), ElementName = "ProjectTemplateLink")]
+		public NestableContent[] Children { get; set; }
 
 		/// <remarks/>
 		[XmlAttribute]
 		public string Name { get; set; }
 	}
 
-	/// <remarks/>
-	[Serializable]
-	[System.ComponentModel.DesignerCategory("code")]
-	[XmlType(AnonymousType = true, Namespace = "http://schemas.microsoft.com/developer/vstemplate/2005")]
-	public class ProjectLink
+	public abstract class NestableContent
 	{
-		/// <remarks/>
-		[XmlAttribute]
-		public string ProjectName { get; set; }
 
-		/// <remarks/>
-		[XmlAttribute]
-		public bool CopyParameters { get; set; }
-
-		/// <remarks/>
-		[XmlText]
-		public string Value { get; set; }
 	}
 }

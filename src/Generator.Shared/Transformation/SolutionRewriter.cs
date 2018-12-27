@@ -64,6 +64,8 @@ namespace Generator.Shared.Transformation
 				Log.Error(e);
 				return false;
 			}
+
+
 			/**
 			 * project.vstemplate TemplateContent like
 			 *
@@ -101,6 +103,8 @@ namespace Generator.Shared.Transformation
 			template.TemplateData.Icon.Id = context.Configuration.IconPackageReference.Id;
 			template.TemplateData.Icon.Package = context.Configuration.IconPackageReference.Package;
 
+			template.TemplateContent = BuildRootTemplateContent(context, explorer, templatePath);
+
 			using (var fileStream = new FileStream(templatePath, FileMode.Create))
 			{
 				using (var streamWriter = new StreamWriter(fileStream, Encoding.UTF8))
@@ -116,6 +120,11 @@ namespace Generator.Shared.Transformation
 				</ProjectTemplateLink>
 			 */
 			// rewrite csproj references like <ProjectReference Include="..\$ext_safeprojectname$.Business\$ext_safeprojectname$.Business.csproj">
+		}
+
+		private TemplateContent BuildRootTemplateContent(RewriteContext context, SolutionExplorer explorer, string templatePath)
+		{
+			throw new NotImplementedException();
 		}
 
 		private bool MoveContentFiles(out string contentFolder)
