@@ -90,17 +90,23 @@ namespace Generator.Shared.Transformation
 			var folders = new HashSet<string>(GetReferencedDocuments().Select(Path.GetDirectoryName));
 			foreach (var folder in folders)
 			{
-				foreach (var file in Directory.GetFiles(folder, "*.resx", SearchOption.TopDirectoryOnly))
+				foreach (var file in Directory.GetFiles(folder))
 				{
-					yield return file;
-				}
-				foreach (var file in Directory.GetFiles(folder, "*.xaml", SearchOption.TopDirectoryOnly))
-				{
-					yield return file;
-				}
-				foreach (var file in Directory.GetFiles(folder, "*.settings", SearchOption.TopDirectoryOnly))
-				{
-					yield return file;
+					var extension = Path.GetExtension(file);
+					switch (extension)
+					{
+						case ".resx":
+						case ".xaml":
+						case ".settings":
+						case ".css":
+						case ".js":
+						case ".ts":
+						case ".cshtml":
+						case ".sass":
+						case ".less":
+							yield return file;
+							break;
+					}
 				}
 			}
 		}

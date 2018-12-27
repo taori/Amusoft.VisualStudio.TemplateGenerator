@@ -25,7 +25,7 @@ namespace Generator.Shared.Utilities
 					return;
 
 				var relativePath = sourcePath
-					.Substring(sourcePath.Length)
+					.Substring(source.Length)
 					.TrimStart(Path.DirectorySeparatorChar);
 				var newPath = Path.Combine(destination, relativePath);
 				var fileInfo = new FileInfo(newPath);

@@ -33,7 +33,7 @@ namespace Generator.Shared.Transformation
 			}
 
 			var explorer = await SolutionExplorer.CreateAsync(solutionFile, Context.Progress, Context.CancellationToken);
-			explorer.GetAdditiontalDocuments()
+//			explorer.GetAdditiontalDocuments()
 
 			/**
 			 *	root.vstemplate links like
