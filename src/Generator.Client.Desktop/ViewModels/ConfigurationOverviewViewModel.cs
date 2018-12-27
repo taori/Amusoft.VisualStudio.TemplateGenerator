@@ -12,7 +12,7 @@ using System.Windows.Input;
 using System.Windows.Threading;
 using Generator.Client.Desktop.Utility;
 using Generator.Client.Desktop.Views;
-using Generator.Shared.Configuration;
+using Generator.Shared.Template;
 using Generator.Shared.Transformation;
 using MahApps.Metro.Controls;
 using MahApps.Metro.Controls.Dialogs;
@@ -191,6 +191,20 @@ namespace Generator.Client.Desktop.ViewModels
 		{
 			get => _buildTemplateCommand;
 			set => SetValue(ref _buildTemplateCommand, value, nameof(BuildTemplateCommand));
+		}
+
+		private ICommand _copyConfigurationCommand;
+
+		public ICommand CopyConfigurationCommand
+		{
+			get => _copyConfigurationCommand ?? (_copyConfigurationCommand = new TaskCommand<ConfigurationViewModel>(CopyConfigurationExecute));
+			set => SetValue(ref _copyConfigurationCommand, value, nameof(CopyConfigurationCommand));
+		}
+
+		private async Task CopyConfigurationExecute(ConfigurationViewModel arg)
+		{
+			if (await ConfigurationManager.CopyConfigurationAsync(arg.Model))
+				await ReloadConfigurationsAsync(null);
 		}
 	}
 }

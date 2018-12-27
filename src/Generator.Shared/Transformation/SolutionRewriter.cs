@@ -1,5 +1,11 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
+using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Serialization;
+using Generator.Shared.Resources;
+using Generator.Shared.Template;
 using Generator.Shared.Utilities;
 using NLog;
 
@@ -33,16 +39,31 @@ namespace Generator.Shared.Transformation
 			}
 
 			var explorer = await SolutionExplorer.CreateAsync(solutionFile, Context.Progress, Context.CancellationToken);
-//			explorer.GetAdditiontalDocuments()
+			var projectFileList = explorer
+				.ProjectsLookup
+				.Select(s => s.Key)
+				.ToDictionary(
+					projectFilePath => projectFilePath, 
+					projectFilePath =>
+						explorer.GetAdditiontalDocuments(projectFilePath)
+							.Concat(explorer.GetReferencedDocuments(projectFilePath)).ToList()
+					);
 
-			/**
-			 *	root.vstemplate links like
-			 *	<ProjectTemplateLink ProjectName="$safeprojectname$.Interface" CopyParameters="true">
-				  Interface\InterfaceTemplate.vstemplate
-				</ProjectTemplateLink>
-			 */
-			// rewrite csproj references like <ProjectReference Include="..\$ext_safeprojectname$.Business\$ext_safeprojectname$.Business.csproj">
 
+			var rootTemplatePath = Path.Combine(Folder, "root.vstemplate");
+			try
+			{
+				CreateRootVsTemplate(Context, explorer, rootTemplatePath);
+				if(!FileHelper.RemoveXmlMarker(rootTemplatePath))
+					throw new Exception($"Failed to remove xml tag from template file.");
+			}
+			catch (Exception e)
+			{
+				Context.Progress.Report($"Failed to create {rootTemplatePath}.");
+				await Task.Delay(3000);
+				Log.Error(e);
+				return false;
+			}
 			/**
 			 * project.vstemplate TemplateContent like
 			 *
@@ -63,6 +84,38 @@ namespace Generator.Shared.Transformation
 
 			Log.Info($"Rewriting complete.");
 			return true;
+		}
+
+		private void CreateRootVsTemplate(RewriteContext context, SolutionExplorer explorer, string templatePath)
+		{
+			var serializer = new XmlSerializer(typeof(VsTemplate));
+			var template = new VsTemplate();
+			template.Type = Constants.VsTemplate.ProjectTypes.ProjectGroup;
+			template.TemplateData.CreateInPlace = context.Configuration.CreateInPlace;
+			template.TemplateData.CreateNewFolder = context.Configuration.CreateNewFolder;
+			template.TemplateData.DefaultName = context.Configuration.DefaultName;
+			template.TemplateData.Description = context.Configuration.Description;
+			template.TemplateData.Name = context.Configuration.Name;
+			template.TemplateData.ProvideDefaultName = context.Configuration.ProvideDefaultName;
+			template.TemplateData.CodeLanguage = context.Configuration.CodeLanguage;
+			template.TemplateData.Icon.Id = context.Configuration.IconPackageReference.Id;
+			template.TemplateData.Icon.Package = context.Configuration.IconPackageReference.Package;
+
+			using (var fileStream = new FileStream(templatePath, FileMode.Create))
+			{
+				using (var streamWriter = new StreamWriter(fileStream, Encoding.UTF8))
+				{
+					serializer.Serialize(streamWriter, template);
+				}
+			}
+
+			/**
+			 *	root.vstemplate links like
+			 *	<ProjectTemplateLink ProjectName="$safeprojectname$.Interface" CopyParameters="true">
+				  Interface\InterfaceTemplate.vstemplate
+				</ProjectTemplateLink>
+			 */
+			// rewrite csproj references like <ProjectReference Include="..\$ext_safeprojectname$.Business\$ext_safeprojectname$.Business.csproj">
 		}
 
 		private bool MoveContentFiles(out string contentFolder)

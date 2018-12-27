@@ -7,7 +7,12 @@
         xmlns:viewModels="clr-namespace:Generator.Client.Desktop.ViewModels"
         xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
         mc:Ignorable="d"
-        Title="Multi Project Template Generator" Height="450" Width="800">
+        Title="{Binding Path=Title}" Height="450" Width="800">
+	<mah:MetroWindow.RightWindowCommands>
+		<mah:WindowCommands>
+			<Button Content="versions" Command="{Binding Path=ShowVersionsCommand}"></Button>
+		</mah:WindowCommands>
+	</mah:MetroWindow.RightWindowCommands>
 	<Window.DataContext>
 		<viewModels:MainViewModel/>
 	</Window.DataContext>

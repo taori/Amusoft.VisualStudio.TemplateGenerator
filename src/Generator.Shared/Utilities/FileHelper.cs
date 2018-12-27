@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading;
 using NLog;
 
@@ -37,6 +38,25 @@ namespace Generator.Shared.Utilities
 			}
 
 			Log.Debug($"Copy complete.");
+		}
+
+		private static readonly Regex XmlRegex = new Regex("\\<\\?xml[^>]+\\>\\r?\\n?", RegexOptions.IgnoreCase | RegexOptions.Compiled);
+		public static bool RemoveXmlMarker(string filePath)
+		{
+			if(string.IsNullOrEmpty(filePath))
+				throw new ArgumentNullException(nameof(filePath), $"{nameof(filePath)}");
+			if(!File.Exists(filePath))
+				throw new FileNotFoundException(filePath);
+
+			var content = File.ReadAllText(filePath);
+			if (XmlRegex.IsMatch(content))
+			{
+				var replaced = XmlRegex.Replace(content, string.Empty);
+				File.WriteAllText(filePath, replaced);
+				return true;
+			}
+
+			return false;
 		}
 
 		public static bool MoveContents(string source, string destination)

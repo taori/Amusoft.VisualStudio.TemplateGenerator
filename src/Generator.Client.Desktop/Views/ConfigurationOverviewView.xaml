@@ -36,6 +36,7 @@
 				<KeyBinding Key="E" Command="{Binding ElementName=Self, Path=DataContext.EditConfigurationCommand}" CommandParameter="{Binding Path=Items/}" />
 				<KeyBinding Key="Delete" Command="{Binding ElementName=Self, Path=DataContext.DeleteConfigurationCommand}" CommandParameter="{Binding Path=Items/}" />
 				<KeyBinding Key="B" Command="{Binding ElementName=Self, Path=DataContext.BuildTemplateCommand}" CommandParameter="{Binding Path=Items/}" />
+				<KeyBinding Key="C" Modifiers="Control" Command="{Binding ElementName=Self, Path=DataContext.BuildTemplateCommand}" CommandParameter="{Binding Path=Items/}" />
 			</ListView.InputBindings>
 			<ListView.ItemContainerStyle>
 				<Style TargetType="{x:Type ListViewItem}">
@@ -48,9 +49,10 @@
 				<DataTemplate>
 					<DockPanel Margin="5">
 						<StackPanel VerticalAlignment="Center" Orientation="Horizontal" DockPanel.Dock="Right" >
-							<Button CommandParameter="{Binding Path=.}" Command="{Binding ElementName=Self, Path=DataContext.BuildTemplateCommand}" Content="Build Template" Padding="5" ToolTip="B" Margin="0,0,5,0"></Button>
-							<Button CommandParameter="{Binding Path=.}" Command="{Binding ElementName=Self, Path=DataContext.EditConfigurationCommand}" Content="Edit" Padding="5" ToolTip="E" Margin="0,0,5,0"></Button>
-							<Button CommandParameter="{Binding Path=.}" Command="{Binding ElementName=Self, Path=DataContext.DeleteConfigurationCommand}" Content="Delete" Padding="5" ToolTip="Delete"></Button>
+							<Button CommandParameter="{Binding Path=.}" Command="{Binding ElementName=Self, Path=DataContext.BuildTemplateCommand}" Content="Build Template" Padding="5" ToolTip="B" Margin="0,0,5,0" />
+							<Button CommandParameter="{Binding Path=.}" Command="{Binding ElementName=Self, Path=DataContext.CopyConfigurationCommand}" Content="Copy" Padding="5" ToolTip="E" Margin="0,0,5,0" />
+							<Button CommandParameter="{Binding Path=.}" Command="{Binding ElementName=Self, Path=DataContext.EditConfigurationCommand}" Content="Edit" Padding="5" ToolTip="E" Margin="0,0,5,0" />
+							<Button CommandParameter="{Binding Path=.}" Command="{Binding ElementName=Self, Path=DataContext.DeleteConfigurationCommand}" Content="Delete" Padding="5" ToolTip="Delete" />
 						</StackPanel>
 						<TextBlock VerticalAlignment="Center" Text="{Binding Path=ConfigurationName}"/>
 					</DockPanel>

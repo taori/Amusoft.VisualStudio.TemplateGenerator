@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Generator.Shared.Configuration
+namespace Generator.Shared.Template
 {
-	public class Configuration
+	public class Configuration : ICloneable
 	{
 		public Guid Id { get; set; }
 
@@ -25,10 +25,16 @@ namespace Generator.Shared.Configuration
 
 		public string Description { get; set; }
 
-		public string ProjectType { get; set; }
+		public string CodeLanguage { get; set; }
 
 		public bool ProvideDefaultName { get; set; }
 
 		public string Name { get; set; }
+
+		/// <inheritdoc />
+		public object Clone()
+		{
+			return this.MemberwiseClone();
+		}
 	}
 }

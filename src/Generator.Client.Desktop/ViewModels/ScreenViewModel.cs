@@ -2,6 +2,14 @@
 {
 	public abstract class ScreenViewModel : ViewModelBase
 	{
+		private string _title;
+
+		public string Title
+		{
+			get => _title;
+			set => SetValue(ref _title, value, nameof(Title));
+		}
+
 		private ContentViewModel _content;
 
 		public ContentViewModel Content

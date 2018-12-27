@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Generator.Shared.Template;
 using Generator.Shared.Utilities;
 using NLog;
 
@@ -11,7 +12,7 @@ namespace Generator.Shared.Transformation
 {
 	public struct RewriteContext
 	{
-		public RewriteContext(CancellationToken cancellationToken, IProgress<string> progress, Configuration.Configuration configuration)
+		public RewriteContext(CancellationToken cancellationToken, IProgress<string> progress, Configuration configuration)
 		{
 			CancellationToken = cancellationToken;
 			Progress = progress;
@@ -22,7 +23,7 @@ namespace Generator.Shared.Transformation
 
 		public IProgress<string> Progress { get; set; }
 
-		public Configuration.Configuration Configuration { get; }
+		public Configuration Configuration { get; }
 	}
 
 	public class SolutionRewriterRunner
@@ -31,9 +32,9 @@ namespace Generator.Shared.Transformation
 
 		public string SolutionPath { get; }
 
-		public Configuration.Configuration Configuration { get; }
+		public Configuration Configuration { get; }
 
-		public SolutionRewriterRunner(Configuration.Configuration configuration)
+		public SolutionRewriterRunner(Configuration configuration)
 		{
 			if (string.IsNullOrEmpty(configuration.SolutionPath)) throw new ArgumentException($"{nameof(SolutionPath)} cannot be null or empty.", nameof(configuration.SolutionPath));
 			SolutionPath = configuration.SolutionPath;
@@ -96,8 +97,8 @@ namespace Generator.Shared.Transformation
 
 			var sourceFiles = new HashSet<string>(
 				sourceExplorer
-					.GetReferencedDocuments()
-					.Concat(sourceExplorer.GetAdditiontalDocuments()
+					.GetAllReferencedDocuments()
+					.Concat(sourceExplorer.GetAllAdditiontalDocuments()
 			));
 			
 			foreach (var sourceFile in sourceFiles)

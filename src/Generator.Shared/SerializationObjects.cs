@@ -11,10 +11,10 @@ namespace Generator.Shared
 	public class VsTemplate
 	{
 		/// <remarks/>
-		public TemplateData TemplateData { get; set; }
+		public TemplateData TemplateData { get; set; } = new TemplateData();
 
 		/// <remarks/>
-		public TemplateContent TemplateContent { get; set; }
+		public TemplateContent TemplateContent { get; set; } = new TemplateContent();
 
 		/// <summary>
 		/// e.g. 3.0.0
@@ -42,10 +42,11 @@ namespace Generator.Shared
 		public string Description { get; set; }
 
 		/// <remarks/>
-		public IconPackageReference Icon { get; set; }
+		public IconPackageReference Icon { get; set; } = new IconPackageReference();
 
 		/// <remarks/>
-		public string ProjectType { get; set; }
+		[XmlElement("ProjectType")]
+		public string CodeLanguage { get; set; }
 
 		/// <remarks/>
 		public bool CreateNewFolder { get; set; }

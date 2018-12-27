@@ -64,8 +64,8 @@
 				<Label Style="{StaticResource LabelSmallStyle}" Content="Description:" />
 				<TextBox Text="{Binding Path=Description, UpdateSourceTrigger=PropertyChanged}" />
 
-				<Label Style="{StaticResource LabelSmallStyle}" Content="ProjectType:" />
-				<ComboBox SelectedValue="{Binding Path=ProjectType}" SelectedValuePath="Content" >
+				<Label Style="{StaticResource LabelSmallStyle}" Content="Language:" />
+				<ComboBox SelectedValue="{Binding Path=CodeLanguage}" SelectedValuePath="Content" >
 					<ComboBoxItem Content="CSharp"/>
 					<ComboBoxItem Content="VisualBasic"/>
 				</ComboBox>

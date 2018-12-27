@@ -4,13 +4,9 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Generator.Client.Desktop;
-using Microsoft.Build.Construction;
-using Microsoft.Build.Evaluation;
-using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.MSBuild;
 using Newtonsoft.Json;
 
-namespace Generator.Shared.Configuration
+namespace Generator.Shared.Template
 {
 	public static class ConfigurationManager
 	{
@@ -76,6 +72,24 @@ namespace Generator.Shared.Configuration
 		{
 			return !string.IsNullOrEmpty(ApplicationSettings.Default.ConfigurationStorePath)
 			       && Directory.Exists(ApplicationSettings.Default.ConfigurationStorePath);
+		}
+
+		public static async Task<bool> CopyConfigurationAsync(Configuration configuration)
+		{
+			var configurations = (await LoadConfigurationsAsync()).ToList();
+			var index = configurations.FindIndex(d => d.Id == configuration.Id);
+
+			if (index >= 0)
+			{
+				var item = configurations[index];
+				var clone = item.Clone() as Configuration;
+				clone.Id = Guid.NewGuid();
+				configurations.Insert(index+1, clone);
+				await SaveConfigurationsAsync(configurations);
+				return true;
+			}
+
+			return false;
 		}
 	}
 }

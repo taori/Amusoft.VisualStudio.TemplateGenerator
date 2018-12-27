@@ -8,7 +8,7 @@ using System.Windows.Forms;
 using System.Windows.Input;
 using Generator.Client.Desktop.Utility;
 using Generator.Shared;
-using Generator.Shared.Configuration;
+using Generator.Shared.Template;
 
 namespace Generator.Client.Desktop.ViewModels
 {
@@ -147,12 +147,12 @@ namespace Generator.Client.Desktop.ViewModels
 			set => SetValue(ref _description, value, nameof(Description));
 		}
 
-		private string _projectType;
+		private string _codeLanguage;
 
-		public string ProjectType
+		public string CodeLanguage
 		{
-			get => _projectType;
-			set => SetValue(ref _projectType, value, nameof(ProjectType));
+			get => _codeLanguage;
+			set => SetValue(ref _codeLanguage, value, nameof(CodeLanguage));
 		}
 
 		private bool _createNewFolder;
@@ -262,7 +262,7 @@ namespace Generator.Client.Desktop.ViewModels
 			Model.CreateNewFolder = CreateNewFolder;
 			Model.DefaultName = DefaultName;
 			Model.Description = Description;
-			Model.ProjectType = ProjectType;
+			Model.CodeLanguage = CodeLanguage;
 			Model.ProvideDefaultName = ProvideDefaultName;
 			Model.Name = Name;
 			Model.OutputFolders = new List<string>(OutputFolders);
@@ -283,7 +283,7 @@ namespace Generator.Client.Desktop.ViewModels
 			CreateNewFolder = Model.CreateNewFolder;
 			DefaultName = Model.DefaultName;
 			Description = Model.Description;
-			ProjectType = Model.ProjectType;
+			CodeLanguage = Model.CodeLanguage;
 			ProvideDefaultName = Model.ProvideDefaultName;
 			Name = Model.Name;
 			OutputFolders = new ObservableCollection<string>(Model.OutputFolders);
