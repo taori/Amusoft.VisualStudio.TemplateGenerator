@@ -4,21 +4,25 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Generator.Shared.Utilities;
 using NLog;
 
 namespace Generator.Shared.Transformation
 {
 	public struct RewriteContext
 	{
-		public RewriteContext(CancellationToken cancellationToken, IProgress<string> progress)
+		public RewriteContext(CancellationToken cancellationToken, IProgress<string> progress, Configuration.Configuration configuration)
 		{
 			CancellationToken = cancellationToken;
 			Progress = progress;
+			Configuration = configuration;
 		}
 
 		public CancellationToken CancellationToken { get; set; }
 
 		public IProgress<string> Progress { get; set; }
+
+		public Configuration.Configuration Configuration { get; }
 	}
 
 	public class SolutionRewriterRunner
@@ -26,11 +30,14 @@ namespace Generator.Shared.Transformation
 		private static readonly ILogger Log = LogManager.GetLogger(nameof(SolutionRewriterRunner));
 
 		public string SolutionPath { get; }
-		
-		public SolutionRewriterRunner(string solutionPath)
+
+		public Configuration.Configuration Configuration { get; }
+
+		public SolutionRewriterRunner(Configuration.Configuration configuration)
 		{
-			if (string.IsNullOrEmpty(solutionPath)) throw new ArgumentException("Value cannot be null or empty.", nameof(solutionPath));
-			SolutionPath = solutionPath;
+			if (string.IsNullOrEmpty(configuration.SolutionPath)) throw new ArgumentException($"{nameof(SolutionPath)} cannot be null or empty.", nameof(configuration.SolutionPath));
+			SolutionPath = configuration.SolutionPath;
+			Configuration = configuration;
 		}
 
 		public async Task RewriteAsync(IList<string> destinationFolders, CancellationToken cancellationToken, IProgress<string> progress)
@@ -38,7 +45,7 @@ namespace Generator.Shared.Transformation
 			if (destinationFolders.Count == 0)
 				return;
 
-			var context = new RewriteContext(cancellationToken, progress);
+			var context = new RewriteContext(cancellationToken, progress, Configuration);
 
 			foreach (var folder in destinationFolders)
 			{
@@ -55,7 +62,7 @@ namespace Generator.Shared.Transformation
 			{
 				var explorer = await SolutionExplorer.CreateAsync(SolutionPath, progress, cancellationToken);
 				await CopySolutionAsync(context, explorer, destinationFolders[0]);
-				var destinationSolution = await FindSolutionAsync(context, destinationFolders[0]);
+				var destinationSolution = FileHelper.FindSolutionAsync(destinationFolders[0]);
 				if (string.IsNullOrEmpty(destinationSolution))
 				{
 					Log.Error($"Failed to find destination solution in \"{destinationFolders[0]}\".");
@@ -64,18 +71,21 @@ namespace Generator.Shared.Transformation
 					return;
 				}
 
-				await RewriteSolutionAsync(context, destinationSolution);
+				if (!await RewriteSolutionAsync(context, destinationFolders[0]))
+				{
+					progress.Report($"Solution rewrite of {SolutionPath} failed.{Environment.NewLine}See logs for details.");
+					return;
+				}
+
+				if (destinationFolders.Count > 1)
+					Log.Debug($"Copying to {destinationFolders.Count-1} additional output folders.");
 
 				for (int i = 1; i < destinationFolders.Count; i++)
 				{
-					CopyFolderContents(context, destinationFolders[0], destinationFolders[i]);
+					FileHelper.CopyFolderContents(context.CancellationToken, destinationFolders[0], destinationFolders[i]);
+					await Task.Delay(20, cancellationToken);
 				}
 			}
-		}
-
-		private async Task<string> FindSolutionAsync(RewriteContext context, string destinationFolder)
-		{
-			return Directory.EnumerateFiles(destinationFolder, "*.sln", SearchOption.AllDirectories).FirstOrDefault();
 		}
 
 		private async Task CopySolutionAsync(RewriteContext context, SolutionExplorer sourceExplorer, string destinationPath)
@@ -113,39 +123,11 @@ namespace Generator.Shared.Transformation
 				.Substring(directoryName.Length)
 				.TrimStart(Path.DirectorySeparatorChar);
 		}
-
-		private void CopyFolderContents(RewriteContext context, string sourceFolder, string destinationFolder)
+		
+		private async Task<bool> RewriteSolutionAsync(RewriteContext context, string destinationFolder)
 		{
-			Log.Debug($"Copying files from \"{sourceFolder}\" to \"{destinationFolder}\".");
-			var sourcePaths = Directory
-				.EnumerateFiles(sourceFolder, "*", SearchOption.AllDirectories);
-
-			foreach (var sourcePath in sourcePaths)
-			{
-				if (context.CancellationToken.IsCancellationRequested)
-					return;
-
-				var relativePath = sourcePath
-					.Substring(sourceFolder.Length)
-					.TrimStart(Path.DirectorySeparatorChar);
-				var newPath = Path.Combine(destinationFolder, relativePath);
-				var fileInfo = new FileInfo(newPath);
-				if (!fileInfo.Directory.Exists)
-				{
-					fileInfo.Directory.Create();
-				}
-				File.Copy(sourcePath, newPath);
-			}
-
-			Log.Debug($"Copy complete.");
-		}
-
-		private Task RewriteSolutionAsync(RewriteContext context, string solutionPath)
-		{
-			Log.Info($"Rewriting \"{solutionPath}\".");
-			//			var crawler = new SolutionCrawler(SolutionPath);
-			//			await crawler.ExecuteAsync(context.Progress, context.CancellationToken);
-			return Task.CompletedTask;
+			var rewriter = new SolutionRewriter(context, destinationFolder);
+			return await rewriter.RewriteAsync();
 		}
 
 		private bool TryClearFolder(RewriteContext context, string folder)

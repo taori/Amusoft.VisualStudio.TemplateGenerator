@@ -98,6 +98,10 @@ namespace Generator.Shared.Transformation
 				{
 					yield return file;
 				}
+				foreach (var file in Directory.GetFiles(folder, "*.settings", SearchOption.TopDirectoryOnly))
+				{
+					yield return file;
+				}
 			}
 		}
 	}

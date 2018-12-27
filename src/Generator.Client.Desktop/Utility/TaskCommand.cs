@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using System.Windows.Input;
+using NLog;
 
 namespace Generator.Client.Desktop.Utility
 {
@@ -19,6 +20,8 @@ namespace Generator.Client.Desktop.Utility
 
 	public class TaskCommand<T> : ICommand
 	{
+		private static readonly ILogger Log = LogManager.GetLogger(nameof(TaskCommand));
+
 		readonly Func<T, Task> _execute = null;
 		readonly Predicate<T> _canExecute = null;
 
@@ -49,7 +52,14 @@ namespace Generator.Client.Desktop.Utility
 
 		public async void Execute(object parameter)
 		{
-			await _execute((T)parameter);
+			try
+			{
+				await _execute((T)parameter);
+			}
+			catch (Exception e)
+			{
+				Log.Error(e);
+			}
 		}
 	}
 }
