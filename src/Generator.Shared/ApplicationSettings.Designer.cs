@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Generator.Client.Desktop {
+namespace Generator.Shared {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]

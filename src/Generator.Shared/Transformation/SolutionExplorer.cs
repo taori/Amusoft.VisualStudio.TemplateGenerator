@@ -79,7 +79,6 @@ namespace Generator.Shared.Transformation
 
 		public IEnumerable<string> GetAllReferencedDocuments()
 		{
-			yield return SolutionPath;
 			foreach (var pathToProject in ProjectsLookup)
 			{
 				foreach (var filePath in GetReferencedDocuments(pathToProject.Key))
@@ -93,7 +92,6 @@ namespace Generator.Shared.Transformation
 		{
 			foreach (var project in ProjectsLookup[projectFilePath])
 			{
-				yield return projectFilePath;
 				foreach (var document in project.Documents)
 				{
 					yield return document.FilePath;
@@ -127,6 +125,12 @@ namespace Generator.Shared.Transformation
 						case ".html":
 						case ".css":
 						case ".js":
+						case ".json,tsx,ruleset,tt,json,js,editorconfig":
+						case ".tsx":
+						case ".ruleset":
+						case ".tt":
+						case ".json":
+						case ".editorconfig":
 						case ".ts":
 						case ".cshtml":
 						case ".sass":
@@ -164,6 +168,11 @@ namespace Generator.Shared.Transformation
 					}
 				}
 			}
+		}
+
+		public IEnumerable<string> GetAllProjectFiles()
+		{
+			return this.ProjectsLookup.Select(s => s.Key);
 		}
 	}
 }

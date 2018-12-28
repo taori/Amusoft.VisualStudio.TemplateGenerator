@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using Generator.Client.Desktop.Utility;
+using Generator.Shared.Serialization;
 
 namespace Generator.Client.Desktop.ViewModels
 {
@@ -20,7 +21,7 @@ namespace Generator.Client.Desktop.ViewModels
 		private Task ShowVersionsExecute(object arg)
 		{
 			var app = typeof(Generator.Client.Desktop.App).Assembly;
-			var shared = typeof(Generator.Shared.VsTemplate).Assembly;
+			var shared = typeof(VsTemplate).Assembly;
 			var message = $"app: {FileVersionInfo.GetVersionInfo(app.Location).FileVersion}{Environment.NewLine}"
 			              + $"shared: {FileVersionInfo.GetVersionInfo(shared.Location).FileVersion}";
 

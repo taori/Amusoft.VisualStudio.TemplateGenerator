@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
+using System.Security.Permissions;
 using System.Text.RegularExpressions;
 using System.Threading;
 using NLog;
@@ -13,7 +14,7 @@ namespace Generator.Shared.Utilities
 
 		public static string FindSolutionAsync(string folder)
 			=> Directory.EnumerateFiles(folder, "*.sln", SearchOption.AllDirectories).FirstOrDefault();
-
+		
 		public static void CopyFolderContents(CancellationToken cancellationToken, string source, string destination)
 		{
 			Log.Debug($"Copying files from \"{source}\" to \"{destination}\".");
@@ -91,6 +92,71 @@ namespace Generator.Shared.Utilities
 				Log.Error(e);
 				return false;
 			}
+		}
+
+
+		public static bool TryClearFolder(CancellationToken cancellationToken, string folder)
+		{
+			Log.Trace($"Clearing folder \"{folder}\".");
+			if (!Directory.Exists(folder))
+			{
+				Log.Trace($"folder \"{folder}\" does not exist.");
+				return true;
+			}
+
+			try
+			{
+				Log.Trace($"Clearing files of \"{folder}\".");
+				foreach (var file in Directory.GetFiles(folder, "*", SearchOption.TopDirectoryOnly))
+				{
+					cancellationToken.ThrowIfCancellationRequested();
+					try
+					{
+						File.Delete(file);
+					}
+					catch (Exception e)
+					{
+						Log.Error($"Failed to delete {file}.");
+						Log.Error(e);
+						return false;
+					}
+				}
+			}
+			catch (Exception e)
+			{
+				Log.Error($"Failed to get files for {folder}.");
+				Log.Error(e);
+				return false;
+			}
+
+			try
+			{
+				Log.Trace($"Clearing directories of \"{folder}\".");
+				foreach (var subfolder in Directory.GetDirectories(folder, "*", SearchOption.TopDirectoryOnly))
+				{
+					cancellationToken.ThrowIfCancellationRequested();
+					try
+					{
+						if (!TryClearFolder(cancellationToken, subfolder))
+							return false;
+						Directory.Delete(subfolder);
+					}
+					catch (Exception e)
+					{
+						Log.Error($"Failed to delete {subfolder}.");
+						Log.Error(e);
+						return false;
+					}
+				}
+			}
+			catch (Exception e)
+			{
+				Log.Error($"Failed to get directories for {folder}.");
+				Log.Error(e);
+				return false;
+			}
+
+			return true;
 		}
 	}
 }

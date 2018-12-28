@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Generator.Shared.Serialization;
 
 namespace Generator.Shared.Template
 {

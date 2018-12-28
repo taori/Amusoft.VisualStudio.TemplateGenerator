@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using Generator.Client.Desktop;
 using Newtonsoft.Json;
 
 namespace Generator.Shared.Template

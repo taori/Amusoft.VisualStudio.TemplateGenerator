@@ -5,12 +5,20 @@
 		<TargetFramework>net461</TargetFramework>
 		<UseWPF>true</UseWPF>
 		<LangVersion>latest</LangVersion>
+		<ApplicationManifest>Application.manifest</ApplicationManifest>
 	</PropertyGroup>
 
 	<ItemGroup>
+	  <None Remove="Application.manifest" />
 	  <None Remove="Views\ConfigurationOverviewView.xaml" />
 	  <None Remove="Views\ConfigurationEditWindow.xaml" />
 	  <None Remove="Views\MainWindow.xaml" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Content Include="Application.manifest">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </Content>
 	</ItemGroup>
 
 	<ItemGroup>

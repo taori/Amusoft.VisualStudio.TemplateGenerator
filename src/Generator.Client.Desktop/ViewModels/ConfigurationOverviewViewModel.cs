@@ -61,11 +61,11 @@ namespace Generator.Client.Desktop.ViewModels
 					var progress = await window.ShowProgressAsync($"Building templates", "loading...", true);
 					try
 					{
-						var rewriter = new SolutionRewriterRunner(arg.Model);
+						var rewriter = new RewriteTool(arg.Model);
 						progress.Canceled += ProgressOnCanceled(cts);
 						await Task.Delay(1000, cts.Token);
 						progress.SetIndeterminate();
-						await rewriter.RewriteAsync(arg.OutputFolders, cts.Token, new Progress<string>(p => progress.SetMessage(p)));
+						await rewriter.ExecuteAsync(arg.OutputFolders, cts.Token, new Progress<string>(p => progress.SetMessage(p)));
 					}
 					catch (TaskCanceledException)
 					{
@@ -141,6 +141,7 @@ namespace Generator.Client.Desktop.ViewModels
 					ConfigurationManager.SetConfigurationStore(dialog.SelectedPath);
 					await Task.Delay(50);
 					CommandManager.InvalidateRequerySuggested();
+					await ReloadConfigurationsAsync(null);
 				}
 			}
 		}

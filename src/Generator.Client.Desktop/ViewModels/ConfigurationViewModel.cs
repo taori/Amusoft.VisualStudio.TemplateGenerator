@@ -8,6 +8,7 @@ using System.Windows.Forms;
 using System.Windows.Input;
 using Generator.Client.Desktop.Utility;
 using Generator.Shared;
+using Generator.Shared.Serialization;
 using Generator.Shared.Template;
 
 namespace Generator.Client.Desktop.ViewModels
