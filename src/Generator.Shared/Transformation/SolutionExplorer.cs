@@ -8,6 +8,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Generator.Shared.Resources;
+using Microsoft.Build.Definition;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.MSBuild;
 using NLog;
@@ -110,7 +111,12 @@ namespace Generator.Shared.Transformation
 
 		public IEnumerable<string> GetAdditiontalDocuments(string projectFilePath)
 		{
-			var folders = new HashSet<string>(GetReferencedDocuments(projectFilePath).Select(Path.GetDirectoryName));
+			var folders = new HashSet<string>(
+				GetReferencedDocuments(projectFilePath).Select(Path.GetDirectoryName)
+					.Concat(Directory.GetDirectories(Path.GetDirectoryName(projectFilePath), "*", SearchOption.AllDirectories))
+			);
+			folders = FilterArtifacts(projectFilePath, folders);
+
 			foreach (var folder in folders)
 			{
 				foreach (var file in Directory.GetFiles(folder))
@@ -125,7 +131,6 @@ namespace Generator.Shared.Transformation
 						case ".html":
 						case ".css":
 						case ".js":
-						case ".json,tsx,ruleset,tt,json,js,editorconfig":
 						case ".tsx":
 						case ".ruleset":
 						case ".tt":
@@ -152,6 +157,7 @@ namespace Generator.Shared.Transformation
 						case ".csproj":
 						case ".vb":
 						case ".vbproj":
+						case ".vstemplate":
 							break;
 
 						default:
@@ -168,6 +174,22 @@ namespace Generator.Shared.Transformation
 					}
 				}
 			}
+		}
+
+		private static HashSet<string> FilterArtifacts(string projectFilePath, HashSet<string> folders)
+		{
+			var evaluation = GetEvaluationProject(projectFilePath);
+			var bin = Path.Combine(evaluation.DirectoryPath, evaluation.GetPropertyValue("BaseOutputPath").TrimEnd(Path.DirectorySeparatorChar));
+			var obj = Path.Combine(evaluation.DirectoryPath, evaluation.GetPropertyValue("BaseIntermediateOutputPath").TrimEnd(Path.DirectorySeparatorChar));
+			folders = new HashSet<string>(folders.Where(d => !d.Contains(bin) && !d.Contains(obj)));
+			
+			return folders;
+		}
+
+		private static Microsoft.Build.Evaluation.Project GetEvaluationProject(string projectFilePath)
+		{
+			return Microsoft.Build.Evaluation.ProjectCollection.GlobalProjectCollection.LoadedProjects.FirstOrDefault(d => d.FullPath == projectFilePath) ??
+				Microsoft.Build.Evaluation.Project.FromFile(projectFilePath, new ProjectOptions());
 		}
 
 		public IEnumerable<string> GetAllProjectFiles()

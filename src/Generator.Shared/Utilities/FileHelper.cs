@@ -80,7 +80,7 @@ namespace Generator.Shared.Utilities
 				{
 					if (directory.FullName != destination)
 					{
-						Log.Trace($"Directory copy: {directory.Name}");
+						Log.Info($"Directory copy: {directory.Name}");
 						directory.MoveTo(Path.Combine(destination, directory.Name));
 					}
 				}
@@ -93,7 +93,6 @@ namespace Generator.Shared.Utilities
 				return false;
 			}
 		}
-
 
 		public static bool TryClearFolder(CancellationToken cancellationToken, string folder)
 		{

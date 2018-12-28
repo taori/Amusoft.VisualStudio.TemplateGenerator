@@ -30,6 +30,9 @@ namespace Generator.Shared.Serialization
 		public string Content { get; set; }
 
 		[XmlAttribute]
+		public bool OpenInEditor { get; set; }
+
+		[XmlAttribute]
 		public bool ReplaceParameters { get; set; }
 	}
 }

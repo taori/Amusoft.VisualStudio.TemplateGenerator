@@ -76,14 +76,14 @@ namespace Generator.Shared.Transformation
 			string replaced;
 			using (var fileStream = new FileStream(file, FileMode.Open))
 			{
-				using (var reader = new StreamReader(fileStream, Encoding.UTF8))
+				using (var reader = new StreamReader(fileStream))
 				{
 					replaced = StringHelper.MultiReplace(await reader.ReadToEndAsync(), replacements);
 				}
 			}
 			using (var fileStream = new FileStream(file, FileMode.Create))
 			{
-				using (var writer = new StreamWriter(fileStream, Encoding.UTF8))
+				using (var writer = new StreamWriter(fileStream))
 				{
 					await writer.WriteAsync(replaced);
 				}
@@ -96,8 +96,11 @@ namespace Generator.Shared.Transformation
 			template.Type = Constants.VsTemplate.ProjectTypes.Project;
 			template.TemplateData = new TemplateData();
 			template.TemplateData.Icon = null;
-			template.TemplateData.Name = projectInfos.ProjectTemplateNamespace;
-			template.TemplateData.DefaultName = projectInfos.ProjectTemplateNamespace;
+			template.TemplateData.Name = "Fill";
+			template.TemplateData.DefaultName = "Fill";
+			template.TemplateData.ProvideDefaultName = true;
+			template.TemplateData.CreateNewFolder = true;
+			template.TemplateData.CreateInPlace = true;
 			template.TemplateData.CodeLanguage = Context.Configuration.CodeLanguage;
 			template.TemplateContent = CreateContent(projectInfos);
 			return template;

@@ -64,6 +64,16 @@ namespace Generator.Shared.Transformation
 				await rewriter.ExecuteAsync();
 			}
 
+			try
+			{
+				File.Delete(solutionFile);
+			}
+			catch (Exception e)
+			{
+				Log.Error(e);
+				return false;
+			}
+			
 			Log.Info($"Rewriting complete.");
 			return true;
 		}
