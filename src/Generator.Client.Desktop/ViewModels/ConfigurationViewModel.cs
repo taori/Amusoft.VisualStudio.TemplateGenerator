@@ -281,6 +281,14 @@ namespace Generator.Client.Desktop.ViewModels
 			set => SetValue(ref _removeOutputFolderCommand, value, nameof(RemoveOutputFolderCommand));
 		}
 
+		private ICommand _removeOpenInEditorReferenceCommand;
+
+		public ICommand RemoveOpenInEditorReferenceCommand
+		{
+			get => _removeOpenInEditorReferenceCommand;
+			set => SetValue(ref _removeOpenInEditorReferenceCommand, value, nameof(RemoveOpenInEditorReferenceCommand));
+		}
+
 		private ObservableCollection<string> _openInEditorReferences;
 
 		public ObservableCollection<string> OpenInEditorReferences

@@ -26,9 +26,9 @@
 		<ScrollViewer Padding="10">
 			<Grid>
 				<Grid.ColumnDefinitions>
-					<ColumnDefinition Width="7*"/>
+					<ColumnDefinition Width="*"/>
 					<ColumnDefinition Width="10"/>
-					<ColumnDefinition Width="3*"/>
+					<ColumnDefinition Width="200"/>
 				</Grid.ColumnDefinitions>
 				<Grid.RowDefinitions>
 					<RowDefinition Height="Auto"/>
@@ -37,6 +37,7 @@
 					<RowDefinition Height="Auto"/>
 					<RowDefinition Height="Auto"/>
 					<RowDefinition Height="Auto"/>
+					<RowDefinition />
 					<RowDefinition />
 				</Grid.RowDefinitions>
 
@@ -106,6 +107,24 @@
 				<controls:LabeledControl LabelText="Startup project:" Grid.Row="6" Grid.Column="0" Grid.ColumnSpan="3">
 					<ComboBox SelectedValue="{Binding Path=PrimaryProject}" ItemsSource="{Binding Path=StartupProjectOptions}" />
 				</controls:LabeledControl>
+
+				<controls:LabeledControl LabelText="Output folders:" Grid.Row="7" Grid.Column="0">
+					<DockPanel>
+						<Button DockPanel.Dock="Right" Margin="5,0,0,0" Content="+" Padding="5,0" VerticalAlignment="Top"
+						        Command="{Binding Path=AddOutputFolderCommand}"/>
+						<ListView ItemsSource="{Binding Path=OpenInEditorReferences}">
+							<ListView.InputBindings>
+								<KeyBinding Key="Delete" Command="{Binding RemoveOpenInEditorReferenceCommand}" CommandParameter="{Binding Path=OpenInEditorReferences/}"/>
+							</ListView.InputBindings>
+							<ListView.ItemTemplate>
+								<DataTemplate>
+									<TextBlock Text="{Binding Path=.}"/>
+								</DataTemplate>
+							</ListView.ItemTemplate>
+						</ListView>
+					</DockPanel>
+				</controls:LabeledControl>
+
 
 			</Grid>
 		</ScrollViewer>
