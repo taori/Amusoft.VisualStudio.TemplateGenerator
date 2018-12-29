@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Reactive.Subjects;
@@ -9,41 +11,28 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Windows.Input;
 using Generator.Client.Desktop.Utility;
+using Generator.Client.Desktop.Views;
 using Generator.Shared;
 using Generator.Shared.Serialization;
 using Generator.Shared.Template;
 using Generator.Shared.Transformation;
+using NLog;
 
 namespace Generator.Client.Desktop.ViewModels
 {
-	public class IconViewModel : ViewModelBase
-	{
-		private string _package;
-
-		public string Package
-		{
-			get => _package;
-			set => SetValue(ref _package, value, nameof(Package));
-		}
-
-		private ushort _id;
-
-		public ushort Id
-		{
-			get => _id;
-			set => SetValue(ref _id, value, nameof(Id));
-		}
-	}
-
-	public class ConfigurationViewModel : ViewModelBase
+	public class ConfigurationViewModel : ViewModelBase, INotifyDataErrorInfo
 	{
 		public Configuration Model { get; }
+
+		private static readonly ILogger Log = LogManager.GetLogger(nameof(ConfigurationViewModel));
 
 		public ConfigurationViewModel(Configuration model)
 		{
 			SelectSolutionCommand = new TaskCommand(SelectSolutionExecute);
 			AddOutputFolderCommand = new TaskCommand(AddOutputFolderExecute);
 			RemoveOutputFolderCommand = new TaskCommand(RemoveOutputFolderExecute);
+			RemoveOpenInEditorReferenceCommand = new TaskCommand<string>(RemoveOpenInEditorReferenceExecute);
+			ManageOpenInEditorReferencesCommand = new TaskCommand(ManageOpenInEditorReferencesExecute);
 			Model = model;
 			UpdateFromModel();
 		}
@@ -80,6 +69,27 @@ namespace Generator.Client.Desktop.ViewModels
 			return Task.CompletedTask;
 		}
 
+		private async Task ManageOpenInEditorReferencesExecute(object arg)
+		{
+			var window = new ManageOpenInEditorReferencesWindow();
+			var viewModel = new ManageOpenInEditorReferencesViewModel(this);
+			window.DataContext = viewModel;
+			window.Show();
+
+			await viewModel.LoadAsync();
+		}
+
+		private Task RemoveOpenInEditorReferenceExecute(string arg)
+		{
+			if (string.IsNullOrEmpty(arg))
+				return Task.CompletedTask;
+
+			if (MessageBox.Show($"Remove for sure?", "Question") == DialogResult.OK)
+				OpenInEditorReferences.Remove(arg);
+
+			return Task.CompletedTask;
+		}
+		
 		private Task AddOutputFolderExecute(object arg)
 		{
 			using (var dialog = new FolderBrowserDialog())
@@ -141,9 +151,9 @@ namespace Generator.Client.Desktop.ViewModels
 			set => SetValue(ref _startupProjectOptions, value, nameof(StartupProjectOptions));
 		}
 
-		private IconViewModel _icon = new IconViewModel();
+		private IconPackageViewModel _icon = new IconPackageViewModel();
 
-		public IconViewModel Icon
+		public IconPackageViewModel Icon
 		{
 			get => _icon;
 			set => SetValue(ref _icon, value, nameof(Icon));
@@ -289,6 +299,14 @@ namespace Generator.Client.Desktop.ViewModels
 			set => SetValue(ref _removeOpenInEditorReferenceCommand, value, nameof(RemoveOpenInEditorReferenceCommand));
 		}
 
+		private ICommand _manageOpenInEditorReferencesCommand;
+
+		public ICommand ManageOpenInEditorReferencesCommand
+		{
+			get => _manageOpenInEditorReferencesCommand;
+			set => SetValue(ref _manageOpenInEditorReferencesCommand, value, nameof(ManageOpenInEditorReferencesCommand));
+		}
+		
 		private ObservableCollection<string> _openInEditorReferences;
 
 		public ObservableCollection<string> OpenInEditorReferences
@@ -324,7 +342,7 @@ namespace Generator.Client.Desktop.ViewModels
 		{
 			ConfigurationName = Model.ConfigurationName;
 			Id = Model.Id;
-			Icon = new IconViewModel()
+			Icon = new IconPackageViewModel()
 			{
 				Id = Model.IconPackageReference?.Id ?? 0,
 				Package = Model.IconPackageReference?.Package
@@ -344,7 +362,76 @@ namespace Generator.Client.Desktop.ViewModels
 
 		public bool CanBuild()
 		{
-			return File.Exists(SolutionPath);
+			_errors.Clear();
+
+			if (!ValidateSolutionFile())
+				return false;
+			if (!ValidateOutputFolders())
+				return false;
+
+			return true;
 		}
+
+		private bool ValidateSolutionFile()
+		{
+			if (string.IsNullOrEmpty(SolutionPath) || string.IsNullOrWhiteSpace(SolutionPath))
+			{
+				AddError(nameof(SolutionPath), $"No solution file specified.");
+				return false;
+			}
+			if (!File.Exists(SolutionPath))
+			{
+				AddError(nameof(SolutionPath), $"Solution file does not exist.");
+				return false;
+			}
+
+			return true;
+		}
+
+		private bool ValidateOutputFolders()
+		{
+			if (OutputFolders == null || OutputFolders.Count == 0)
+			{
+				AddError(nameof(OutputFolders), $"No output folder available.");
+				return false;
+			}
+			if (OutputFolders.All(d => !Directory.Exists(d)))
+			{
+				AddError(nameof(OutputFolders), $"None of the output folders exist.");
+				return false;
+			}
+
+			return true;
+		}
+
+		private void AddError(string property, string message)
+		{
+			if (!_errors.TryGetValue(property, out var errors))
+			{
+				errors = new List<string>();
+				_errors.Add(property, errors);
+			}
+			
+			Log.Info($"Validation error {property}: {message}.");
+			errors.Add(message);
+			ErrorsChanged?.Invoke(this, new DataErrorsChangedEventArgs(property));
+		}
+
+		private readonly Dictionary<string, List<string>> _errors = new Dictionary<string, List<string>>();
+
+		/// <inheritdoc />
+		public IEnumerable GetErrors(string propertyName)
+		{
+			if (propertyName != null && _errors.TryGetValue(propertyName, out var errors))
+				return errors;
+
+			return Enumerable.Empty<string>();
+		}
+
+		/// <inheritdoc />
+		public bool HasErrors => _errors.Values.Any(d => d.Count > 0);
+
+		/// <inheritdoc />
+		public event EventHandler<DataErrorsChangedEventArgs> ErrorsChanged;
 	}
 }

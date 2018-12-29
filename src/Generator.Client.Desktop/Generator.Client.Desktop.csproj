@@ -14,6 +14,7 @@
 	  <None Remove="Views\ConfigurationOverviewView.xaml" />
 	  <None Remove="Views\ConfigurationEditWindow.xaml" />
 	  <None Remove="Views\MainWindow.xaml" />
+	  <None Remove="Views\ManageOpenInEditorReferencesWindow.xaml" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -23,6 +24,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <PackageReference Include="Extended.Wpf.Toolkit" Version="3.4.0" />
 	  <PackageReference Include="JetBrains.Annotations" Version="2018.2.1" />
 	  <PackageReference Include="MahApps.Metro" Version="1.6.5" />
 	  <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.0.1" />
@@ -39,6 +41,9 @@
 
 	<ItemGroup>
 	  <Compile Update="Controls\LabeledControl.xaml.cs">
+	    <SubType>Code</SubType>
+	  </Compile>
+	  <Compile Update="Views\ManageOpenInEditorReferencesWindow.xaml.cs">
 	    <SubType>Code</SubType>
 	  </Compile>
 	  <Compile Update="Views\ConfigurationOverviewView.xaml.cs">
@@ -60,6 +65,9 @@
 
 	<ItemGroup>
 	  <Page Update="Controls\LabeledControl.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </Page>
+	  <Page Update="Views\ManageOpenInEditorReferencesWindow.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </Page>
 	  <Page Update="Views\GetStringWindow.xaml">

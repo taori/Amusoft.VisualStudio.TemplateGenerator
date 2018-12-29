@@ -1,0 +1,42 @@
+﻿<mah:MetroWindow x:Class="Generator.Client.Desktop.Views.ManageOpenInEditorReferencesWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Generator.Client.Desktop"
+        xmlns:viewModels="clr-namespace:Generator.Client.Desktop.ViewModels"
+        xmlns:system="clr-namespace:System;assembly=mscorlib"
+        xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
+        xmlns:controls="clr-namespace:Generator.Client.Desktop.Controls"
+        xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
+        mc:Ignorable="d"
+        d:DataContext="{d:DesignInstance viewModels:ManageOpenInEditorReferencesViewModel}"
+		SizeToContent="WidthAndHeight"
+        Title="{Binding Path=Title}" Height="450" Width="800" MaxHeight="700">
+	<Window.InputBindings>
+		<KeyBinding Key="Enter" Command="{Binding Path=ToggleSolutionFileCommand}" CommandParameter="{Binding Path=SolutionItems/}" />
+	</Window.InputBindings>
+	<DockPanel>
+		<TextBox Text="{Binding Path=Filter.Value, UpdateSourceTrigger=PropertyChanged}" 
+				 mah:TextBoxHelper.UseFloatingWatermark="True"
+		         mah:TextBoxHelper.Watermark="Filter:" 
+		         mah:TextBoxHelper.AutoWatermark="True"
+				 DockPanel.Dock="Top" />
+		<TextBlock
+			DockPanel.Dock="Top"  
+			Text="Press enter to toggle the inclusion of files."/>
+		<ListView ItemsSource="{Binding Path=SolutionItems}" IsSynchronizedWithCurrentItem="True">
+			<ListView.InputBindings>
+				<KeyBinding Key="Enter" Command="{Binding Path=ToggleSolutionFileCommand}" CommandParameter="{Binding Path=SolutionItems/}" />
+			</ListView.InputBindings>
+			<ListView.ItemTemplate>
+				<DataTemplate>
+					<StackPanel Orientation="Horizontal">
+						<CheckBox IsChecked="{Binding Path=Included}" IsEnabled="False"/>
+						<TextBlock Text="{Binding Path=RelativePath}"/>
+					</StackPanel>
+				</DataTemplate>
+			</ListView.ItemTemplate>
+		</ListView>
+	</DockPanel>
+</mah:MetroWindow>

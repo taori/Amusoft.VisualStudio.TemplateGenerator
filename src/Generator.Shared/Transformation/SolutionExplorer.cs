@@ -178,6 +178,8 @@ namespace Generator.Shared.Transformation
 						case ".jpeg":
 						case ".bmp":
 						case ".svg":
+						case ".dotsettings":
+						case ".user":
 							yield return file;
 							break;
 
