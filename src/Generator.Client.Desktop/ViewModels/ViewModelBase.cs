@@ -21,7 +21,7 @@ namespace Generator.Client.Desktop.ViewModels
 				return false;
 
 			field = value;
-			PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+			OnPropertyChanged(propertyName);
 			return true;
 		}
 	}

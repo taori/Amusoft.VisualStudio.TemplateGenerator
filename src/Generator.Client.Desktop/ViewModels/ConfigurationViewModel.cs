@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
+using System.Linq;
 using System.Reactive.Subjects;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Windows.Input;
@@ -10,6 +12,7 @@ using Generator.Client.Desktop.Utility;
 using Generator.Shared;
 using Generator.Shared.Serialization;
 using Generator.Shared.Template;
+using Generator.Shared.Transformation;
 
 namespace Generator.Client.Desktop.ViewModels
 {
@@ -43,6 +46,28 @@ namespace Generator.Client.Desktop.ViewModels
 			RemoveOutputFolderCommand = new TaskCommand(RemoveOutputFolderExecute);
 			Model = model;
 			UpdateFromModel();
+		}
+
+		/// <inheritdoc />
+		protected override async void OnPropertyChanged(string propertyName = null)
+		{
+			base.OnPropertyChanged(propertyName);
+			if (propertyName == nameof(SolutionPath))
+				await LoadStartupProjectOptionsAsync();
+		}
+
+		private Task LoadStartupProjectOptionsAsync()
+		{
+			var solutionPath = Model?.SolutionPath;
+			if (string.IsNullOrEmpty(solutionPath) || !File.Exists(solutionPath))
+				return Task.CompletedTask;
+
+			var referencedNamespaces = SolutionExplorer.GetReferencedProjectPaths(solutionPath)
+				.Select(SolutionExplorer.GetAssemblyName).ToArray();
+
+			StartupProjectOptions = new ObservableCollection<string>(referencedNamespaces);
+
+			return Task.CompletedTask;
 		}
 
 		private Task RemoveOutputFolderExecute(object arg)
@@ -106,6 +131,14 @@ namespace Generator.Client.Desktop.ViewModels
 		{
 			get => _outputFolders ?? (_outputFolders = new ObservableCollection<string>());
 			set => SetValue(ref _outputFolders, value, nameof(OutputFolders));
+		}
+
+		private ObservableCollection<string> _startupProjectOptions;
+
+		public ObservableCollection<string> StartupProjectOptions
+		{
+			get => _startupProjectOptions ?? (_startupProjectOptions = new ObservableCollection<string>());
+			set => SetValue(ref _startupProjectOptions, value, nameof(StartupProjectOptions));
 		}
 
 		private IconViewModel _icon = new IconViewModel();
@@ -188,6 +221,14 @@ namespace Generator.Client.Desktop.ViewModels
 			set => SetValue(ref _provideDefaultName, value, nameof(ProvideDefaultName));
 		}
 
+		private string _primaryProject;
+
+		public string PrimaryProject
+		{
+			get => _primaryProject;
+			set => SetValue(ref _primaryProject, value, nameof(PrimaryProject));
+		}
+
 		private ICommand _commitChangesCommand;
 
 		public ICommand CommitChangesCommand
@@ -265,6 +306,7 @@ namespace Generator.Client.Desktop.ViewModels
 			Model.Description = Description;
 			Model.CodeLanguage = CodeLanguage;
 			Model.ProvideDefaultName = ProvideDefaultName;
+			Model.PrimaryProject = PrimaryProject;
 			Model.Name = Name;
 			Model.OutputFolders = new List<string>(OutputFolders);
 			Model.OpenInEditorReferences = new List<string>(OpenInEditorReferences);
@@ -287,6 +329,7 @@ namespace Generator.Client.Desktop.ViewModels
 			CodeLanguage = Model.CodeLanguage;
 			ProvideDefaultName = Model.ProvideDefaultName;
 			Name = Model.Name;
+			PrimaryProject = Model.PrimaryProject;
 			OutputFolders = new ObservableCollection<string>(Model.OutputFolders);
 			OpenInEditorReferences = new ObservableCollection<string>(Model.OpenInEditorReferences);
 		}

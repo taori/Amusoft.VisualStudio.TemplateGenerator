@@ -30,6 +30,8 @@ namespace Generator.Shared.Template
 
 		public bool ProvideDefaultName { get; set; }
 
+		public string PrimaryProject { get; set; }
+
 		public string Name { get; set; }
 
 		/// <inheritdoc />

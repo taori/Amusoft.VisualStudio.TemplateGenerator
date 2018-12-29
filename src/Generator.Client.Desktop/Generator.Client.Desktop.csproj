@@ -10,6 +10,7 @@
 
 	<ItemGroup>
 	  <None Remove="Application.manifest" />
+	  <None Remove="Controls\LabeledControl.xaml" />
 	  <None Remove="Views\ConfigurationOverviewView.xaml" />
 	  <None Remove="Views\ConfigurationEditWindow.xaml" />
 	  <None Remove="Views\MainWindow.xaml" />
@@ -37,6 +38,9 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <Compile Update="Controls\LabeledControl.xaml.cs">
+	    <SubType>Code</SubType>
+	  </Compile>
 	  <Compile Update="Views\ConfigurationOverviewView.xaml.cs">
 	    <SubType>Code</SubType>
 	  </Compile>
@@ -55,6 +59,9 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <Page Update="Controls\LabeledControl.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </Page>
 	  <Page Update="Views\GetStringWindow.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </Page>

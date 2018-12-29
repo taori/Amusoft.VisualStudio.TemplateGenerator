@@ -8,6 +8,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Generator.Shared.Resources;
+using Microsoft.Build.Construction;
 using Microsoft.Build.Definition;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.MSBuild;
@@ -45,6 +46,34 @@ namespace Generator.Shared.Transformation
 		public SolutionExplorer(string solutionPath)
 		{
 			SolutionPath = solutionPath;
+		}
+
+		public static IEnumerable<string> GetReferencedProjectPaths(string solutionPath)
+		{
+			if (string.IsNullOrEmpty(solutionPath))
+				throw new ArgumentNullException(nameof(solutionPath), $"{nameof(solutionPath)}");
+			if (!File.Exists(solutionPath))
+				throw new FileNotFoundException(solutionPath);
+
+			var solutionFile = SolutionFile.Parse(solutionPath);
+
+			return solutionFile
+				.ProjectsByGuid
+				.Values
+				.Where(d => d.ProjectType != SolutionProjectType.SolutionFolder)
+				.Select(s => s.AbsolutePath);
+		}
+
+		public static string GetAssemblyName(string projectFile)
+		{
+			if (string.IsNullOrEmpty(projectFile))
+				throw new ArgumentNullException(nameof(projectFile), $"{nameof(projectFile)}");
+			if (!File.Exists(projectFile))
+				throw new FileNotFoundException(projectFile);
+
+			var evaluationProject = GetEvaluationProject(projectFile);
+//			var props = evaluationProject.Properties.Where(d => d.EvaluatedValue.Contains("ViewModels")).ToArray();
+			return evaluationProject.GetPropertyValue("RootNamespace") ?? string.Empty;
 		}
 
 		private async Task ExecuteAsync(IProgress<string> progress, CancellationToken cancellationToken)
@@ -169,7 +198,7 @@ namespace Generator.Shared.Transformation
 							{
 								Log.Warn($"Extension {extension} is currently not supported. You can add more values in the AppSettings for {Constants.Configuration.AdditionalFileCopyExtensions}, or suggest that extension on GitHub to be added.");
 							}
-								
+
 							break;
 					}
 				}
@@ -182,7 +211,7 @@ namespace Generator.Shared.Transformation
 			var bin = Path.Combine(evaluation.DirectoryPath, evaluation.GetPropertyValue("BaseOutputPath").TrimEnd(Path.DirectorySeparatorChar));
 			var obj = Path.Combine(evaluation.DirectoryPath, evaluation.GetPropertyValue("BaseIntermediateOutputPath").TrimEnd(Path.DirectorySeparatorChar));
 			folders = new HashSet<string>(folders.Where(d => !d.Contains(bin) && !d.Contains(obj)));
-			
+
 			return folders;
 		}
 

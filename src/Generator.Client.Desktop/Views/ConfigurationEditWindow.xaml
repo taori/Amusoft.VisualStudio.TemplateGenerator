@@ -7,6 +7,7 @@
         xmlns:viewModels="clr-namespace:Generator.Client.Desktop.ViewModels"
         xmlns:system="clr-namespace:System;assembly=mscorlib"
         xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
+        xmlns:controls="clr-namespace:Generator.Client.Desktop.Controls"
         mc:Ignorable="d"
         d:DataContext="{d:DesignInstance viewModels:ConfigurationViewModel}"
 		SizeToContent="WidthAndHeight"
@@ -22,63 +23,91 @@
 				<Button Content="Discard" Command="{Binding Path=UndoChangesCommand}" Padding="5" />
 			</StackPanel>
 		</Border>
-		<ScrollViewer  Padding="10">
-			<StackPanel>
-				<Label Style="{StaticResource LabelSmallStyle}" Content="Configuration name:" />
-				<TextBox Text="{Binding Path=ConfigurationName, UpdateSourceTrigger=PropertyChanged}" />
+		<ScrollViewer Padding="10">
+			<Grid>
+				<Grid.ColumnDefinitions>
+					<ColumnDefinition Width="7*"/>
+					<ColumnDefinition Width="10"/>
+					<ColumnDefinition Width="3*"/>
+				</Grid.ColumnDefinitions>
+				<Grid.RowDefinitions>
+					<RowDefinition Height="Auto"/>
+					<RowDefinition Height="Auto"/>
+					<RowDefinition Height="Auto"/>
+					<RowDefinition Height="Auto"/>
+					<RowDefinition Height="Auto"/>
+					<RowDefinition Height="Auto"/>
+					<RowDefinition />
+				</Grid.RowDefinitions>
 
-				<Label Style="{StaticResource LabelSmallStyle}" Content="Solution path:" />
-				<DockPanel>
-					<Button DockPanel.Dock="Right" Margin="5,0,0,0" Content="..." Padding="5,0" Command="{Binding Path=SelectSolutionCommand}"/>
-					<TextBox Text="{Binding Path=SolutionPath}" IsReadOnly="True" Background="LightGray" />
-				</DockPanel>
+				<controls:LabeledControl LabelText="Configuration name:" Grid.Row="0" Grid.Column="0">
+					<TextBox Text="{Binding Path=ConfigurationName, UpdateSourceTrigger=PropertyChanged}" />
+				</controls:LabeledControl>
+				<controls:LabeledControl LabelText="Language:" Grid.Row="0" Grid.Column="2">
+					<ComboBox SelectedValue="{Binding Path=CodeLanguage}" SelectedValuePath="Content" >
+						<ComboBoxItem Content="CSharp"/>
+						<ComboBoxItem Content="VisualBasic"/>
+					</ComboBox>
+				</controls:LabeledControl>
 
-				<Label Style="{StaticResource LabelSmallStyle}" Content="Output folders:" />
-				<DockPanel>
-					<Button DockPanel.Dock="Right" Margin="5,0,0,0" Content="+" Padding="5,0" VerticalAlignment="Top" 
+				<controls:LabeledControl LabelText="Suggested namespace:" Grid.Row="1" Grid.Column="0">
+					<TextBox Text="{Binding Path=DefaultName, UpdateSourceTrigger=PropertyChanged}" />
+				</controls:LabeledControl>
+				<controls:LabeledControl LabelText="Display name (VS):" Grid.Row="1" Grid.Column="2">
+					<TextBox Text="{Binding Path=Name, UpdateSourceTrigger=PropertyChanged}" />
+				</controls:LabeledControl>
+
+				<controls:LabeledControl LabelText="Description:" Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3">
+					<TextBox Text="{Binding Path=Description, UpdateSourceTrigger=PropertyChanged}" TextWrapping="WrapWithOverflow" AcceptsReturn="True" />
+				</controls:LabeledControl>
+
+				<controls:LabeledControl LabelText="Icon package:" Grid.Row="3" Grid.Column="0">
+					<TextBox Text="{Binding Path=Icon.Package, UpdateSourceTrigger=PropertyChanged}" />
+				</controls:LabeledControl>
+				<controls:LabeledControl LabelText="Icon id:" Grid.Row="3" Grid.Column="2">
+					<TextBox Text="{Binding Path=Icon.Id, UpdateSourceTrigger=PropertyChanged}" />
+				</controls:LabeledControl>
+
+				<controls:LabeledControl LabelText="Solution path:" Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="3">
+					<DockPanel>
+						<Button DockPanel.Dock="Right" Margin="5,0,0,0" Content="..." Padding="5,0" Command="{Binding Path=SelectSolutionCommand}"/>
+						<TextBox Text="{Binding Path=SolutionPath}" IsReadOnly="True" Background="LightGray" />
+					</DockPanel>
+				</controls:LabeledControl>
+
+				<controls:LabeledControl LabelText="Output folders:" Grid.Row="5" Grid.Column="0">
+					<DockPanel>
+						<Button DockPanel.Dock="Right" Margin="5,0,0,0" Content="+" Padding="5,0" VerticalAlignment="Top"
 					        Command="{Binding Path=AddOutputFolderCommand}"/>
-					<ListView ItemsSource="{Binding Path=OutputFolders}">
-						<ListView.InputBindings>
-							<KeyBinding Key="Delete" Command="{Binding RemoveOutputFolderCommand}" CommandParameter="{Binding Path=OutputFolders/}"/>
-						</ListView.InputBindings>
-						<ListView.ItemTemplate>
-							<DataTemplate>
-								<TextBlock Text="{Binding Path=.}"/>
-							</DataTemplate>
-						</ListView.ItemTemplate>
-					</ListView>
-				</DockPanel>
+						<ListView ItemsSource="{Binding Path=OutputFolders}">
+							<ListView.InputBindings>
+								<KeyBinding Key="Delete" Command="{Binding RemoveOutputFolderCommand}" CommandParameter="{Binding Path=OutputFolders/}"/>
+							</ListView.InputBindings>
+							<ListView.ItemTemplate>
+								<DataTemplate>
+									<TextBlock Text="{Binding Path=.}"/>
+								</DataTemplate>
+							</ListView.ItemTemplate>
+						</ListView>
+					</DockPanel>
+				</controls:LabeledControl>
+				<StackPanel Grid.Row="5" Grid.Column="2">
+					<controls:LabeledControl LabelText="Display name:" >
+						<CheckBox IsChecked="{Binding Path=ProvideDefaultName, UpdateSourceTrigger=PropertyChanged}" />
+					</controls:LabeledControl>
+					<controls:LabeledControl LabelText="CreateInPlace:" >
+						<CheckBox IsChecked="{Binding Path=CreateInPlace, UpdateSourceTrigger=PropertyChanged}" />
+					</controls:LabeledControl>
+					<controls:LabeledControl LabelText="CreateNewFolder:" >
+						<CheckBox IsChecked="{Binding Path=CreateNewFolder, UpdateSourceTrigger=PropertyChanged}" />
+					</controls:LabeledControl>
+				</StackPanel>
 
-				<Label Style="{StaticResource LabelSmallStyle}" Content="Icon package:" />
-				<TextBox Text="{Binding Path=Icon.Package, UpdateSourceTrigger=PropertyChanged}" />
+				<controls:LabeledControl LabelText="Startup project:" Grid.Row="6" Grid.Column="0" Grid.ColumnSpan="3">
+					<ComboBox SelectedValue="{Binding Path=PrimaryProject}" ItemsSource="{Binding Path=StartupProjectOptions}" />
+				</controls:LabeledControl>
 
-				<Label Style="{StaticResource LabelSmallStyle}" Content="Icon id:" />
-				<TextBox Text="{Binding Path=Icon.Id, UpdateSourceTrigger=PropertyChanged}" />
-
-				<Label Style="{StaticResource LabelSmallStyle}" Content="Name:" />
-				<TextBox Text="{Binding Path=Name, UpdateSourceTrigger=PropertyChanged}" />
-
-				<Label Style="{StaticResource LabelSmallStyle}" Content="DefaultName:" />
-				<TextBox Text="{Binding Path=DefaultName, UpdateSourceTrigger=PropertyChanged}" />
-
-				<Label Style="{StaticResource LabelSmallStyle}" Content="Description:" />
-				<TextBox Text="{Binding Path=Description, UpdateSourceTrigger=PropertyChanged}" />
-
-				<Label Style="{StaticResource LabelSmallStyle}" Content="Language:" />
-				<ComboBox SelectedValue="{Binding Path=CodeLanguage}" SelectedValuePath="Content" >
-					<ComboBoxItem Content="CSharp"/>
-					<ComboBoxItem Content="VisualBasic"/>
-				</ComboBox>
-
-				<Label Style="{StaticResource LabelSmallStyle}" Content="ProvideDefaultName:" />
-				<CheckBox IsChecked="{Binding Path=ProvideDefaultName, UpdateSourceTrigger=PropertyChanged}" />
-
-				<Label Style="{StaticResource LabelSmallStyle}" Content="CreateInPlace:" />
-				<CheckBox IsChecked="{Binding Path=CreateInPlace, UpdateSourceTrigger=PropertyChanged}" />
-
-				<Label Style="{StaticResource LabelSmallStyle}" Content="CreateNewFolder:" />
-				<CheckBox IsChecked="{Binding Path=CreateNewFolder, UpdateSourceTrigger=PropertyChanged}" />
-			</StackPanel>
+			</Grid>
 		</ScrollViewer>
 	</DockPanel>
 </mah:MetroWindow>

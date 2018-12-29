@@ -4,6 +4,7 @@
              xmlns:local="clr-namespace:Generator.Client.Desktop"
              xmlns:viewModels="clr-namespace:Generator.Client.Desktop.ViewModels"
              xmlns:view="clr-namespace:Generator.Client.Desktop.Views"
+			 ShutdownMode="OnMainWindowClose"
              StartupUri="Views\MainWindow.xaml">
     <Application.Resources>
 

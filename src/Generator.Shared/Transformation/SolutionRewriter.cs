@@ -108,7 +108,7 @@ namespace Generator.Shared.Transformation
 
 			var content = new TemplateContent();
 			var links = new List<NestableContent>();
-			foreach (var reference in cache.GetSolutionProjectReferences())
+			foreach (var reference in GetSortedSolutionReferences(cache))
 			{
 				links.Add(new ProjectTemplateLink(reference.RootTemplateNamespace, reference.RelativeVsTemplatePath));
 			}
@@ -118,6 +118,24 @@ namespace Generator.Shared.Transformation
 				new ProjectCollection(links.ToArray())
 			};
 			return content;
+		}
+
+		private IEnumerable<ProjectRewriteCacheEntry> GetSortedSolutionReferences(ProjectRewriteCache cache)
+		{
+			var references = cache.GetSolutionProjectReferences().ToArray();
+			var pp = Context.Configuration.PrimaryProject;
+
+			if (!string.IsNullOrEmpty(pp) && references.Any(d => string.Equals(pp, d.OriginalAssemblyName, StringComparison.OrdinalIgnoreCase)))
+			{
+				return references
+					.Where(d => string.Equals(pp, d.OriginalAssemblyName, StringComparison.OrdinalIgnoreCase))
+					.Concat(references.Where(d => d.OriginalAssemblyName != pp)
+						.OrderBy(d => d.OriginalAssemblyName));
+			}
+			else
+			{
+				return references.OrderBy(d => d.OriginalAssemblyName);
+			}
 		}
 
 		private bool MoveContentFiles(out string contentFolder)
