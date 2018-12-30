@@ -9,17 +9,24 @@
         xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
         xmlns:controls="clr-namespace:Generator.Client.Desktop.Controls"
         xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
+        xmlns:Interactions="http://schemas.microsoft.com/xaml/behaviors"
+        xmlns:utility="clr-namespace:Generator.Client.Desktop.Utility"
         mc:Ignorable="d"
         d:DataContext="{d:DesignInstance viewModels:ManageOpenInEditorReferencesViewModel}"
-		SizeToContent="WidthAndHeight"
-        Title="{Binding Path=Title}" Height="450" Width="800" MaxHeight="700">
+        Title="{Binding Path=Title}" Height="450" Width="800" MaxHeight="700" MinWidth="800" MinHeight="400">
 	<Window.InputBindings>
 		<KeyBinding Key="Enter" Command="{Binding Path=ToggleSolutionFileCommand}" CommandParameter="{Binding Path=ItemsSubset/}" />
 	</Window.InputBindings>
+	<Interactions:Interaction.Triggers>
+		<Interactions:KeyTrigger Key="F1">
+			<utility:InvokeMethodAction TargetObject="{Binding ElementName=textboxFilter, Mode=OneWay}" MethodName="Focus" />
+		</Interactions:KeyTrigger>
+	</Interactions:Interaction.Triggers>
 	<DockPanel>
 		<TextBox Text="{Binding Path=Filter.Value, UpdateSourceTrigger=PropertyChanged}" 
+				 x:Name="textboxFilter"
 				 mah:TextBoxHelper.UseFloatingWatermark="True"
-		         mah:TextBoxHelper.Watermark="Filter:" 
+		         mah:TextBoxHelper.Watermark="Filter (F1):" 
 		         mah:TextBoxHelper.AutoWatermark="True"
 				 DockPanel.Dock="Top" />
 		<TextBlock
