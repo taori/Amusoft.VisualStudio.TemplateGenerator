@@ -153,6 +153,7 @@ namespace Generator.Shared.Transformation
 			var openInEditorFiles = new HashSet<Uri>(GetOpenInEditorFiles(projectInfos));
 			if (openInEditorFiles.Count > 0)
 				Log.Debug(nameof(openInEditorFiles) + " " + string.Join(", ", openInEditorFiles));
+
 			project.Children = GetProjectMembers(Path.GetDirectoryName(Context.ProjectPath), whiteList, openInEditorFiles).ToArray();
 		}
 

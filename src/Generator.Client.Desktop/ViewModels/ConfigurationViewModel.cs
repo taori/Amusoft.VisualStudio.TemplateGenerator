@@ -18,6 +18,7 @@ using Generator.Shared.Serialization;
 using Generator.Shared.Template;
 using Generator.Shared.Transformation;
 using NLog;
+using Folder = Generator.Shared.Template.Folder;
 using MessageBox = System.Windows.Forms.MessageBox;
 
 namespace Generator.Client.Desktop.ViewModels
@@ -53,14 +54,20 @@ namespace Generator.Client.Desktop.ViewModels
 			if (string.IsNullOrEmpty(solutionPath) || !File.Exists(solutionPath))
 				return Task.CompletedTask;
 
-			var referencedNamespaces = SolutionExplorer
-				.GetReferencedProjectPaths(solutionPath)
-				.Select(SolutionExplorer.GetAssemblyName)
+			var referencedNamespaces = GetAssemblyNamesOfSolution(solutionPath)
 				.ToArray();
 
 			StartupProjectOptions = new ObservableCollection<string>(referencedNamespaces);
 
 			return Task.CompletedTask;
+		}
+
+		private static IOrderedEnumerable<string> GetAssemblyNamesOfSolution(string solutionPath)
+		{
+			return SolutionExplorer
+				.GetReferencedProjectPaths(solutionPath)
+				.Select(SolutionExplorer.GetAssemblyName)
+				.OrderBy(d => d);
 		}
 
 		private Task RemoveOutputFolderExecute(object arg)
@@ -255,6 +262,20 @@ namespace Generator.Client.Desktop.ViewModels
 			set => SetValue(ref _primaryProject, value, nameof(PrimaryProject));
 		}
 
+		private ICommand _newFolderCommand;
+
+		public ICommand NewRootFolderCommand
+		{
+			get => _newFolderCommand ?? (_newFolderCommand = new TaskCommand(NewRootFolderExecute));
+			set => SetValue(ref _newFolderCommand, value, nameof(NewRootFolderCommand));
+		}
+
+		private Task NewRootFolderExecute(object arg)
+		{
+			TemplateHierarchy.Add(new FolderViewModel(new Folder()));
+			return Task.CompletedTask;
+		}
+
 		private ICommand _commitChangesCommand;
 
 		public ICommand CommitChangesCommand
@@ -307,6 +328,20 @@ namespace Generator.Client.Desktop.ViewModels
 			set => SetValue(ref _removeOutputFolderCommand, value, nameof(RemoveOutputFolderCommand));
 		}
 
+		private ICommand _removeRootFolderCommand;
+
+		public ICommand RemoveRootFolderCommand
+		{
+			get => _removeRootFolderCommand ?? (_removeRootFolderCommand = new TaskCommand<FolderViewModel>(RemoveRootFolderExecute));
+			set => SetValue(ref _removeRootFolderCommand, value, nameof(RemoveRootFolderCommand));
+		}
+
+		private Task RemoveRootFolderExecute(FolderViewModel arg)
+		{
+			TemplateHierarchy.Remove(arg);
+			return Task.CompletedTask;
+		}
+
 		private ICommand _removeOpenInEditorReferenceCommand;
 
 		public ICommand RemoveOpenInEditorReferenceCommand
@@ -331,6 +366,13 @@ namespace Generator.Client.Desktop.ViewModels
 			set => SetValue(ref _openInEditorReferences, value, nameof(OpenInEditorReferences));
 		}
 
+		private ObservableCollection<TemplateHierarchyViewModel> _templateHierarchy;
+
+		public ObservableCollection<TemplateHierarchyViewModel> TemplateHierarchy
+		{
+			get => _templateHierarchy ?? (_templateHierarchy = new ObservableCollection<TemplateHierarchyViewModel>());
+			set => SetValue(ref _templateHierarchy, value, nameof(TemplateHierarchy));
+		}
 
 		public void UpdateModel()
 		{
@@ -352,6 +394,7 @@ namespace Generator.Client.Desktop.ViewModels
 			Model.Name = Name;
 			Model.OutputFolders = new List<string>(OutputFolders);
 			Model.OpenInEditorReferences = new List<string>(OpenInEditorReferences);
+			Model.TemplateHierarchy = new List<TemplateHierarchyElement>(TemplateHierarchy.Select(s => s.Model));
 		}
 
 		public void UpdateFromModel()
@@ -374,6 +417,7 @@ namespace Generator.Client.Desktop.ViewModels
 			PrimaryProject = Model.PrimaryProject;
 			OutputFolders = new ObservableCollection<string>(Model.OutputFolders);
 			OpenInEditorReferences = new ObservableCollection<string>(Model.OpenInEditorReferences);
+			TemplateHierarchy = new ObservableCollection<TemplateHierarchyViewModel>(Model.TemplateHierarchy.Select(TemplateHierarchyViewModel.Create));
 		}
 
 		public bool CanBuild()

@@ -24,7 +24,7 @@
 				<Button Content="Discard" Command="{Binding Path=UndoChangesCommand}" Padding="5" />
 			</StackPanel>
 		</Border>
-		<ScrollViewer Padding="10">
+		<ScrollViewer Padding="10" VerticalScrollBarVisibility="Auto">
 			<Grid>
 				<Grid.ColumnDefinitions>
 					<ColumnDefinition Width="*"/>
@@ -32,6 +32,7 @@
 					<ColumnDefinition Width="200"/>
 				</Grid.ColumnDefinitions>
 				<Grid.RowDefinitions>
+					<RowDefinition Height="Auto"/>
 					<RowDefinition Height="Auto"/>
 					<RowDefinition Height="Auto"/>
 					<RowDefinition Height="Auto"/>
@@ -111,6 +112,7 @@
 
 				<controls:LabeledControl LabelText="OpenInEditor files:" Grid.Row="7" Grid.Column="0" Grid.ColumnSpan="3">
 					<StackPanel>
+						<Button Content="Manage OpenInEditor references" Command="{Binding Path=ManageOpenInEditorReferencesCommand}" Margin="0,0,0,10" />
 						<ListView ItemsSource="{Binding Path=OpenInEditorReferences}">
 							<ListView.InputBindings>
 								<KeyBinding Key="Delete" Command="{Binding RemoveOpenInEditorReferenceCommand}" CommandParameter="{Binding Path=OpenInEditorReferences/}"/>
@@ -121,11 +123,24 @@
 								</DataTemplate>
 							</ListView.ItemTemplate>
 						</ListView>
-						<Button Content="Manage OpenInEditor references" Command="{Binding Path=ManageOpenInEditorReferencesCommand}" Margin="0,10,0,0" />
 					</StackPanel>
 				</controls:LabeledControl>
 
-
+				<controls:LabeledControl LabelText="Solution folders:" Grid.Row="8" Grid.Column="0" Grid.ColumnSpan="3">
+					<StackPanel>
+						<Button Content="New root folder" Command="{Binding Path=NewRootFolderCommand}" Margin="0,0,0,10" />
+						<ListView ItemsSource="{Binding Path=TemplateHierarchy}" IsSynchronizedWithCurrentItem="True">
+							<ListView.InputBindings>
+								<KeyBinding Key="Delete" Command="{Binding RemoveRootFolderCommand}" CommandParameter="{Binding Path=TemplateHierarchy/}"/>
+							</ListView.InputBindings>
+							<ListView.ItemTemplate>
+								<DataTemplate>
+									<TextBlock Text="{Binding Path=.}"/>
+								</DataTemplate>
+							</ListView.ItemTemplate>
+						</ListView>
+					</StackPanel>
+				</controls:LabeledControl>
 			</Grid>
 		</ScrollViewer>
 	</DockPanel>

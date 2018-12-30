@@ -18,6 +18,8 @@ namespace Generator.Shared.Template
 
 		public List<string> OutputFolders { get; set; } = new List<string>();
 
+		public List<TemplateHierarchyElement> TemplateHierarchy { get; set; } = new List<TemplateHierarchyElement>();
+
 		public bool CreateInPlace { get; set; }
 
 		public bool CreateNewFolder { get; set; }
