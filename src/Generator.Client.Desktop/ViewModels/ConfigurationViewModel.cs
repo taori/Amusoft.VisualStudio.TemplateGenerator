@@ -77,6 +77,8 @@ namespace Generator.Client.Desktop.ViewModels
 		{
 			var window = new ManageOpenInEditorReferencesWindow();
 			var viewModel = new ManageOpenInEditorReferencesViewModel(this);
+			viewModel.WhenConfirmed.Subscribe(model => window.Close());
+			viewModel.WhenDiscarded.Subscribe(model => window.Close());
 			window.DataContext = viewModel;
 			window.Loaded += WindowOnLoaded;
 			window.Show();

@@ -29,8 +29,15 @@ namespace Generator.Shared.Serialization
 		[XmlText]
 		public string Content { get; set; }
 
-		[XmlAttribute]
-		public bool OpenInEditor { get; set; }
+		[XmlIgnore]
+		public bool OpenInEditor
+		{
+			get => string.Equals(OpenInEditorSerialized, "true", StringComparison.OrdinalIgnoreCase);
+			set => OpenInEditorSerialized = value ? "true" : null;
+		}
+
+		[XmlAttribute(nameof(OpenInEditor))]
+		public string OpenInEditorSerialized { get; set; }
 
 		[XmlAttribute]
 		public bool ReplaceParameters { get; set; }

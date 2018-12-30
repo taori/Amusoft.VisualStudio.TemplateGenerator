@@ -94,7 +94,7 @@
 					</DockPanel>
 				</controls:LabeledControl>
 				<StackPanel Grid.Row="5" Grid.Column="2">
-					<controls:LabeledControl LabelText="Display name:" >
+					<controls:LabeledControl LabelText="Provide default name:" >
 						<CheckBox IsChecked="{Binding Path=ProvideDefaultName, UpdateSourceTrigger=PropertyChanged}" />
 					</controls:LabeledControl>
 					<controls:LabeledControl LabelText="CreateInPlace:" >

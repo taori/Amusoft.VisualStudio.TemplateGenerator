@@ -12,17 +12,28 @@
         xmlns:Interactions="http://schemas.microsoft.com/xaml/behaviors"
         xmlns:utility="clr-namespace:Generator.Client.Desktop.Utility"
         mc:Ignorable="d"
+		x:Name="Self"
         d:DataContext="{d:DesignInstance viewModels:ManageOpenInEditorReferencesViewModel}"
         Title="{Binding Path=Title}" Height="450" Width="800" MaxHeight="700" MinWidth="800" MinHeight="400">
 	<Window.InputBindings>
 		<KeyBinding Key="Enter" Command="{Binding Path=ToggleSolutionFileCommand}" CommandParameter="{Binding Path=ItemsSubset/}" />
+		<KeyBinding Key="S" Modifiers="Control" Command="{Binding Path=CommitChangesCommand}" />
 	</Window.InputBindings>
 	<Interactions:Interaction.Triggers>
+		<Interactions:KeyTrigger Key="Escape">
+			<utility:InvokeMethodAction TargetObject="{Binding ElementName=Self}" MethodName="Close" />
+		</Interactions:KeyTrigger>
 		<Interactions:KeyTrigger Key="F1">
-			<utility:InvokeMethodAction TargetObject="{Binding ElementName=textboxFilter, Mode=OneWay}" MethodName="Focus" />
+			<utility:InvokeMethodAction TargetObject="{Binding ElementName=textboxFilter}" MethodName="Focus" />
 		</Interactions:KeyTrigger>
 	</Interactions:Interaction.Triggers>
 	<DockPanel>
+		<Border Background="{StaticResource AccentColorBrush}" DockPanel.Dock="Bottom" Padding="5">
+			<StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+				<Button Content="Update references" Command="{Binding Path=CommitChangesCommand}" Padding="5" Margin="0,0,5,0" />
+				<Button Content="Discard changes" Command="{Binding Path=UndoChangesCommand}" Padding="5" />
+			</StackPanel>
+		</Border>
 		<TextBox Text="{Binding Path=Filter.Value, UpdateSourceTrigger=PropertyChanged}" 
 				 x:Name="textboxFilter"
 				 mah:TextBoxHelper.UseFloatingWatermark="True"

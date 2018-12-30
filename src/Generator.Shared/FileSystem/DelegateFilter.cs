@@ -2,7 +2,7 @@
 
 namespace Generator.Shared.FileSystem
 {
-	public class DelegateFilter : FileListerOptions
+	public class DelegateFilter : FileWalkerFilter
 	{
 		private readonly Predicate<string> _filter;
 		
@@ -11,6 +11,11 @@ namespace Generator.Shared.FileSystem
 		public DelegateFilter(Predicate<string> filter)
 		{
 			_filter = filter ?? throw new ArgumentNullException(nameof(filter));
+		}
+
+		/// <inheritdoc />
+		public override void Initialize(string root)
+		{
 		}
 
 		/// <inheritdoc />

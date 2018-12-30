@@ -3,8 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Generator.Shared.Resources;
 using Generator.Shared.Serialization;
@@ -73,14 +71,19 @@ namespace Generator.Shared.Transformation
 
 		private async Task RewriteAsync(string file, Dictionary<string, string> replacements)
 		{
-			string replaced;
+			string replaced = null;
+			bool rewritten;
 			using (var fileStream = new FileStream(file, FileMode.Open))
 			{
 				using (var reader = new StreamReader(fileStream))
 				{
-					replaced = StringHelper.MultiReplace(await reader.ReadToEndAsync(), replacements);
+					rewritten = StringHelper.TryMultiReplace(await reader.ReadToEndAsync(), replacements, ref replaced);
 				}
 			}
+
+			if (!rewritten)
+				return;
+
 			using (var fileStream = new FileStream(file, FileMode.Create))
 			{
 				using (var writer = new StreamWriter(fileStream))
@@ -113,7 +116,7 @@ namespace Generator.Shared.Transformation
 			project.ReplaceParameters = true;
 			project.File = Path.GetFileName(projectInfos.ProjectFilePath);
 			project.TargetFileName = projectInfos.ProjectTemplateReference;
-			AddFiles(project);
+			AddFiles(project, projectInfos);
 			content.Children = new NestableContent[]
 			{
 				project
@@ -121,7 +124,7 @@ namespace Generator.Shared.Transformation
 			return content;
 		}
 
-		private void AddFiles(Project project)
+		private void AddFiles(Project project, ProjectRewriteCacheEntry projectInfos)
 		{
 			/**
 			 * project.vstemplate TemplateContent like
@@ -147,21 +150,52 @@ namespace Generator.Shared.Transformation
 			);
 			var whiteList = new HashSet<string>(allowedDocuments);
 
-			project.Children = GetProjectMembers(Path.GetDirectoryName(Context.ProjectPath), whiteList).ToArray();
+			var openInEditorFiles = new HashSet<Uri>(GetOpenInEditorFiles(projectInfos));
+			if (openInEditorFiles.Count > 0)
+				Log.Debug(nameof(openInEditorFiles) + " " + string.Join(", ", openInEditorFiles));
+			project.Children = GetProjectMembers(Path.GetDirectoryName(Context.ProjectPath), whiteList, openInEditorFiles).ToArray();
 		}
 
-		private static IEnumerable<NestableContent> GetProjectMembers(string directoryName, HashSet<string> whiteList)
+		private IEnumerable<Uri> GetOpenInEditorFiles(ProjectRewriteCacheEntry projectInfos)
+		{
+			Uri MakeFullUri(string relative)
+			{
+				return new Uri(
+					new Uri(Context.Explorer.SolutionPath, UriKind.Absolute),
+					new Uri(relative, UriKind.Relative)
+				);
+			}
+
+			var projectBase = new Uri(Path.GetDirectoryName(projectInfos.ProjectFilePath) + Path.DirectorySeparatorChar, UriKind.Absolute);
+			var referenceUris =  Context.Configuration
+				.OpenInEditorReferences
+				.Select(MakeFullUri);
+
+			return referenceUris.Where(d => projectBase.IsBaseOf(d));
+		}
+
+		private static IEnumerable<NestableContent> GetProjectMembers(string directoryName, HashSet<string> whiteList, HashSet<Uri> openInEditorFiles)
 		{
 			var dirInfo = new DirectoryInfo(directoryName);
 			foreach (var subInfo in dirInfo.GetDirectories())
 			{
-				yield return new Folder(GetProjectMembers(subInfo.FullName, whiteList).ToArray(), subInfo.Name, subInfo.Name);
+				yield return new Folder(GetProjectMembers(subInfo.FullName, whiteList, openInEditorFiles).ToArray(), subInfo.Name, subInfo.Name);
 			}
 
 			foreach (var fileInfo in dirInfo.GetFiles())
 			{
 				if (whiteList.Contains(fileInfo.FullName))
-					yield return new ProjectItem(fileInfo.Name, fileInfo.Name);
+				{
+					if (openInEditorFiles.Contains(new Uri(fileInfo.FullName, UriKind.Absolute)))
+					{
+						Log.Info($"Marking \"{fileInfo.FullName}\" as OpenInEditor=true.");
+						yield return new ProjectItem(fileInfo.Name, fileInfo.Name) {OpenInEditor = true};
+					}
+					else
+					{
+						yield return new ProjectItem(fileInfo.Name, fileInfo.Name);
+					}
+				}
 			}
 		}
 	}

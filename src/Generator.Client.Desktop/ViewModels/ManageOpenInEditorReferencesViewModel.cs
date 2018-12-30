@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reactive.Linq;
+using System.Reactive.Subjects;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using Generator.Client.Desktop.Utility;
@@ -17,6 +18,12 @@ namespace Generator.Client.Desktop.ViewModels
 		private static readonly ILogger Log = LogManager.GetLogger(nameof(ManageOpenInEditorReferencesViewModel));
 
 		public ConfigurationViewModel Configuration { get; }
+
+		private Subject<ConfigurationViewModel> _whenConfirmed = new Subject<ConfigurationViewModel>();
+		public IObservable<ConfigurationViewModel> WhenConfirmed => _whenConfirmed;
+
+		private Subject<ConfigurationViewModel> _whenDiscarded = new Subject<ConfigurationViewModel>();
+		public IObservable<ConfigurationViewModel> WhenDiscarded => _whenDiscarded;
 
 		public ManageOpenInEditorReferencesViewModel(ConfigurationViewModel configuration)
 		{
@@ -43,7 +50,14 @@ namespace Generator.Client.Desktop.ViewModels
 			Log.Info("Loading files.");
 
 			var solutionPath = Configuration.SolutionPath;
-			var allFiles = FileLister.FromSolutionFile(solutionPath, new NoFilter());
+			var filters = new FileWalkerFilter[]
+			{
+				new HiddenFolderFilter(),
+				new SolutionFileFilter(), 
+				new BuildArtifactsFilter(), 
+				new NugetFolderFilter(), 
+			};
+			var allFiles = FileWalker.FromFile(solutionPath, filters);
 			var solutionUri = new Uri(solutionPath, UriKind.Absolute);
 			var currentReferences = new HashSet<string>(Configuration.OpenInEditorReferences);
 			var viewModels = allFiles.Select(file =>
@@ -108,6 +122,27 @@ namespace Generator.Client.Desktop.ViewModels
 
 		private Task CommitChangesExecute(object arg)
 		{
+			var selectedItems = _allItems.Where(d => d.Included).Select(d => d.RelativePath.OriginalString);
+			Configuration.OpenInEditorReferences = new ObservableCollection<string>(selectedItems);
+			_whenConfirmed.OnNext(this.Configuration);
+			_whenConfirmed.OnCompleted();
+			_whenDiscarded.OnCompleted();
+			return Task.CompletedTask;
+		}
+
+		private ICommand _undoChangesCommand;
+
+		public ICommand UndoChangesCommand
+		{
+			get => _undoChangesCommand ?? (_undoChangesCommand = new TaskCommand(UndoChangesExecute));
+			set => SetValue(ref _undoChangesCommand, value, nameof(UndoChangesCommand));
+		}
+
+		private Task UndoChangesExecute(object arg)
+		{
+			_whenDiscarded.OnNext(this.Configuration);
+			_whenDiscarded.OnCompleted();
+			_whenConfirmed.OnCompleted();
 			return Task.CompletedTask;
 		}
 
