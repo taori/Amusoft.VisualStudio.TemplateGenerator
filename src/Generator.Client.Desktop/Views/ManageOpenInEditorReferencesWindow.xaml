@@ -14,7 +14,7 @@
 		SizeToContent="WidthAndHeight"
         Title="{Binding Path=Title}" Height="450" Width="800" MaxHeight="700">
 	<Window.InputBindings>
-		<KeyBinding Key="Enter" Command="{Binding Path=ToggleSolutionFileCommand}" CommandParameter="{Binding Path=SolutionItems/}" />
+		<KeyBinding Key="Enter" Command="{Binding Path=ToggleSolutionFileCommand}" CommandParameter="{Binding Path=ItemsSubset/}" />
 	</Window.InputBindings>
 	<DockPanel>
 		<TextBox Text="{Binding Path=Filter.Value, UpdateSourceTrigger=PropertyChanged}" 
@@ -24,17 +24,29 @@
 				 DockPanel.Dock="Top" />
 		<TextBlock
 			DockPanel.Dock="Top"  
+			Padding="10"
+			FontWeight="Bold"
 			Text="Press enter to toggle the inclusion of files."/>
-		<ListView ItemsSource="{Binding Path=SolutionItems}" IsSynchronizedWithCurrentItem="True">
+		<ListView ItemsSource="{Binding Path=ItemsSubset}" IsSynchronizedWithCurrentItem="True">
+			<ListView.ItemsPanel>
+				<ItemsPanelTemplate>
+					<VirtualizingStackPanel/>
+				</ItemsPanelTemplate>
+			</ListView.ItemsPanel>
 			<ListView.InputBindings>
-				<KeyBinding Key="Enter" Command="{Binding Path=ToggleSolutionFileCommand}" CommandParameter="{Binding Path=SolutionItems/}" />
+				<KeyBinding Key="Enter" Command="{Binding Path=ToggleSolutionFileCommand}" CommandParameter="{Binding Path=ItemsSubset/}" />
 			</ListView.InputBindings>
 			<ListView.ItemTemplate>
 				<DataTemplate>
 					<StackPanel Orientation="Horizontal">
-						<CheckBox IsChecked="{Binding Path=Included}" IsEnabled="False"/>
-						<TextBlock Text="{Binding Path=RelativePath}"/>
+						<Ellipse x:Name="ellipse"  Width="10" Height="10" Fill="White" Margin="10,0,10,0" VerticalAlignment="Center"/>
+						<TextBlock Text="{Binding Path=RelativePath}" />
 					</StackPanel>
+					<DataTemplate.Triggers>
+						<DataTrigger Binding="{Binding Included}" Value="True">
+							<Setter TargetName="ellipse" Property="Fill" Value="Green"/>
+						</DataTrigger>
+					</DataTemplate.Triggers>
 				</DataTemplate>
 			</ListView.ItemTemplate>
 		</ListView>

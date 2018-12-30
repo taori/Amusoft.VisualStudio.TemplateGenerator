@@ -8,21 +8,26 @@ using System.Threading.Tasks;
 using System.Windows.Data;
 using System.Windows.Input;
 using Generator.Client.Desktop.Utility;
+using Generator.Shared.FileSystem;
 using Generator.Shared.Template;
+using NLog;
 using Reactive.Bindings;
 
 namespace Generator.Client.Desktop.ViewModels
 {
 	public class ManageOpenInEditorReferencesViewModel : ScreenViewModel
 	{
+		private static readonly ILogger Log = LogManager.GetLogger(nameof(ManageOpenInEditorReferencesViewModel));
+
 		public ConfigurationViewModel Configuration { get; }
 
 		public ManageOpenInEditorReferencesViewModel(ConfigurationViewModel configuration)
 		{
+			Title = "Manage OpenInEditor references.";
 			Configuration = configuration;
 			Filter = new ReactiveProperty<string>();
 			Filter
-				.Throttle(TimeSpan.FromSeconds(500))
+				.Throttle(TimeSpan.FromMilliseconds(500))
 				.Subscribe(FilterChanged);
 		}
 
@@ -30,16 +35,18 @@ namespace Generator.Client.Desktop.ViewModels
 		{
 			Title = "Loading ...";
 
-			var items = await Task.Run(CreateViewModelsAsync);
-			SolutionItems = new ObservableCollection<OpenInEditorToggleViewModel>(items);
+			_allItems.AddRange(await Task.Run(BuildAllViewModelsAsync));
+			ItemsSubset = new ObservableCollection<OpenInEditorToggleViewModel>(_allItems);
 
 			Title = "Manage OpenInEditor references.";
 		}
 
-		private OpenInEditorToggleViewModel[] CreateViewModelsAsync()
+		private IEnumerable<OpenInEditorToggleViewModel> BuildAllViewModelsAsync()
 		{
+			Log.Info("Loading files.");
+
 			var solutionPath = Configuration.SolutionPath;
-			var allFiles = Directory.GetFiles(Path.GetDirectoryName(solutionPath), "*", SearchOption.AllDirectories);
+			var allFiles = FileLister.FromSolutionFile(solutionPath, new NoFilter());
 			var solutionUri = new Uri(solutionPath, UriKind.Absolute);
 			var currentReferences = new HashSet<string>(Configuration.OpenInEditorReferences);
 			var viewModels = allFiles.Select(file =>
@@ -47,45 +54,43 @@ namespace Generator.Client.Desktop.ViewModels
 				var vm = new OpenInEditorToggleViewModel(file, solutionUri);
 				vm.Included = currentReferences.Contains(vm.RelativePath.OriginalString);
 				return vm;
-			}).ToArray();
+			});
+
+			Log.Info("Files loaded.");
 
 			return viewModels;
 		}
 
-		private void FilterChanged(string obj)
+		private void FilterChanged(string filterValue)
 		{
-			var view = CollectionViewSource.GetDefaultView(_solutionItems);
+			Log.Info($"{nameof(FilterChanged)}: {filterValue}");
 			if (string.IsNullOrEmpty(Filter.Value) || string.IsNullOrWhiteSpace(Filter.Value))
 			{
-				view.Filter = null;
+				ItemsSubset = new ObservableCollection<OpenInEditorToggleViewModel>(_allItems);
 			}
 			else
 			{
-				view.Filter = FilterValue;
+				ItemsSubset = new ObservableCollection<OpenInEditorToggleViewModel>(FilterItems(_allItems, filterValue));
 			}
 		}
 
-		private bool FilterValue(object obj)
+		private List<OpenInEditorToggleViewModel> FilterItems(List<OpenInEditorToggleViewModel> items, string filterValue)
 		{
-			if (obj is OpenInEditorToggleViewModel toggleVm)
-			{
-				if (toggleVm.RelativePath.OriginalString.Contains(Filter.Value))
-					return true;
-
-				return false;
-			}
-
-			throw new Exception($"Unexpected datatype {obj.GetType()}. Expecting {nameof(OpenInEditorToggleViewModel)}.");
+			return items
+				.Where(d => d.RelativePath.OriginalString.IndexOf(filterValue, StringComparison.OrdinalIgnoreCase) >= 0)
+				.ToList();
 		}
 
 		public ReactiveProperty<string> Filter { get; } 
 
-		private ObservableCollection<OpenInEditorToggleViewModel> _solutionItems;
+		private List<OpenInEditorToggleViewModel> _allItems = new List<OpenInEditorToggleViewModel>();
 
-		public ObservableCollection<OpenInEditorToggleViewModel> SolutionItems
+		private ObservableCollection<OpenInEditorToggleViewModel> _itemsSubset = new ObservableCollection<OpenInEditorToggleViewModel>();
+
+		public ObservableCollection<OpenInEditorToggleViewModel> ItemsSubset
 		{
-			get => _solutionItems;
-			set => SetValue(ref _solutionItems, value, nameof(SolutionItems));
+			get => _itemsSubset;
+			set => SetValue(ref _itemsSubset, value, nameof(ItemsSubset));
 		}
 
 		private ICommand _toggleSolutionFileCommand;

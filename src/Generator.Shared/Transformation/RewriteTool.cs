@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Generator.Shared.FileSystem;
 using Generator.Shared.Template;
 using Generator.Shared.Utilities;
 using NLog;

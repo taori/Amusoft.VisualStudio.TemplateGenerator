@@ -1,12 +1,11 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
-using System.Security.Permissions;
 using System.Text.RegularExpressions;
 using System.Threading;
 using NLog;
 
-namespace Generator.Shared.Utilities
+namespace Generator.Shared.FileSystem
 {
 	public static class FileHelper
 	{

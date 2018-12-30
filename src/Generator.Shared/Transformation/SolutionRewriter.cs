@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Serialization;
+using Generator.Shared.FileSystem;
 using Generator.Shared.Resources;
 using Generator.Shared.Serialization;
 using Generator.Shared.Template;

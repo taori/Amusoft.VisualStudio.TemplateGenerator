@@ -8,6 +8,7 @@ using System.Linq;
 using System.Reactive.Subjects;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Forms;
 using System.Windows.Input;
 using Generator.Client.Desktop.Utility;
@@ -17,6 +18,7 @@ using Generator.Shared.Serialization;
 using Generator.Shared.Template;
 using Generator.Shared.Transformation;
 using NLog;
+using MessageBox = System.Windows.Forms.MessageBox;
 
 namespace Generator.Client.Desktop.ViewModels
 {
@@ -51,8 +53,10 @@ namespace Generator.Client.Desktop.ViewModels
 			if (string.IsNullOrEmpty(solutionPath) || !File.Exists(solutionPath))
 				return Task.CompletedTask;
 
-			var referencedNamespaces = SolutionExplorer.GetReferencedProjectPaths(solutionPath)
-				.Select(SolutionExplorer.GetAssemblyName).ToArray();
+			var referencedNamespaces = SolutionExplorer
+				.GetReferencedProjectPaths(solutionPath)
+				.Select(SolutionExplorer.GetAssemblyName)
+				.ToArray();
 
 			StartupProjectOptions = new ObservableCollection<string>(referencedNamespaces);
 
@@ -74,9 +78,19 @@ namespace Generator.Client.Desktop.ViewModels
 			var window = new ManageOpenInEditorReferencesWindow();
 			var viewModel = new ManageOpenInEditorReferencesViewModel(this);
 			window.DataContext = viewModel;
+			window.Loaded += WindowOnLoaded;
 			window.Show();
+		}
 
-			await viewModel.LoadAsync();
+		private async void WindowOnLoaded(object sender, RoutedEventArgs e)
+		{
+			if (sender is Window window)
+			{
+				window.Loaded -= WindowOnLoaded;
+				await Task.Delay(500);
+				if (window.DataContext is ManageOpenInEditorReferencesViewModel vm)
+					await vm.LoadAsync();
+			}
 		}
 
 		private Task RemoveOpenInEditorReferenceExecute(string arg)
