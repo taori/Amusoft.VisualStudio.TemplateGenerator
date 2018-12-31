@@ -2,7 +2,7 @@
 
 ## features
 
-- Build template from raw VS project
+- Build multi project template from a raw visual studio solution
     - No need to export anything from within VS
 - Multi project template generation
 - Configure once, rebuild approach
