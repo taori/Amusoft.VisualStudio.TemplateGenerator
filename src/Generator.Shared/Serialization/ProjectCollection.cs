@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Xml.Serialization;
 
 namespace Generator.Shared.Serialization
@@ -24,5 +25,11 @@ namespace Generator.Shared.Serialization
 		[XmlElement(typeof(ProjectTemplateLink))]
 		[XmlElement(typeof(SolutionFolder))]
 		public List<NestableContent> Children { get; set; }
+
+		/// <inheritdoc />
+		public override int HasPrimaryProject(string primaryNamespace)
+		{
+			return Children.Max(d => d.HasPrimaryProject(primaryNamespace));
+		}
 	}
 }

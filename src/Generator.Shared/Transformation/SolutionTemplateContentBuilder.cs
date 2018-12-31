@@ -29,20 +29,10 @@ namespace Generator.Shared.Transformation
 			var orphans = sortedReferences.Where(d => !referencedProjects.Contains(d.OriginalAssemblyName));
 			var projectCollection = AddRecursive(root, referencesByNamespace)
 				.Concat(orphans.Select(ToProjectTemplateLink))
+				.OrderByDescending(d => d.HasPrimaryProject(Context.Configuration.PrimaryProject))
 				.ToList();
 
-			SetPrimaryProject(projectCollection);
 			return new ProjectCollection(projectCollection);
-		}
-
-		private void SetPrimaryProject(List<NestableContent> projectCollection)
-		{
-			if (string.IsNullOrEmpty(Context.Configuration.PrimaryProject))
-				return;
-
-			for (int i = 0; i < projectCollection.Count; i++)
-			{
-			}
 		}
 
 		private IEnumerable<NestableContent> AddRecursive(Folder folder, Dictionary<string, ProjectRewriteCacheEntry> referencesByNamespace)
@@ -71,7 +61,7 @@ namespace Generator.Shared.Transformation
 
 		private static ProjectTemplateLink ToProjectTemplateLink(ProjectRewriteCacheEntry reference)
 		{
-			return new ProjectTemplateLink(reference.RootTemplateNamespace, reference.RelativeVsTemplatePath);
+			return new ProjectTemplateLink(reference.RootTemplateNamespace, reference.RelativeVsTemplatePath, reference.OriginalAssemblyName);
 		}
 
 		private IEnumerable<ProjectRewriteCacheEntry> GetSortedSolutionReferences(ProjectRewriteCache cache)

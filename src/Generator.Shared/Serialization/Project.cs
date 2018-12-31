@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Xml.Serialization;
 
 namespace Generator.Shared.Serialization
@@ -40,5 +41,11 @@ namespace Generator.Shared.Serialization
 
 		[XmlAttribute]
 		public bool ReplaceParameters { get; set; }
+
+		/// <inheritdoc />
+		public override int HasPrimaryProject(string primaryNamespace)
+		{
+			return Children.Max(d => d.HasPrimaryProject(primaryNamespace));
+		}
 	}
 }

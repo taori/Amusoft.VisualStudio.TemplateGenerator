@@ -41,5 +41,11 @@ namespace Generator.Shared.Serialization
 
 		[XmlAttribute]
 		public bool ReplaceParameters { get; set; }
+
+		/// <inheritdoc />
+		public override int HasPrimaryProject(string primaryNamespace)
+		{
+			return 0;
+		}
 	}
 }

@@ -10,7 +10,7 @@ namespace Generator.Shared.Serialization
 	[Serializable]
 	[System.ComponentModel.DesignerCategory("code")]
 	[XmlType(TypeName = "SolutionFolder", Namespace = "http://schemas.microsoft.com/developer/vstemplate/2005")]
-	[DebuggerDisplay("{Name} ({Children.Length})")]
+	[DebuggerDisplay("{Name} ({Children.Count})")]
 	public class SolutionFolder : NestableContent
 	{
 		/// <inheritdoc />
@@ -32,5 +32,11 @@ namespace Generator.Shared.Serialization
 		/// <remarks/>
 		[XmlAttribute]
 		public string Name { get; set; }
+
+		/// <inheritdoc />
+		public override int HasPrimaryProject(string primaryNamespace)
+		{
+			return Children.Max(d => d.HasPrimaryProject(primaryNamespace));
+		}
 	}
 }

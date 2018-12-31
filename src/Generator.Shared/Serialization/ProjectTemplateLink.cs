@@ -11,11 +11,12 @@ namespace Generator.Shared.Serialization
 	public class ProjectTemplateLink : NestableContent
 	{
 		/// <inheritdoc />
-		public ProjectTemplateLink(string projectName, string relativeTemplatePath, bool copyParameters = true)
+		public ProjectTemplateLink(string projectName, string relativeTemplatePath, string originalNamespace, bool copyParameters = true)
 		{
 			ProjectName = projectName;
 			CopyParameters = copyParameters;
 			RelativeTemplatePath = relativeTemplatePath;
+			OriginalNamespace = originalNamespace;
 		}
 
 		/// <inheritdoc />
@@ -36,5 +37,17 @@ namespace Generator.Shared.Serialization
 
 		[XmlText]
 		public string RelativeTemplatePath { get; set; }
+
+		[XmlIgnore]
+		public string OriginalNamespace { get; set; }
+
+		/// <inheritdoc />
+		public override int HasPrimaryProject(string primaryNamespace)
+		{
+			if (string.Equals(OriginalNamespace, primaryNamespace, StringComparison.OrdinalIgnoreCase))
+				return 1;
+
+			return 0;
+		}
 	}
 }
