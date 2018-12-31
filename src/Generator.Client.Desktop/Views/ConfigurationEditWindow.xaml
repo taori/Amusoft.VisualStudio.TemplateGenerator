@@ -135,7 +135,11 @@
 							<DataTemplate DataType="{x:Type viewModels:FolderViewModel}">
 								<StackPanel>
 									<DockPanel Margin="0,5,0,0">
-										<Button Focusable="False" Content="x" Command="{Binding ElementName=Self, Path=DataContext.RemoveHierarchyFolderCommand}" CommandParameter="{Binding Path=.}"  DockPanel.Dock="Right" VerticalAlignment="Center" Margin="5,0,0,0"/>
+										<Button Focusable="False" Content="x" 
+										        Command="{Binding ElementName=Self, Path=DataContext.RemoveHierarchyFolderCommand}" 
+										        CommandParameter="{Binding Path=.}" 
+										        IsEnabled="{Binding Path=IsRoot, Converter={StaticResource BooleanInversionConverter}}"
+										        DockPanel.Dock="Right" VerticalAlignment="Center" Margin="5,0,0,0"/>
 										<Button Focusable="False" Content="+project" Command="{Binding Path=NewFileCommand}" DockPanel.Dock="Right" VerticalAlignment="Center" Margin="5,0,0,0" />
 										<Button Focusable="False" Content="+folder" Command="{Binding Path=NewFolderCommand}" DockPanel.Dock="Right" VerticalAlignment="Center" Margin="5,0,0,0"/>
 										<StackPanel VerticalAlignment="Center">
@@ -157,7 +161,14 @@
 							</DataTemplate>
 							<DataTemplate DataType="{x:Type viewModels:ProjectViewModel}">
 								<DockPanel Margin="0,5,0,0">
-									<Button DockPanel.Dock="Right" Focusable="False" HorizontalAlignment="Right" Content="x" VerticalAlignment="Center" Command="{Binding ElementName=Self, Path=DataContext.RemoveHierarchyFolderCommand}" CommandParameter="{Binding Path=.}"/>
+									<Button 
+										DockPanel.Dock="Right" 
+										Focusable="False" 
+										HorizontalAlignment="Right" 
+										Content="x" 
+										VerticalAlignment="Center" 
+										Command="{Binding ElementName=Self, Path=DataContext.RemoveHierarchyFolderCommand}" 
+										CommandParameter="{Binding Path=.}"/>
 									<ComboBox Margin="0,0,5,0" HorizontalAlignment="Stretch" ItemsSource="{Binding ElementName=Self, Path=DataContext.ProjectNamespaces}" SelectedValue="{Binding Path=Namespace}"/>
 								</DockPanel>
 							</DataTemplate>

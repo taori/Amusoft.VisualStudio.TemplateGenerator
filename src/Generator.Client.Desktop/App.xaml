@@ -28,6 +28,7 @@
 				</Setter>
 			</Style>
 
+			<utility:BooleanInversionConverter x:Key="BooleanInversionConverter"/>
 			<BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
 			<utility:EnhancedBooleanToVisibilityConverter x:Key="EnhancedBooleanToVisibilityConverter"/>
 
