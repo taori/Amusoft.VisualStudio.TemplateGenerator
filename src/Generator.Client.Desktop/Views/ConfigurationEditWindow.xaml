@@ -89,7 +89,7 @@
 						</controls:LabeledControl>
 					</Grid>
 				</GroupBox>
-				<GroupBox Header="Deployment options">
+				<GroupBox Header="Deployment settings">
 					<Grid>
 						<Grid.ColumnDefinitions>
 							<ColumnDefinition Width="*" />
@@ -101,7 +101,7 @@
 							<RowDefinition Height="Auto" />
 						</Grid.RowDefinitions>
 
-						<GroupBox Header="output folders" Grid.Row="0" Grid.Column="0" Style="{StaticResource GroupBoxContrastStyle}">
+						<GroupBox Header="output folders:" Grid.Row="0" Grid.Column="0" Style="{StaticResource GroupBoxContrastStyle}">
 							<DockPanel>
 								<Button DockPanel.Dock="Right" Margin="5,0,0,0" Content="+" Padding="5,0" VerticalAlignment="Top"
 								        Command="{Binding Path=AddOutputFolderCommand}" />
@@ -140,7 +140,7 @@
 							</StackPanel>
 						</Border>
 
-						<GroupBox Header="Zip settings" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3" Style="{StaticResource GroupBoxContrastStyle}">
+						<GroupBox Header="Zip settings:" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3" Style="{StaticResource GroupBoxContrastStyle}">
 							<StackPanel>
 								<TextBox Text="{Binding Path=ArtifactName, UpdateSourceTrigger=PropertyChanged, ValidatesOnNotifyDataErrors=True, ValidatesOnDataErrors=True, NotifyOnValidationError=True}"
 								         mah:TextBoxHelper.UseFloatingWatermark="True" 
