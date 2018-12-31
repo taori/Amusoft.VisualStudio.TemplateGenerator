@@ -65,7 +65,7 @@ namespace Generator.Client.Desktop.ViewModels
 						progress.Canceled += ProgressOnCanceled(cts);
 						await Task.Delay(1000, cts.Token);
 						progress.SetIndeterminate();
-						await rewriter.ExecuteAsync(arg.OutputFolders, cts.Token, new Progress<string>(p => progress.SetMessage(p)));
+						await rewriter.ExecuteAsync(cts.Token, new Progress<string>(p => progress.SetMessage(p)));
 					}
 					catch (TaskCanceledException)
 					{

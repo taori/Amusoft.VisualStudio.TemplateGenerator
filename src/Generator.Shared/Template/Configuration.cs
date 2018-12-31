@@ -24,6 +24,10 @@ namespace Generator.Shared.Template
 
 		public bool CreateNewFolder { get; set; }
 
+		public bool ZipContents { get; set; }
+
+		public string ArtifactName { get; set; }
+
 		public string DefaultName { get; set; }
 
 		public string Description { get; set; }

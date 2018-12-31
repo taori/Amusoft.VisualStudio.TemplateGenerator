@@ -32,6 +32,9 @@
 		</Border>
 		<ScrollViewer Padding="10" VerticalScrollBarVisibility="Auto">
 			<StackPanel>
+				<GroupBox Header="Errors" Visibility="{Binding Path=HasErrors, Converter={StaticResource BooleanToVisibilityConverter}}">
+					<ItemsControl ItemsSource="{Binding Path=ValidationErrors}"></ItemsControl>
+				</GroupBox>
 				<GroupBox Header="Template data">
 					<Grid>
 						<Grid.ColumnDefinitions>
@@ -95,6 +98,7 @@
 						</Grid.ColumnDefinitions>
 						<Grid.RowDefinitions>
 							<RowDefinition Height="Auto" />
+							<RowDefinition Height="Auto" />
 						</Grid.RowDefinitions>
 
 						<GroupBox Header="output folders" Grid.Row="0" Grid.Column="0" Style="{StaticResource GroupBoxContrastStyle}">
@@ -119,17 +123,31 @@
 								</ListView>
 							</DockPanel>
 						</GroupBox>
-						<StackPanel Grid.Row="0" Grid.Column="2">
-							<controls:LabeledControl LabelText="Provide default name:">
-								<CheckBox IsChecked="{Binding Path=ProvideDefaultName, UpdateSourceTrigger=PropertyChanged}" />
-							</controls:LabeledControl>
-							<controls:LabeledControl LabelText="CreateInPlace:">
-								<CheckBox IsChecked="{Binding Path=CreateInPlace, UpdateSourceTrigger=PropertyChanged}" />
-							</controls:LabeledControl>
-							<controls:LabeledControl LabelText="CreateNewFolder:">
-								<CheckBox IsChecked="{Binding Path=CreateNewFolder, UpdateSourceTrigger=PropertyChanged}" />
-							</controls:LabeledControl>
-						</StackPanel>
+						<Border Grid.Row="0" Grid.Column="2" Padding="0,0,0,10">
+							<StackPanel >
+								<controls:LabeledControl LabelText="Provide default name:">
+									<CheckBox IsChecked="{Binding Path=ProvideDefaultName, UpdateSourceTrigger=PropertyChanged}" />
+								</controls:LabeledControl>
+								<controls:LabeledControl LabelText="CreateInPlace:">
+									<CheckBox IsChecked="{Binding Path=CreateInPlace, UpdateSourceTrigger=PropertyChanged}" />
+								</controls:LabeledControl>
+								<controls:LabeledControl LabelText="CreateNewFolder:">
+									<CheckBox IsChecked="{Binding Path=CreateNewFolder, UpdateSourceTrigger=PropertyChanged}" />
+								</controls:LabeledControl>
+								<controls:LabeledControl LabelText="Zip contents?:">
+									<CheckBox IsChecked="{Binding Path=ZipContents, UpdateSourceTrigger=PropertyChanged}" />
+								</controls:LabeledControl>
+							</StackPanel>
+						</Border>
+
+						<GroupBox Header="Zip settings" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3" Style="{StaticResource GroupBoxContrastStyle}">
+							<StackPanel>
+								<TextBox Text="{Binding Path=ArtifactName, UpdateSourceTrigger=PropertyChanged, ValidatesOnNotifyDataErrors=True, ValidatesOnDataErrors=True, NotifyOnValidationError=True}"
+								         mah:TextBoxHelper.UseFloatingWatermark="True" 
+								         mah:TextBoxHelper.Watermark="Artifact name:">
+								</TextBox>
+							</StackPanel>
+						</GroupBox>
 					</Grid>
 
 				</GroupBox>

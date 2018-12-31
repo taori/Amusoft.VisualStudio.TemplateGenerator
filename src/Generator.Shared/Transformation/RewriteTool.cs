@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.IO.Compression;
 using System.Linq;
+using System.Security.AccessControl;
 using System.Threading;
 using System.Threading.Tasks;
 using Generator.Shared.FileSystem;
@@ -26,40 +28,87 @@ namespace Generator.Shared.Transformation
 			Configuration = configuration;
 		}
 
-		public async Task ExecuteAsync(IList<string> destinationFolders, CancellationToken cancellationToken, IProgress<string> progress)
+		public async Task ExecuteAsync(CancellationToken cancellationToken, IProgress<string> progress)
 		{
-			if (destinationFolders.Count == 0)
-				return;
-
-			var context = new SolutionRewriteContext(cancellationToken, progress, Configuration);
-
-			foreach (var folder in destinationFolders)
+			if (Configuration.OutputFolders.Count == 0)
 			{
-				Log.Info($"Clearing \"{folder}\".");
-				if (!FileHelper.TryClearFolder(context.CancellationToken, folder))
-				{
-					progress.Report($"Failed to clear \"{folder}\". {Environment.NewLine}See logs for details.");
-					await Task.Delay(3000, cancellationToken);
-					return;
-				}
+				Log.Error($"No output paths specified.");
+				progress.Report($"No output paths specified.");
+				await Task.Delay(3000, cancellationToken);
+				return;
 			}
 
-			if (destinationFolders.Count >= 1)
+			var tempFolder = CreateTempFolder();
+			var context = new SolutionRewriteContext(cancellationToken, progress, Configuration);
+			if (!Directory.Exists(tempFolder))
 			{
-				var explorer = await SolutionExplorer.CreateAsync(SolutionPath, progress, cancellationToken);
-				await CopySolutionAsync(context, explorer, destinationFolders[0]);
-				if (!await RewriteSolutionAsync(context, destinationFolders[0]))
+				progress.Report($"Failed to create temp folder");
+				await Task.Delay(3000, cancellationToken);
+				Log.Error($"Failed to create temp folder");
+				return;
+			}
+
+			var explorer = await SolutionExplorer.CreateAsync(SolutionPath, progress, cancellationToken);
+			await CopySolutionAsync(context, explorer, tempFolder);
+
+			if (!await RewriteSolutionAsync(context, tempFolder))
+			{
+				progress.Report($"Solution rewrite of {SolutionPath} failed.{Environment.NewLine}See logs for details.");
+				return;
+			}
+
+			await DistributeArtifacts(cancellationToken, context, tempFolder);
+			Log.Debug($"Deleting temporary working folder {tempFolder}.");
+			Directory.Delete(tempFolder, true);
+		}
+
+		private string CreateTempFolder()
+		{
+			var folder = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
+			var info = new DirectoryInfo(folder);
+			info.Create();
+			return info.FullName;
+		}
+
+		private async Task DistributeArtifacts(CancellationToken cancellationToken, SolutionRewriteContext context, string tempFolder)
+		{
+			if (Configuration.OutputFolders.Count > 1)
+				Log.Debug($"Copying to {Configuration.OutputFolders.Count - 1} additional output folders.");
+
+			if (Configuration.ZipContents)
+			{
+				var zipName = Path.GetTempFileName();
+				try
 				{
-					progress.Report($"Solution rewrite of {SolutionPath} failed.{Environment.NewLine}See logs for details.");
-					return;
+					Log.Debug($"Creating zip file with contents of {tempFolder} at {zipName}.");
+
+					ZipHelper.ZipFolderContents(tempFolder, zipName);
+
+					foreach (var destinationFolder in Configuration.OutputFolders)
+					{
+						var destinationName = Path.Combine(destinationFolder, $"{Configuration.ArtifactName}.zip");
+						Log.Debug($"Copying file {zipName} to {destinationName}.");
+						File.Copy(zipName, destinationName, true);
+						await Task.Delay(20, cancellationToken);
+					}
 				}
-
-				if (destinationFolders.Count > 1)
-					Log.Debug($"Copying to {destinationFolders.Count-1} additional output folders.");
-
-				for (int i = 1; i < destinationFolders.Count; i++)
+				catch (Exception e)
 				{
-					FileHelper.CopyFolderContents(context.CancellationToken, destinationFolders[0], destinationFolders[i]);
+					Log.Error(e);
+					throw;
+				}
+				finally
+				{
+					Log.Debug($"Deleting tmp file {zipName}.");
+					File.Delete(zipName);
+				}
+			}
+			else
+			{
+				foreach (var folder in Configuration.OutputFolders)
+				{
+					var destination = Path.Combine(folder, Configuration.ArtifactName);
+					FileHelper.CopyFolderContents(context.CancellationToken, tempFolder, destination);
 					await Task.Delay(20, cancellationToken);
 				}
 			}

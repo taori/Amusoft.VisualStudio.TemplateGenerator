@@ -3,9 +3,11 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 using System.IO;
 using System.Linq;
 using System.Reactive.Subjects;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
@@ -230,6 +232,22 @@ namespace Generator.Client.Desktop.ViewModels
 			set => SetValue(ref _createNewFolder, value, nameof(CreateNewFolder));
 		}
 
+		private bool _zipContents;
+
+		public bool ZipContents
+		{
+			get => _zipContents;
+			set => SetValue(ref _zipContents, value, nameof(ZipContents));
+		}
+
+		private string _artifactName;
+
+		public string ArtifactName
+		{
+			get => _artifactName;
+			set => SetValue(ref _artifactName, value, nameof(ArtifactName));
+		}
+
 		private bool _createInPlace;
 
 		public bool CreateInPlace
@@ -388,6 +406,8 @@ namespace Generator.Client.Desktop.ViewModels
 			Model.SolutionPath = SolutionPath;
 			Model.CreateInPlace = CreateInPlace;
 			Model.CreateNewFolder = CreateNewFolder;
+			Model.ZipContents = ZipContents;
+			Model.ArtifactName = ArtifactName;
 			Model.DefaultName = DefaultName;
 			Model.Description = Description;
 			Model.CodeLanguage = CodeLanguage;
@@ -413,6 +433,8 @@ namespace Generator.Client.Desktop.ViewModels
 			SolutionPath = Model.SolutionPath;
 			CreateInPlace = Model.CreateInPlace;
 			CreateNewFolder = Model.CreateNewFolder;
+			ZipContents = Model.ZipContents;
+			ArtifactName = Model.ArtifactName;
 			DefaultName = Model.DefaultName;
 			Description = Model.Description;
 			CodeLanguage = Model.CodeLanguage;
@@ -432,6 +454,23 @@ namespace Generator.Client.Desktop.ViewModels
 				return false;
 			if (!ValidateOutputFolders())
 				return false;
+			if (!ValidateArtifactName())
+				return false;
+
+			return true;
+		}
+		
+		private static readonly Regex ArtifactNameRegex = new Regex(@"[\w_\d-\.]+");
+		private bool ValidateArtifactName()
+		{
+			if (
+				string.IsNullOrEmpty(ArtifactName)
+				|| string.IsNullOrWhiteSpace(ArtifactName)
+				|| !ArtifactNameRegex.IsMatch(ArtifactName))
+			{
+				AddError(nameof(ArtifactName), $"Invalid artifact name.");
+				return false;
+			}
 
 			return true;
 		}
@@ -476,8 +515,9 @@ namespace Generator.Client.Desktop.ViewModels
 				_errors.Add(property, errors);
 			}
 			
-			Log.Info($"Validation error {property}: {message}.");
+			Log.Debug($"Validation error {property}: {message}.");
 			errors.Add(message);
+			OnPropertyChanged(nameof(ValidationErrors));
 			ErrorsChanged?.Invoke(this, new DataErrorsChangedEventArgs(property));
 		}
 
@@ -486,10 +526,15 @@ namespace Generator.Client.Desktop.ViewModels
 		/// <inheritdoc />
 		public IEnumerable GetErrors(string propertyName)
 		{
-			if (propertyName != null && _errors.TryGetValue(propertyName, out var errors))
+			if(!string.IsNullOrEmpty(propertyName) && _errors.TryGetValue(propertyName, out var errors))
 				return errors;
 
-			return Enumerable.Empty<string>();
+			return _errors.TryGetValue(string.Empty, out var globalErrors) ? (IEnumerable<string>)globalErrors : Array.Empty<string>();
+		}
+
+		public IEnumerable<string> ValidationErrors
+		{
+			get { return _errors.Values.SelectMany(s => s); }
 		}
 
 		/// <inheritdoc />
