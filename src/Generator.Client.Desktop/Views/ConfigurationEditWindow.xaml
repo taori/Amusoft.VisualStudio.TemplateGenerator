@@ -1,24 +1,27 @@
 ﻿<mah:MetroWindow x:Class="Generator.Client.Desktop.Views.ConfigurationEditWindow"
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:Generator.Client.Desktop"
-        xmlns:viewModels="clr-namespace:Generator.Client.Desktop.ViewModels"
-        xmlns:system="clr-namespace:System;assembly=mscorlib"
-        xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
-        xmlns:controls="clr-namespace:Generator.Client.Desktop.Controls"
-        xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
-        xmlns:utility="clr-namespace:Generator.Client.Desktop.Utility"
-        xmlns:Interactions="http://schemas.microsoft.com/xaml/behaviors"
-        mc:Ignorable="d"
-        d:DataContext="{d:DesignInstance viewModels:ConfigurationViewModel}"
-		SizeToContent="WidthAndHeight"
-		x:Name="Self"
-        Title="Configuration editor" Height="450" Width="800">
+                 xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                 xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                 xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                 xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                 xmlns:local="clr-namespace:Generator.Client.Desktop"
+                 xmlns:viewModels="clr-namespace:Generator.Client.Desktop.ViewModels"
+                 xmlns:system="clr-namespace:System;assembly=mscorlib"
+                 xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
+                 xmlns:controls="clr-namespace:Generator.Client.Desktop.Controls"
+                 xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
+                 xmlns:utility="clr-namespace:Generator.Client.Desktop.Utility"
+                 xmlns:Interactions="http://schemas.microsoft.com/xaml/behaviors"
+                 mc:Ignorable="d"
+                 d:DataContext="{d:DesignInstance viewModels:ConfigurationViewModel}"
+                 SizeToContent="WidthAndHeight"
+                 x:Name="Self"
+                 Title="Configuration editor" Height="450" Width="800">
+	<Interactions:Interaction.Behaviors>
+		<utility:KeepWindowInScreenBehavior/>
+	</Interactions:Interaction.Behaviors>
 	<Window.InputBindings>
 		<KeyBinding Key="S" Modifiers="Control" Command="{Binding Path=CommitChangesCommand}" />
-		<KeyBinding Key="OemPlus" Command="{Binding AddOutputFolderCommand}"/>
+		<KeyBinding Key="OemPlus" Command="{Binding AddOutputFolderCommand}" />
 	</Window.InputBindings>
 	<DockPanel>
 		<Border Background="{StaticResource AccentColorBrush}" DockPanel.Dock="Bottom" Padding="5">
@@ -28,155 +31,202 @@
 			</StackPanel>
 		</Border>
 		<ScrollViewer Padding="10" VerticalScrollBarVisibility="Auto">
-			<Grid>
-				<Grid.ColumnDefinitions>
-					<ColumnDefinition Width="*"/>
-					<ColumnDefinition Width="10"/>
-					<ColumnDefinition Width="200"/>
-				</Grid.ColumnDefinitions>
-				<Grid.RowDefinitions>
-					<RowDefinition Height="Auto"/>
-					<RowDefinition Height="Auto"/>
-					<RowDefinition Height="Auto"/>
-					<RowDefinition Height="Auto"/>
-					<RowDefinition Height="Auto"/>
-					<RowDefinition Height="Auto"/>
-					<RowDefinition Height="Auto"/>
-					<RowDefinition Height="Auto"/>
-					<RowDefinition Height="Auto"/>
-				</Grid.RowDefinitions>
+			<StackPanel>
+				<GroupBox Header="Template data">
+					<Grid>
+						<Grid.ColumnDefinitions>
+							<ColumnDefinition Width="*" />
+							<ColumnDefinition Width="10" />
+							<ColumnDefinition Width="200" />
+						</Grid.ColumnDefinitions>
+						<Grid.RowDefinitions>
+							<RowDefinition Height="Auto" />
+							<RowDefinition Height="Auto" />
+							<RowDefinition Height="Auto" />
+							<RowDefinition Height="Auto" />
+							<RowDefinition Height="Auto" />
+						</Grid.RowDefinitions>
 
-				<controls:LabeledControl LabelText="Configuration name:" Grid.Row="0" Grid.Column="0">
-					<TextBox Text="{Binding Path=ConfigurationName, UpdateSourceTrigger=PropertyChanged}" />
-				</controls:LabeledControl>
-				<controls:LabeledControl LabelText="Language:" Grid.Row="0" Grid.Column="2">
-					<ComboBox SelectedValue="{Binding Path=CodeLanguage}" SelectedValuePath="Content" >
-						<ComboBoxItem Content="CSharp"/>
-						<ComboBoxItem Content="VisualBasic"/>
-					</ComboBox>
-				</controls:LabeledControl>
+						<controls:LabeledControl LabelText="Configuration name:" Grid.Row="0" Grid.Column="0">
+							<TextBox Text="{Binding Path=ConfigurationName, UpdateSourceTrigger=PropertyChanged}" />
+						</controls:LabeledControl>
+						<controls:LabeledControl LabelText="Language:" Grid.Row="0" Grid.Column="2">
+							<ComboBox SelectedValue="{Binding Path=CodeLanguage}" SelectedValuePath="Content">
+								<ComboBoxItem Content="CSharp" />
+								<ComboBoxItem Content="VisualBasic" />
+							</ComboBox>
+						</controls:LabeledControl>
 
-				<controls:LabeledControl LabelText="Suggested namespace:" Grid.Row="1" Grid.Column="0">
-					<TextBox Text="{Binding Path=DefaultName, UpdateSourceTrigger=PropertyChanged}" />
-				</controls:LabeledControl>
-				<controls:LabeledControl LabelText="Display name (VS):" Grid.Row="1" Grid.Column="2">
-					<TextBox Text="{Binding Path=Name, UpdateSourceTrigger=PropertyChanged}" />
-				</controls:LabeledControl>
+						<controls:LabeledControl LabelText="Suggested namespace:" Grid.Row="1" Grid.Column="0">
+							<TextBox Text="{Binding Path=DefaultName, UpdateSourceTrigger=PropertyChanged}" />
+						</controls:LabeledControl>
+						<controls:LabeledControl LabelText="Display name (VS):" Grid.Row="1" Grid.Column="2">
+							<TextBox Text="{Binding Path=Name, UpdateSourceTrigger=PropertyChanged}" />
+						</controls:LabeledControl>
 
-				<controls:LabeledControl LabelText="Description:" Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3">
-					<TextBox Text="{Binding Path=Description, UpdateSourceTrigger=PropertyChanged}" TextWrapping="WrapWithOverflow" AcceptsReturn="True" />
-				</controls:LabeledControl>
+						<controls:LabeledControl LabelText="Description:" Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3">
+							<TextBox Text="{Binding Path=Description, UpdateSourceTrigger=PropertyChanged}" TextWrapping="WrapWithOverflow"
+							         AcceptsReturn="True" />
+						</controls:LabeledControl>
 
-				<controls:LabeledControl LabelText="Icon package:" Grid.Row="3" Grid.Column="0">
-					<TextBox Text="{Binding Path=Icon.Package, UpdateSourceTrigger=PropertyChanged}" />
-				</controls:LabeledControl>
-				<controls:LabeledControl LabelText="Icon id:" Grid.Row="3" Grid.Column="2">
-					<TextBox Text="{Binding Path=Icon.Id, UpdateSourceTrigger=PropertyChanged}" />
-				</controls:LabeledControl>
+						<controls:LabeledControl LabelText="Icon package:" Grid.Row="3" Grid.Column="0">
+							<TextBox Text="{Binding Path=Icon.Package, UpdateSourceTrigger=PropertyChanged}" />
+						</controls:LabeledControl>
+						<controls:LabeledControl LabelText="Icon id:" Grid.Row="3" Grid.Column="2">
+							<TextBox Text="{Binding Path=Icon.Id, UpdateSourceTrigger=PropertyChanged}" />
+						</controls:LabeledControl>
 
-				<controls:LabeledControl LabelText="Solution path:" Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="3">
-					<DockPanel>
-						<Button DockPanel.Dock="Right" Margin="5,0,0,0" Content="..." Padding="5,0" Command="{Binding Path=SelectSolutionCommand}"/>
-						<TextBox Text="{Binding Path=SolutionPath, ValidatesOnNotifyDataErrors=True}" IsReadOnly="True" Background="LightGray" />
-					</DockPanel>
-				</controls:LabeledControl>
+						<controls:LabeledControl LabelText="Solution path:" Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="3">
+							<DockPanel>
+								<Button DockPanel.Dock="Right" Margin="5,0,0,0" Content="..." Padding="5,0"
+								        Command="{Binding Path=SelectSolutionCommand}" />
+								<TextBox Text="{Binding Path=SolutionPath, ValidatesOnNotifyDataErrors=True}" IsReadOnly="True"
+								         Background="LightGray" />
+							</DockPanel>
+						</controls:LabeledControl>
+					</Grid>
+				</GroupBox>
+				<GroupBox Header="Deployment options">
+					<Grid>
+						<Grid.ColumnDefinitions>
+							<ColumnDefinition Width="*" />
+							<ColumnDefinition Width="10" />
+							<ColumnDefinition Width="200" />
+						</Grid.ColumnDefinitions>
+						<Grid.RowDefinitions>
+							<RowDefinition Height="Auto" />
+						</Grid.RowDefinitions>
 
-				<controls:LabeledControl LabelText="Output folders:" Grid.Row="5" Grid.Column="0">
-					<DockPanel>
-						<Button DockPanel.Dock="Right" Margin="5,0,0,0" Content="+" Padding="5,0" VerticalAlignment="Top"
-					        Command="{Binding Path=AddOutputFolderCommand}"/>
-						<ListView ItemsSource="{Binding Path=OutputFolders, ValidatesOnNotifyDataErrors=True}">
-							<ListView.InputBindings>
-								<KeyBinding Key="Delete" Command="{Binding RemoveOutputFolderCommand}" CommandParameter="{Binding Path=OutputFolders/}"/>
-							</ListView.InputBindings>
-							<ListView.ItemTemplate>
-								<DataTemplate>
-									<TextBlock Text="{Binding Path=.}"/>
-								</DataTemplate>
-							</ListView.ItemTemplate>
-						</ListView>
-					</DockPanel>
-				</controls:LabeledControl>
-				<StackPanel Grid.Row="5" Grid.Column="2">
-					<controls:LabeledControl LabelText="Provide default name:" >
-						<CheckBox IsChecked="{Binding Path=ProvideDefaultName, UpdateSourceTrigger=PropertyChanged}" />
-					</controls:LabeledControl>
-					<controls:LabeledControl LabelText="CreateInPlace:" >
-						<CheckBox IsChecked="{Binding Path=CreateInPlace, UpdateSourceTrigger=PropertyChanged}" />
-					</controls:LabeledControl>
-					<controls:LabeledControl LabelText="CreateNewFolder:" >
-						<CheckBox IsChecked="{Binding Path=CreateNewFolder, UpdateSourceTrigger=PropertyChanged}" />
-					</controls:LabeledControl>
-				</StackPanel>
+						<GroupBox Header="output folders" Grid.Row="0" Grid.Column="0" Style="{StaticResource GroupBoxContrastStyle}">
+							<DockPanel>
+								<Button DockPanel.Dock="Right" Margin="5,0,0,0" Content="+" Padding="5,0" VerticalAlignment="Top"
+								        Command="{Binding Path=AddOutputFolderCommand}" />
+								<ListView ItemsSource="{Binding Path=OutputFolders, ValidatesOnNotifyDataErrors=True}">
+									<ListView.Template>
+										<ControlTemplate>
+											<ItemsPresenter/>
+										</ControlTemplate>
+									</ListView.Template>
+									<ListView.InputBindings>
+										<KeyBinding Key="Delete" Command="{Binding RemoveOutputFolderCommand}"
+										            CommandParameter="{Binding Path=OutputFolders/}" />
+									</ListView.InputBindings>
+									<ListView.ItemTemplate>
+										<DataTemplate>
+											<TextBlock Text="{Binding Path=.}" />
+										</DataTemplate>
+									</ListView.ItemTemplate>
+								</ListView>
+							</DockPanel>
+						</GroupBox>
+						<StackPanel Grid.Row="0" Grid.Column="2">
+							<controls:LabeledControl LabelText="Provide default name:">
+								<CheckBox IsChecked="{Binding Path=ProvideDefaultName, UpdateSourceTrigger=PropertyChanged}" />
+							</controls:LabeledControl>
+							<controls:LabeledControl LabelText="CreateInPlace:">
+								<CheckBox IsChecked="{Binding Path=CreateInPlace, UpdateSourceTrigger=PropertyChanged}" />
+							</controls:LabeledControl>
+							<controls:LabeledControl LabelText="CreateNewFolder:">
+								<CheckBox IsChecked="{Binding Path=CreateNewFolder, UpdateSourceTrigger=PropertyChanged}" />
+							</controls:LabeledControl>
+						</StackPanel>
+					</Grid>
 
-				<controls:LabeledControl LabelText="Startup project:" Grid.Row="6" Grid.Column="0" Grid.ColumnSpan="3">
-					<ComboBox SelectedValue="{Binding Path=PrimaryProject}" ItemsSource="{Binding Path=ProjectNamespaces}" />
-				</controls:LabeledControl>
+				</GroupBox>
+				<GroupBox Header="Solution layout">
+					<Grid>
+						<Grid.ColumnDefinitions>
+							<ColumnDefinition Width="*" />
+							<ColumnDefinition Width="10" />
+							<ColumnDefinition Width="200" />
+						</Grid.ColumnDefinitions>
+						<Grid.RowDefinitions>
+							<RowDefinition Height="Auto" />
+							<RowDefinition Height="Auto" />
+							<RowDefinition Height="Auto" />
+						</Grid.RowDefinitions>
 
-				<controls:LabeledControl LabelText="OpenInEditor files:" Grid.Row="7" Grid.Column="0" Grid.ColumnSpan="3">
-					<StackPanel>
-						<Button Content="Manage OpenInEditor references" Command="{Binding Path=ManageOpenInEditorReferencesCommand}" Margin="0,0,0,10" />
-						<ListView ItemsSource="{Binding Path=OpenInEditorReferences}">
-							<ListView.InputBindings>
-								<KeyBinding Key="Delete" Command="{Binding RemoveOpenInEditorReferenceCommand}" CommandParameter="{Binding Path=OpenInEditorReferences/}"/>
-							</ListView.InputBindings>
-							<ListView.ItemTemplate>
-								<DataTemplate>
-									<TextBlock Text="{Binding Path=.}"/>
-								</DataTemplate>
-							</ListView.ItemTemplate>
-						</ListView>
-					</StackPanel>
-				</controls:LabeledControl>
+						<GroupBox Header="Startup project:" Style="{StaticResource GroupBoxContrastStyle}" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3">
+							<ComboBox SelectedValue="{Binding Path=PrimaryProject}" ItemsSource="{Binding Path=ProjectNamespaces}" />
+						</GroupBox>
 
-				<controls:LabeledControl LabelText="Solution folders:" Grid.Row="8" Grid.Column="0" Grid.ColumnSpan="3">
-					<StackPanel>
-						<StackPanel.Resources>
-							<DataTemplate DataType="{x:Type viewModels:FolderViewModel}">
-								<StackPanel>
-									<DockPanel Margin="0,5,0,0">
-										<Button Focusable="False" Content="x" 
-										        Command="{Binding ElementName=Self, Path=DataContext.RemoveHierarchyFolderCommand}" 
-										        CommandParameter="{Binding Path=.}" 
-										        IsEnabled="{Binding Path=IsRoot, Converter={StaticResource BooleanInversionConverter}}"
-										        DockPanel.Dock="Right" VerticalAlignment="Center" Margin="5,0,0,0"/>
-										<Button Focusable="False" Content="+project" Command="{Binding Path=NewFileCommand}" DockPanel.Dock="Right" VerticalAlignment="Center" Margin="5,0,0,0" />
-										<Button Focusable="False" Content="+folder" Command="{Binding Path=NewFolderCommand}" DockPanel.Dock="Right" VerticalAlignment="Center" Margin="5,0,0,0"/>
-										<StackPanel VerticalAlignment="Center">
-											<TextBox 
-												Visibility="{Binding Path=IsRoot, Converter={StaticResource EnhancedBooleanToVisibilityConverter}, ConverterParameter={utility:SystemType Bool=True}}"
-												mah:TextBoxHelper.Watermark="Foldername:"
-												Text="{Binding Path=FolderName, UpdateSourceTrigger=PropertyChanged}"/>
-											<TextBlock 
-												Visibility="{Binding Path=IsRoot, Converter={StaticResource EnhancedBooleanToVisibilityConverter}}"
-												Text="{Binding Path=FolderName}" />
+						<GroupBox Header="Open in editor:" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3" Style="{StaticResource GroupBoxContrastStyle}">
+
+							<StackPanel>
+								<Button Content="Manage OpenInEditor references" Command="{Binding Path=ManageOpenInEditorReferencesCommand}"
+								        Margin="0,0,0,10" />
+								<ListView ItemsSource="{Binding Path=OpenInEditorReferences}">
+									<ListView.InputBindings>
+										<KeyBinding Key="Delete" Command="{Binding RemoveOpenInEditorReferenceCommand}"
+										            CommandParameter="{Binding Path=OpenInEditorReferences/}" />
+									</ListView.InputBindings>
+									<ListView.Template>
+										<ControlTemplate>
+											<ItemsPresenter/>
+										</ControlTemplate>
+									</ListView.Template>
+									<ListView.ItemTemplate>
+										<DataTemplate>
+											<TextBlock Text="{Binding Path=.}" />
+										</DataTemplate>
+									</ListView.ItemTemplate>
+								</ListView>
+							</StackPanel>
+						</GroupBox>
+
+						<GroupBox Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3" Header="Solution folders:" Style="{StaticResource GroupBoxContrastStyle}">
+							<StackPanel>
+								<StackPanel.Resources>
+									<DataTemplate DataType="{x:Type viewModels:FolderViewModel}">
+										<StackPanel>
+											<DockPanel Margin="0,5,0,0">
+												<Button Focusable="False" Content="x"
+												        Command="{Binding ElementName=Self, Path=DataContext.RemoveHierarchyFolderCommand}"
+												        CommandParameter="{Binding Path=.}"
+												        IsEnabled="{Binding Path=IsRoot, Converter={StaticResource BooleanInversionConverter}}"
+												        DockPanel.Dock="Right" VerticalAlignment="Center" Margin="5,0,0,0" />
+												<Button Focusable="False" Content="+project" Command="{Binding Path=NewFileCommand}" DockPanel.Dock="Right"
+												        VerticalAlignment="Center" Margin="5,0,0,0" />
+												<Button Focusable="False" Content="+folder" Command="{Binding Path=NewFolderCommand}"
+												        DockPanel.Dock="Right" VerticalAlignment="Center" Margin="5,0,0,0" />
+												<StackPanel VerticalAlignment="Center">
+													<TextBox
+														Visibility="{Binding Path=IsRoot, Converter={StaticResource EnhancedBooleanToVisibilityConverter}, ConverterParameter={utility:SystemType Bool=True}}"
+														mah:TextBoxHelper.Watermark="Foldername:"
+														Text="{Binding Path=FolderName, UpdateSourceTrigger=PropertyChanged}" />
+													<TextBlock
+														Visibility="{Binding Path=IsRoot, Converter={StaticResource EnhancedBooleanToVisibilityConverter}}"
+														Text="{Binding Path=FolderName}" />
+												</StackPanel>
+											</DockPanel>
+											<ItemsControl
+												Focusable="False"
+												ItemsSource="{Binding Path=Items}"
+												Margin="20,0,0,0" />
 										</StackPanel>
-									</DockPanel>
-									<ItemsControl 
-										Focusable="False"
-										ItemsSource="{Binding Path=Items}"
-										Margin="20,0,0,0">
-									</ItemsControl>
-								</StackPanel>
-							</DataTemplate>
-							<DataTemplate DataType="{x:Type viewModels:ProjectViewModel}">
-								<DockPanel Margin="0,5,0,0">
-									<Button 
-										DockPanel.Dock="Right" 
-										Focusable="False" 
-										HorizontalAlignment="Right" 
-										Content="x" 
-										VerticalAlignment="Center" 
-										Command="{Binding ElementName=Self, Path=DataContext.RemoveHierarchyFolderCommand}" 
-										CommandParameter="{Binding Path=.}"/>
-									<ComboBox Margin="0,0,5,0" HorizontalAlignment="Stretch" ItemsSource="{Binding ElementName=Self, Path=DataContext.ProjectNamespaces}" SelectedValue="{Binding Path=Namespace}"/>
-								</DockPanel>
-							</DataTemplate>
-						</StackPanel.Resources>
-						<ContentPresenter Content="{Binding Path=TemplateHierarchy}"></ContentPresenter>
-					</StackPanel>
-				</controls:LabeledControl>
-			</Grid>
+									</DataTemplate>
+									<DataTemplate DataType="{x:Type viewModels:ProjectViewModel}">
+										<DockPanel Margin="0,5,0,0">
+											<Button
+												DockPanel.Dock="Right"
+												Focusable="False"
+												HorizontalAlignment="Right"
+												Content="x"
+												VerticalAlignment="Center"
+												Command="{Binding ElementName=Self, Path=DataContext.RemoveHierarchyFolderCommand}"
+												CommandParameter="{Binding Path=.}" />
+											<ComboBox Margin="0,0,5,0" HorizontalAlignment="Stretch"
+											          ItemsSource="{Binding ElementName=Self, Path=DataContext.ProjectNamespaces}"
+											          SelectedValue="{Binding Path=Namespace}" />
+										</DockPanel>
+									</DataTemplate>
+								</StackPanel.Resources>
+								<ContentPresenter Content="{Binding Path=TemplateHierarchy}" />
+							</StackPanel>
+						</GroupBox>
+					</Grid>
+				</GroupBox>
+			</StackPanel>
 		</ScrollViewer>
 	</DockPanel>
 </mah:MetroWindow>

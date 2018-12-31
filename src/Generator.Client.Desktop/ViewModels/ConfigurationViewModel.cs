@@ -107,7 +107,7 @@ namespace Generator.Client.Desktop.ViewModels
 			if (string.IsNullOrEmpty(arg))
 				return Task.CompletedTask;
 
-			if (MessageBox.Show($"Remove for sure?", "Question") == DialogResult.OK)
+			if (MessageBox.Show($"Remove for sure?", "Question", MessageBoxButtons.YesNo) == DialogResult.Yes)
 				OpenInEditorReferences.Remove(arg);
 
 			return Task.CompletedTask;
