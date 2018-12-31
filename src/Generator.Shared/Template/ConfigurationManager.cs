@@ -18,14 +18,18 @@ namespace Generator.Shared.Template
 
 			using (var stream = new StreamReader(new FileStream(ConfigurationStorePath, FileMode.Open)))
 			{
-				var items = JsonConvert.DeserializeObject<Configuration[]>(await stream.ReadToEndAsync());
+				var settings = new JsonSerializerSettings();
+				settings.TypeNameHandling = TypeNameHandling.Auto;
+				var items = JsonConvert.DeserializeObject<Configuration[]>(await stream.ReadToEndAsync(), settings);
 				return items;
 			}
 		}
 
 		public static async Task SaveConfigurationsAsync(IEnumerable<Configuration> configurations)
 		{
-			var serialized = JsonConvert.SerializeObject(configurations, Formatting.Indented);
+			var settings = new JsonSerializerSettings();
+			settings.TypeNameHandling = TypeNameHandling.Auto;
+			var serialized = JsonConvert.SerializeObject(configurations, Formatting.Indented, settings);
 			using (var stream = new StreamWriter(new FileStream(ConfigurationStorePath, FileMode.Create)))
 			{
 				await stream.WriteAsync(serialized);

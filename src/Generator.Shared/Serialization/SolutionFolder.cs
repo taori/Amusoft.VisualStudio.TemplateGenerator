@@ -1,4 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
 using System.Xml.Serialization;
 
 namespace Generator.Shared.Serialization
@@ -7,12 +10,13 @@ namespace Generator.Shared.Serialization
 	[Serializable]
 	[System.ComponentModel.DesignerCategory("code")]
 	[XmlType(TypeName = "SolutionFolder", Namespace = "http://schemas.microsoft.com/developer/vstemplate/2005")]
+	[DebuggerDisplay("{Name} ({Children.Length})")]
 	public class SolutionFolder : NestableContent
 	{
 		/// <inheritdoc />
-		public SolutionFolder(string name, NestableContent[] children)
+		public SolutionFolder(string name, IEnumerable<NestableContent> children)
 		{
-			Children = children;
+			Children = children.ToList();
 			Name = name;
 		}
 
@@ -21,8 +25,9 @@ namespace Generator.Shared.Serialization
 		{
 		}
 
+		[XmlElement(typeof(SolutionFolder), ElementName = "SolutionFolder")]
 		[XmlElement(typeof(ProjectTemplateLink), ElementName = "ProjectTemplateLink")]
-		public NestableContent[] Children { get; set; }
+		public List<NestableContent> Children { get; set; }
 
 		/// <remarks/>
 		[XmlAttribute]

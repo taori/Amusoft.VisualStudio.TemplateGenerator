@@ -4,27 +4,41 @@
              xmlns:local="clr-namespace:Generator.Client.Desktop"
              xmlns:viewModels="clr-namespace:Generator.Client.Desktop.ViewModels"
              xmlns:view="clr-namespace:Generator.Client.Desktop.Views"
-			 ShutdownMode="OnMainWindowClose"
+             xmlns:utility="clr-namespace:Generator.Client.Desktop.Utility"
+             xmlns:Interactions="http://schemas.microsoft.com/xaml/behaviors"
+             ShutdownMode="OnMainWindowClose"
              StartupUri="Views\MainWindow.xaml">
-    <Application.Resources>
+	<Application.Resources>
 
-	    <ResourceDictionary>
-		    <ResourceDictionary.MergedDictionaries>
-			    <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.xaml" />
-			    <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Fonts.xaml" />
-			    <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/colors.xaml" />
-			    <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Accents/cobalt.xaml" />
-			    <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Accents/baselight.xaml" />
-		    </ResourceDictionary.MergedDictionaries>
+		<ResourceDictionary>
+			<ResourceDictionary.MergedDictionaries>
+				<ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.xaml" />
+				<ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Fonts.xaml" />
+				<ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/colors.xaml" />
+				<ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Accents/cobalt.xaml" />
+				<ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Accents/baselight.xaml" />
+			</ResourceDictionary.MergedDictionaries>
+			<Style TargetType="TextBox" BasedOn="{StaticResource MetroTextBox}">
+				<Setter Property="utility:BehaviorInStyleAttacher.Behaviors">
+					<Setter.Value>
+						<utility:AdditionalBehaviorsCollection>
+							<utility:SelectAllOnFocusBehavior/>
+						</utility:AdditionalBehaviorsCollection>
+					</Setter.Value>
+				</Setter>
+			</Style>
 
-		    <DataTemplate DataType="{x:Type viewModels:ConfigurationOverviewViewModel}">
-			    <view:ConfigurationOverviewView/>
-		    </DataTemplate>
+			<BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+			<utility:EnhancedBooleanToVisibilityConverter x:Key="EnhancedBooleanToVisibilityConverter"/>
 
-		    <Style TargetType="{x:Type Label}" x:Key="LabelSmallStyle">
-			    <Setter Property="FontWeight" Value="Bold"/>
-			    <Setter Property="FontSize" Value="10"/>
-		    </Style>
+			<DataTemplate DataType="{x:Type viewModels:ConfigurationOverviewViewModel}">
+				<view:ConfigurationOverviewView/>
+			</DataTemplate>
+
+			<Style TargetType="{x:Type Label}" x:Key="LabelSmallStyle">
+				<Setter Property="FontWeight" Value="Bold"/>
+				<Setter Property="FontSize" Value="10"/>
+			</Style>
 		</ResourceDictionary>
-    </Application.Resources>
+	</Application.Resources>
 </Application>

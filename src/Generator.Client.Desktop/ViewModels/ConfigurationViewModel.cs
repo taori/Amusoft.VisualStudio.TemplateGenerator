@@ -57,7 +57,7 @@ namespace Generator.Client.Desktop.ViewModels
 			var referencedNamespaces = GetAssemblyNamesOfSolution(solutionPath)
 				.ToArray();
 
-			StartupProjectOptions = new ObservableCollection<string>(referencedNamespaces);
+			ProjectNamespaces = new ObservableCollection<string>(referencedNamespaces);
 
 			return Task.CompletedTask;
 		}
@@ -168,10 +168,10 @@ namespace Generator.Client.Desktop.ViewModels
 
 		private ObservableCollection<string> _startupProjectOptions;
 
-		public ObservableCollection<string> StartupProjectOptions
+		public ObservableCollection<string> ProjectNamespaces
 		{
 			get => _startupProjectOptions ?? (_startupProjectOptions = new ObservableCollection<string>());
-			set => SetValue(ref _startupProjectOptions, value, nameof(StartupProjectOptions));
+			set => SetValue(ref _startupProjectOptions, value, nameof(ProjectNamespaces));
 		}
 
 		private IconPackageViewModel _icon = new IconPackageViewModel();
@@ -261,21 +261,7 @@ namespace Generator.Client.Desktop.ViewModels
 			get => _primaryProject;
 			set => SetValue(ref _primaryProject, value, nameof(PrimaryProject));
 		}
-
-		private ICommand _newFolderCommand;
-
-		public ICommand NewRootFolderCommand
-		{
-			get => _newFolderCommand ?? (_newFolderCommand = new TaskCommand(NewRootFolderExecute));
-			set => SetValue(ref _newFolderCommand, value, nameof(NewRootFolderCommand));
-		}
-
-		private Task NewRootFolderExecute(object arg)
-		{
-			TemplateHierarchy.Add(new FolderViewModel(new Folder()));
-			return Task.CompletedTask;
-		}
-
+		
 		private ICommand _commitChangesCommand;
 
 		public ICommand CommitChangesCommand
@@ -328,26 +314,42 @@ namespace Generator.Client.Desktop.ViewModels
 			set => SetValue(ref _removeOutputFolderCommand, value, nameof(RemoveOutputFolderCommand));
 		}
 
-		private ICommand _removeRootFolderCommand;
-
-		public ICommand RemoveRootFolderCommand
-		{
-			get => _removeRootFolderCommand ?? (_removeRootFolderCommand = new TaskCommand<FolderViewModel>(RemoveRootFolderExecute));
-			set => SetValue(ref _removeRootFolderCommand, value, nameof(RemoveRootFolderCommand));
-		}
-
-		private Task RemoveRootFolderExecute(FolderViewModel arg)
-		{
-			TemplateHierarchy.Remove(arg);
-			return Task.CompletedTask;
-		}
-
 		private ICommand _removeOpenInEditorReferenceCommand;
 
 		public ICommand RemoveOpenInEditorReferenceCommand
 		{
 			get => _removeOpenInEditorReferenceCommand;
 			set => SetValue(ref _removeOpenInEditorReferenceCommand, value, nameof(RemoveOpenInEditorReferenceCommand));
+		}
+
+		private ICommand _removeHierarchyFolderCommand;
+
+		public ICommand RemoveHierarchyFolderCommand
+		{
+			get => _removeHierarchyFolderCommand ?? (_removeHierarchyFolderCommand = new TaskCommand<TemplateHierarchyViewModel>(RemoveHierarchyFolderExecute));
+			set => SetValue(ref _removeHierarchyFolderCommand, value, nameof(RemoveHierarchyFolderCommand));
+		}
+
+		private Task RemoveHierarchyFolderExecute(TemplateHierarchyViewModel item)
+		{
+			RemoveHierarchyElement(TemplateHierarchy, item);
+			return Task.CompletedTask;
+		}
+
+		private void RemoveHierarchyElement(FolderViewModel folderViewModel, TemplateHierarchyViewModel item)
+		{
+			var children = folderViewModel.Items.ToArray();
+			foreach (var child in children)
+			{
+				if (object.ReferenceEquals(child, item))
+				{
+					folderViewModel.Items.Remove(item);
+					return;
+				}
+
+				if(child is FolderViewModel subFolder)
+					RemoveHierarchyElement(subFolder, item);
+			}
 		}
 
 		private ICommand _manageOpenInEditorReferencesCommand;
@@ -366,11 +368,11 @@ namespace Generator.Client.Desktop.ViewModels
 			set => SetValue(ref _openInEditorReferences, value, nameof(OpenInEditorReferences));
 		}
 
-		private ObservableCollection<TemplateHierarchyViewModel> _templateHierarchy;
+		private FolderViewModel _templateHierarchy;
 
-		public ObservableCollection<TemplateHierarchyViewModel> TemplateHierarchy
+		public FolderViewModel TemplateHierarchy
 		{
-			get => _templateHierarchy ?? (_templateHierarchy = new ObservableCollection<TemplateHierarchyViewModel>());
+			get => _templateHierarchy;
 			set => SetValue(ref _templateHierarchy, value, nameof(TemplateHierarchy));
 		}
 
@@ -394,7 +396,9 @@ namespace Generator.Client.Desktop.ViewModels
 			Model.Name = Name;
 			Model.OutputFolders = new List<string>(OutputFolders);
 			Model.OpenInEditorReferences = new List<string>(OpenInEditorReferences);
-			Model.TemplateHierarchy = new List<TemplateHierarchyElement>(TemplateHierarchy.Select(s => s.Model));
+
+			TemplateHierarchy.UpdateModel();
+			Model.TemplateHierarchy = TemplateHierarchy.Model as Folder;
 		}
 
 		public void UpdateFromModel()
@@ -417,7 +421,7 @@ namespace Generator.Client.Desktop.ViewModels
 			PrimaryProject = Model.PrimaryProject;
 			OutputFolders = new ObservableCollection<string>(Model.OutputFolders);
 			OpenInEditorReferences = new ObservableCollection<string>(Model.OpenInEditorReferences);
-			TemplateHierarchy = new ObservableCollection<TemplateHierarchyViewModel>(Model.TemplateHierarchy.Select(TemplateHierarchyViewModel.Create));
+			TemplateHierarchy = new FolderViewModel(Model.TemplateHierarchy);
 		}
 
 		public bool CanBuild()

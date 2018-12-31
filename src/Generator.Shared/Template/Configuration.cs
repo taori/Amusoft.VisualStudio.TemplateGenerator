@@ -18,7 +18,7 @@ namespace Generator.Shared.Template
 
 		public List<string> OutputFolders { get; set; } = new List<string>();
 
-		public List<TemplateHierarchyElement> TemplateHierarchy { get; set; } = new List<TemplateHierarchyElement>();
+		public Folder TemplateHierarchy { get; set; } = new Folder() { IsRoot = true, Name = "Solution root"};
 
 		public bool CreateInPlace { get; set; }
 

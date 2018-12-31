@@ -9,9 +9,12 @@
         xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
         xmlns:controls="clr-namespace:Generator.Client.Desktop.Controls"
         xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
+        xmlns:utility="clr-namespace:Generator.Client.Desktop.Utility"
+        xmlns:Interactions="http://schemas.microsoft.com/xaml/behaviors"
         mc:Ignorable="d"
         d:DataContext="{d:DesignInstance viewModels:ConfigurationViewModel}"
 		SizeToContent="WidthAndHeight"
+		x:Name="Self"
         Title="Configuration editor" Height="450" Width="800">
 	<Window.InputBindings>
 		<KeyBinding Key="S" Modifiers="Control" Command="{Binding Path=CommitChangesCommand}" />
@@ -107,7 +110,7 @@
 				</StackPanel>
 
 				<controls:LabeledControl LabelText="Startup project:" Grid.Row="6" Grid.Column="0" Grid.ColumnSpan="3">
-					<ComboBox SelectedValue="{Binding Path=PrimaryProject}" ItemsSource="{Binding Path=StartupProjectOptions}" />
+					<ComboBox SelectedValue="{Binding Path=PrimaryProject}" ItemsSource="{Binding Path=ProjectNamespaces}" />
 				</controls:LabeledControl>
 
 				<controls:LabeledControl LabelText="OpenInEditor files:" Grid.Row="7" Grid.Column="0" Grid.ColumnSpan="3">
@@ -128,17 +131,38 @@
 
 				<controls:LabeledControl LabelText="Solution folders:" Grid.Row="8" Grid.Column="0" Grid.ColumnSpan="3">
 					<StackPanel>
-						<Button Content="New root folder" Command="{Binding Path=NewRootFolderCommand}" Margin="0,0,0,10" />
-						<ListView ItemsSource="{Binding Path=TemplateHierarchy}" IsSynchronizedWithCurrentItem="True">
-							<ListView.InputBindings>
-								<KeyBinding Key="Delete" Command="{Binding RemoveRootFolderCommand}" CommandParameter="{Binding Path=TemplateHierarchy/}"/>
-							</ListView.InputBindings>
-							<ListView.ItemTemplate>
-								<DataTemplate>
-									<TextBlock Text="{Binding Path=.}"/>
-								</DataTemplate>
-							</ListView.ItemTemplate>
-						</ListView>
+						<StackPanel.Resources>
+							<DataTemplate DataType="{x:Type viewModels:FolderViewModel}">
+								<StackPanel>
+									<DockPanel Margin="0,5,0,0">
+										<Button Focusable="False" Content="x" Command="{Binding ElementName=Self, Path=DataContext.RemoveHierarchyFolderCommand}" CommandParameter="{Binding Path=.}"  DockPanel.Dock="Right" VerticalAlignment="Center" Margin="5,0,0,0"/>
+										<Button Focusable="False" Content="+project" Command="{Binding Path=NewFileCommand}" DockPanel.Dock="Right" VerticalAlignment="Center" Margin="5,0,0,0" />
+										<Button Focusable="False" Content="+folder" Command="{Binding Path=NewFolderCommand}" DockPanel.Dock="Right" VerticalAlignment="Center" Margin="5,0,0,0"/>
+										<StackPanel VerticalAlignment="Center">
+											<TextBox 
+												Visibility="{Binding Path=IsRoot, Converter={StaticResource EnhancedBooleanToVisibilityConverter}, ConverterParameter={utility:SystemType Bool=True}}"
+												mah:TextBoxHelper.Watermark="Foldername:"
+												Text="{Binding Path=FolderName, UpdateSourceTrigger=PropertyChanged}"/>
+											<TextBlock 
+												Visibility="{Binding Path=IsRoot, Converter={StaticResource EnhancedBooleanToVisibilityConverter}}"
+												Text="{Binding Path=FolderName}" />
+										</StackPanel>
+									</DockPanel>
+									<ItemsControl 
+										Focusable="False"
+										ItemsSource="{Binding Path=Items}"
+										Margin="20,0,0,0">
+									</ItemsControl>
+								</StackPanel>
+							</DataTemplate>
+							<DataTemplate DataType="{x:Type viewModels:ProjectViewModel}">
+								<DockPanel Margin="0,5,0,0">
+									<Button DockPanel.Dock="Right" Focusable="False" HorizontalAlignment="Right" Content="x" VerticalAlignment="Center" Command="{Binding ElementName=Self, Path=DataContext.RemoveHierarchyFolderCommand}" CommandParameter="{Binding Path=.}"/>
+									<ComboBox Margin="0,0,5,0" HorizontalAlignment="Stretch" ItemsSource="{Binding ElementName=Self, Path=DataContext.ProjectNamespaces}" SelectedValue="{Binding Path=Namespace}"/>
+								</DockPanel>
+							</DataTemplate>
+						</StackPanel.Resources>
+						<ContentPresenter Content="{Binding Path=TemplateHierarchy}"></ContentPresenter>
 					</StackPanel>
 				</controls:LabeledControl>
 			</Grid>

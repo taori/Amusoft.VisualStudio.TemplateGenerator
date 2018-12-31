@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Xml.Serialization;
 
 namespace Generator.Shared.Serialization
@@ -6,6 +7,7 @@ namespace Generator.Shared.Serialization
 	[Serializable]
 	[System.ComponentModel.DesignerCategory("code")]
 	[XmlType(TypeName = "ProjectTemplateLink", Namespace = "http://schemas.microsoft.com/developer/vstemplate/2005")]
+	[DebuggerDisplay("{ProjectName}")]
 	public class ProjectTemplateLink : NestableContent
 	{
 		/// <inheritdoc />

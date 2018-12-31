@@ -7,7 +7,12 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Generator.Client.Desktop", 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Generator.Shared", "Generator.Shared\Generator.Shared.csproj", "{E67D1D77-7045-41C8-B6CF-430B79317AC2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Generator.Client.CommandLine", "Generator.Client.CommandLine\Generator.Client.CommandLine.csproj", "{40BC2431-A6BA-4A64-BD4E-D620DCC30F8A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Generator.Client.CommandLine", "Generator.Client.CommandLine\Generator.Client.CommandLine.csproj", "{40BC2431-A6BA-4A64-BD4E-D620DCC30F8A}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{6A27FCFB-5E7D-4DBC-AE78-8411C1C83460}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

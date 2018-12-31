@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using Generator.Client.Desktop.Utility;
@@ -11,14 +13,16 @@ namespace Generator.Client.Desktop.ViewModels
 	public abstract class TemplateHierarchyViewModel : ViewModelBase
 	{
 		/// <inheritdoc />
-		public TemplateHierarchyViewModel(TemplateHierarchyElement model)
+		protected TemplateHierarchyViewModel(TemplateHierarchyElement model)
 		{
 			Model = model;
 		}
 
+		public abstract void UpdateModel();
+
 		public TemplateHierarchyElement Model { get; }
 
-		public static TemplateHierarchyViewModel Create([NotNull] TemplateHierarchyElement element)
+		public static TemplateHierarchyViewModel Create(TemplateHierarchyElement element)
 		{
 			if (element == null)
 				throw new ArgumentNullException(nameof(element));
@@ -40,6 +44,14 @@ namespace Generator.Client.Desktop.ViewModels
 		{
 			get => _folderName;
 			set => SetValue(ref _folderName, value, nameof(FolderName));
+		}
+
+		private bool _isRoot;
+
+		public bool IsRoot
+		{
+			get => _isRoot;
+			set => SetValue(ref _isRoot, value, nameof(IsRoot));
 		}
 
 		private ObservableCollection<TemplateHierarchyViewModel> _items;
@@ -89,6 +101,25 @@ namespace Generator.Client.Desktop.ViewModels
 		/// <inheritdoc />
 		public FolderViewModel(Folder model) : base(model)
 		{
+			this.FolderName = model.Name;
+			this.IsRoot = model.IsRoot;
+			this.Items = new ObservableCollection<TemplateHierarchyViewModel>(model.Items.Select(TemplateHierarchyViewModel.Create));
+		}
+
+		/// <inheritdoc />
+		public override void UpdateModel()
+		{
+			if (Model is Folder folder)
+			{
+				folder.Name = this.FolderName;
+				folder.IsRoot = this.IsRoot;
+				foreach (var item in Items)
+				{
+					item.UpdateModel();
+				}
+
+				folder.Items = new List<TemplateHierarchyElement>(this.Items.Select(s => s.Model));
+			}
 		}
 	}
 
@@ -105,6 +136,14 @@ namespace Generator.Client.Desktop.ViewModels
 		/// <inheritdoc />
 		public ProjectViewModel(Project model) : base(model)
 		{
+			Namespace = model.Namespace;
+		}
+
+		/// <inheritdoc />
+		public override void UpdateModel()
+		{
+			if (Model is Project project)
+				project.Namespace = Namespace;
 		}
 	}
 }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Xml.Serialization;
 
 namespace Generator.Shared.Serialization
@@ -10,9 +11,9 @@ namespace Generator.Shared.Serialization
 	public class ProjectCollection : NestableContent
 	{
 		/// <inheritdoc />
-		public ProjectCollection(NestableContent[] children)
+		public ProjectCollection(IEnumerable<NestableContent> children)
 		{
-			Children = children;
+			Children = new List<NestableContent>(children);
 		}
 
 		/// <inheritdoc />
@@ -22,6 +23,6 @@ namespace Generator.Shared.Serialization
 
 		[XmlElement(typeof(ProjectTemplateLink))]
 		[XmlElement(typeof(SolutionFolder))]
-		public NestableContent[] Children { get; set; }
+		public List<NestableContent> Children { get; set; }
 	}
 }
