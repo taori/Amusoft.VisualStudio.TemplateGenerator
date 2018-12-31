@@ -149,7 +149,7 @@ namespace Generator.Client.Desktop.ViewModels
 		private async Task NewConfigurationExecute(object arg)
 		{
 			var configurations = new List<Configuration>(await ConfigurationManager.LoadConfigurationsAsync());
-			configurations.Add(new Configuration() { Id = Guid.NewGuid(), ConfigurationName = "New configuration" });
+			configurations.Add(new Configuration() { Id = Guid.NewGuid(), ConfigurationName = "New configuration", ZipContents = true });
 			await ConfigurationManager.SaveConfigurationsAsync(configurations);
 			await ReloadConfigurationsAsync(null);
 		}

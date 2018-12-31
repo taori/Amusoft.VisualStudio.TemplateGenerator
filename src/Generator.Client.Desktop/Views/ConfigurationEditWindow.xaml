@@ -140,7 +140,7 @@
 							</StackPanel>
 						</Border>
 
-						<GroupBox Header="Zip settings:" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3" Style="{StaticResource GroupBoxContrastStyle}">
+						<GroupBox Header="Artifacts:" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3" Style="{StaticResource GroupBoxContrastStyle}">
 							<StackPanel>
 								<TextBox Text="{Binding Path=ArtifactName, UpdateSourceTrigger=PropertyChanged, ValidatesOnNotifyDataErrors=True, ValidatesOnDataErrors=True, NotifyOnValidationError=True}"
 								         mah:TextBoxHelper.UseFloatingWatermark="True" 
