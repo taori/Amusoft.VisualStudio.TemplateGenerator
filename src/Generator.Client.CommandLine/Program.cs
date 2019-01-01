@@ -10,7 +10,6 @@ namespace Generator.Client.CommandLine
 		{
 			var runner = new AppRunner<MainEntry>(new AppSettings() {Case = Case.LowerCase});
 			runner.Run(args);
-			Console.ReadKey();
 		}
 	}
 }
