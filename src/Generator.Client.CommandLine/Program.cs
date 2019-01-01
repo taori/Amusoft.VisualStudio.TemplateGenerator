@@ -1,4 +1,6 @@
 ﻿using System;
+using CommandDotNet;
+using CommandDotNet.Models;
 
 namespace Generator.Client.CommandLine
 {
@@ -6,7 +8,9 @@ namespace Generator.Client.CommandLine
 	{
 		static void Main(string[] args)
 		{
-			Console.WriteLine("Hello World!");
+			var runner = new AppRunner<MainEntry>(new AppSettings() {Case = Case.LowerCase});
+			runner.Run(args);
+			Console.ReadKey();
 		}
 	}
 }
