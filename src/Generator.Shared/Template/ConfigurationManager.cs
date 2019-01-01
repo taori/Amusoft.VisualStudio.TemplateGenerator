@@ -4,19 +4,35 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
+using NLog;
 
 namespace Generator.Shared.Template
 {
 	public static class ConfigurationManager
 	{
-		public static string ConfigurationStorePath => Path.Combine(ApplicationSettings.Default.ConfigurationStorePath, "storage.json");
+		private static readonly ILogger Log = LogManager.GetLogger(nameof(ConfigurationManager));
 
-		public static async Task<Configuration[]> LoadConfigurationsAsync()
+		private static string BuildStoreFilePath(string storeDirectory)
 		{
-			if (string.IsNullOrEmpty(ApplicationSettings.Default.ConfigurationStorePath) || !File.Exists(ConfigurationStorePath))
-				return Array.Empty<Configuration>();
+			return Path.Combine(storeDirectory, "storage.json");
+		}
 
-			using (var stream = new StreamReader(new FileStream(ConfigurationStorePath, FileMode.Open)))
+		private static string GetChosenStorage(string storageFile)
+		{
+			var chosenFile = storageFile ?? BuildStoreFilePath(ApplicationSettings.Default.ConfigurationStorePath);
+			return chosenFile;
+		}
+
+		public static async Task<Configuration[]> LoadConfigurationsAsync(string storageFile = null)
+		{
+			var chosenFile = GetChosenStorage(storageFile);
+			if (string.IsNullOrEmpty(chosenFile) || !File.Exists(chosenFile))
+			{
+				Log.Error($"No configuration storage located at {chosenFile}.");
+				return Array.Empty<Configuration>();
+			}
+
+			using (var stream = new StreamReader(new FileStream(chosenFile, FileMode.Open)))
 			{
 				var settings = new JsonSerializerSettings();
 				settings.TypeNameHandling = TypeNameHandling.Auto;
@@ -25,12 +41,13 @@ namespace Generator.Shared.Template
 			}
 		}
 
-		public static async Task SaveConfigurationsAsync(IEnumerable<Configuration> configurations)
+		public static async Task SaveConfigurationsAsync(IEnumerable<Configuration> configurations, string storageFile = null)
 		{
+			var chosenFile = GetChosenStorage(storageFile);
 			var settings = new JsonSerializerSettings();
 			settings.TypeNameHandling = TypeNameHandling.Auto;
 			var serialized = JsonConvert.SerializeObject(configurations, Formatting.Indented, settings);
-			using (var stream = new StreamWriter(new FileStream(ConfigurationStorePath, FileMode.Create)))
+			using (var stream = new StreamWriter(new FileStream(chosenFile, FileMode.Create)))
 			{
 				await stream.WriteAsync(serialized);
 			}

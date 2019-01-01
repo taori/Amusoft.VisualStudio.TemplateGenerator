@@ -11,6 +11,7 @@
 	<ItemGroup>
 	  <None Remove="Application.manifest" />
 	  <None Remove="Controls\LabeledControl.xaml" />
+	  <None Remove="NLog.config" />
 	  <None Remove="Views\ConfigurationOverviewView.xaml" />
 	  <None Remove="Views\ConfigurationEditWindow.xaml" />
 	  <None Remove="Views\MainWindow.xaml" />
@@ -21,6 +22,9 @@
 	  <Content Include="Application.manifest">
 	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 	  </Content>
+	  <Content Include="NLog.config">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </Content>
 	</ItemGroup>
 
 	<ItemGroup>
@@ -29,8 +33,6 @@
 	  <PackageReference Include="MahApps.Metro" Version="1.6.5" />
 	  <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.0.1" />
 	  <PackageReference Include="NLog" Version="4.5.11" />
-	  <PackageReference Include="NLog.Config" Version="4.5.11" />
-	  <PackageReference Include="NLog.Schema" Version="4.5.11" />
 	  <PackageReference Include="ReactiveProperty" Version="5.3.2" />
 	  <PackageReference Include="System.Reactive" Version="4.1.2" />
 	</ItemGroup>
@@ -55,12 +57,6 @@
 	  <Compile Update="Views\ConfigurationEditWindow.xaml.cs">
 	    <SubType>Code</SubType>
 	  </Compile>
-	</ItemGroup>
-
-	<ItemGroup>
-	  <Content Update="C:\Users\Andreas\.nuget\packages\nlog.schema\4.5.11\contentFiles\any\any\NLog.xsd">
-	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-	  </Content>
 	</ItemGroup>
 
 	<ItemGroup>

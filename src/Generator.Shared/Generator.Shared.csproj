@@ -6,6 +6,16 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+	  <None Remove="NLog.xsd" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Content Include="NLog.xsd">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </Content>
+	</ItemGroup>
+
+	<ItemGroup>
 	  <Compile Update="ApplicationSettings.Designer.cs">
 	    <DependentUpon>ApplicationSettings.settings</DependentUpon>
 	    <DesignTime>True</DesignTime>
