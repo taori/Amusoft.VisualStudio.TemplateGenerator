@@ -248,6 +248,14 @@ namespace Generator.Client.Desktop.ViewModels
 			set => SetValue(ref _artifactName, value, nameof(ArtifactName));
 		}
 
+		private string _fileCopyBlacklist;
+
+		public string FileCopyBlacklist
+		{
+			get => _fileCopyBlacklist;
+			set => SetValue(ref _fileCopyBlacklist, value, nameof(FileCopyBlacklist));
+		}
+
 		private bool _createInPlace;
 
 		public bool CreateInPlace
@@ -408,6 +416,7 @@ namespace Generator.Client.Desktop.ViewModels
 			Model.CreateNewFolder = CreateNewFolder;
 			Model.ZipContents = ZipContents;
 			Model.ArtifactName = ArtifactName;
+			Model.FileCopyBlacklist = FileCopyBlacklist;
 			Model.DefaultName = DefaultName;
 			Model.Description = Description;
 			Model.CodeLanguage = CodeLanguage;
@@ -435,6 +444,7 @@ namespace Generator.Client.Desktop.ViewModels
 			CreateNewFolder = Model.CreateNewFolder;
 			ZipContents = Model.ZipContents;
 			ArtifactName = Model.ArtifactName;
+			FileCopyBlacklist = Model.FileCopyBlacklist;
 			DefaultName = Model.DefaultName;
 			Description = Model.Description;
 			CodeLanguage = Model.CodeLanguage;
@@ -456,10 +466,26 @@ namespace Generator.Client.Desktop.ViewModels
 				return false;
 			if (!ValidateArtifactName())
 				return false;
+			if (!ValidateFileCopyBlacklist())
+				return false;
 
 			return true;
 		}
-		
+
+		private bool ValidateFileCopyBlacklist()
+		{
+			if (
+				string.IsNullOrEmpty(FileCopyBlacklist)
+				|| string.IsNullOrWhiteSpace(FileCopyBlacklist)
+				|| !Configuration.FileCopyBlacklistRegex.IsMatch(FileCopyBlacklist))
+			{
+				AddError(nameof(FileCopyBlacklist), $"Invalid values for FileCopyBlacklist.");
+				return false;
+			}
+
+			return true;
+		}
+
 		private static readonly Regex ArtifactNameRegex = new Regex(@"[\w_\d-\.]+");
 		private bool ValidateArtifactName()
 		{

@@ -99,6 +99,7 @@
 						<Grid.RowDefinitions>
 							<RowDefinition Height="Auto" />
 							<RowDefinition Height="Auto" />
+							<RowDefinition Height="Auto" />
 						</Grid.RowDefinitions>
 
 						<GroupBox Header="output folders:" Grid.Row="0" Grid.Column="0" Style="{StaticResource GroupBoxContrastStyle}">
@@ -140,7 +141,23 @@
 							</StackPanel>
 						</Border>
 
-						<GroupBox Header="Artifacts:" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3" Style="{StaticResource GroupBoxContrastStyle}">
+						<GroupBox Header="File filter:" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3" Style="{StaticResource GroupBoxContrastStyle}">
+							<StackPanel>
+								<TextBox
+									mah:TextBoxHelper.UseFloatingWatermark="True" 
+								         mah:TextBoxHelper.Watermark="File blacklist">
+									<TextBox.Text>
+										<Binding Path="FileCopyBlacklist" UpdateSourceTrigger="PropertyChanged">
+											<Binding.ValidationRules>
+												<NotifyDataErrorValidationRule />
+											</Binding.ValidationRules>
+										</Binding>
+									</TextBox.Text>
+								</TextBox>
+							</StackPanel>
+						</GroupBox>
+
+						<GroupBox Header="Artifacts:" Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3" Style="{StaticResource GroupBoxContrastStyle}">
 							<StackPanel>
 								<TextBox Text="{Binding Path=ArtifactName, UpdateSourceTrigger=PropertyChanged, ValidatesOnNotifyDataErrors=True, ValidatesOnDataErrors=True, NotifyOnValidationError=True}"
 								         mah:TextBoxHelper.UseFloatingWatermark="True" 

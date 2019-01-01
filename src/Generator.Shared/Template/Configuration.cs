@@ -1,11 +1,26 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Text.RegularExpressions;
 using Generator.Shared.Serialization;
 
 namespace Generator.Shared.Template
 {
 	public class Configuration : ICloneable
 	{
+		public static readonly Regex FileCopyBlacklistRegex = new Regex(@"\*\.[\w]+(?=[;,]?)", RegexOptions.Compiled);
+
+		public IEnumerable<string> GetFileCopyBlackListElements()
+		{
+			foreach (Match match in FileCopyBlacklistRegex.Matches(FileCopyBlacklist))
+			{
+				foreach (Group matchGroup in match.Groups)
+				{
+					yield return matchGroup.Value;
+				}
+			}
+		}
+
 		public Guid Id { get; set; }
 
 		public string SolutionPath { get; set; }
@@ -27,6 +42,8 @@ namespace Generator.Shared.Template
 		public bool ZipContents { get; set; }
 
 		public string ArtifactName { get; set; }
+
+		public string FileCopyBlacklist { get; set; }
 
 		public string DefaultName { get; set; }
 

@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Security.AccessControl;
 using System.Threading;
 using System.Threading.Tasks;
@@ -114,11 +116,32 @@ namespace Generator.Shared.Transformation
 			}
 		}
 
+		private class EndsWithComparer : IEqualityComparer<string>
+		{
+			/// <inheritdoc />
+			public bool Equals(string x, string y)
+			{
+				if (x == null && y == null)
+					return true;
+				if (x == null || y == null)
+					return false;
+
+				return y.EndsWith(x);
+			}
+
+			/// <inheritdoc />
+			public int GetHashCode(string obj)
+			{
+				return obj.GetHashCode();
+			}
+		}
 		private Task CopySolutionAsync(SolutionRewriteContext context, SolutionExplorer sourceExplorer, string destinationPath)
 		{
 			Log.Debug($"Copying solution from  \"{sourceExplorer.SolutionPath}\" to \"{destinationPath}\".");
 			context.CancellationToken.ThrowIfCancellationRequested();
 
+			var endsWithComparer = new EndsWithComparer();
+			var blackList = Configuration.GetFileCopyBlackListElements().Select(s => s.TrimStart('*')).ToImmutableHashSet();
 			var sourceFiles = new HashSet<string>(
 				sourceExplorer
 					.GetAllReferencedDocuments()
@@ -126,7 +149,7 @@ namespace Generator.Shared.Transformation
 					.Concat(sourceExplorer.GetAllProjectFiles())
 					.Concat(new []{ sourceExplorer.SolutionPath })
 				);
-			
+
 			foreach (var sourceFile in sourceFiles)
 			{
 				if (context.CancellationToken.IsCancellationRequested)
@@ -135,6 +158,9 @@ namespace Generator.Shared.Transformation
 				var relativePath = GetRelativePath(SolutionPath, sourceFile);
 				var destFileName = Path.Combine(destinationPath, relativePath);
 				var fileInfo = new FileInfo(destFileName);
+				if (blackList.Contains(fileInfo.Name, endsWithComparer))
+					continue;
+
 				if (!fileInfo.Directory.Exists)
 				{
 					fileInfo.Directory.Create();
