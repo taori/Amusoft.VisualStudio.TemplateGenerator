@@ -42,7 +42,7 @@ namespace Generator.Client.CommandLine
 
 		private static int RunApplication(string[] args)
 		{
-			var runner = new AppRunner<ConsoleApplication>(new AppSettings() {Case = Case.LowerCase});
+			var runner = RunnerFactory.Create<ConsoleApplication>();
 			return runner.Run(args);
 		}
 	}

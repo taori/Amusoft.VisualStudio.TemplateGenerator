@@ -19,6 +19,27 @@ namespace Generator.Shared.Template
 		private static readonly ILogger Log = LogManager.GetLogger(nameof(ConfigurationManager));
 
 		private static string WorkspaceFile => FileHelper.GetDomainFile("storage.json");
+
+		public static async Task<Configuration> GetConfigurationByIdAsync(string id)
+		{
+			var configurations = await LoadStorageContentAsync();
+			if (int.TryParse(id, out var parsedNumber))
+			{
+				if (parsedNumber < 1 || parsedNumber > configurations.Length)
+				{
+					throw new Exception($"id out of range [1-{configurations.Length}].");
+				}
+
+				return configurations[parsedNumber-1];
+			}
+
+			if (Guid.TryParse(id, out var guid))
+			{
+				return configurations.FirstOrDefault(d => d.Id == guid) ?? throw new Exception($"No configuration matches id [{guid}].");
+			}
+
+			return configurations.FirstOrDefault(d => d.ConfigurationName == id) ?? throw new Exception($"No configuration name matches [{id}]");
+		}
 		
 		public static async Task<Configuration[]> LoadStorageContentAsync()
 		{
@@ -36,17 +57,27 @@ namespace Generator.Shared.Template
 			}
 		}
 
-		public static async Task SaveConfigurationsAsync(IEnumerable<Configuration> configurations)
+		public static async Task<bool> SaveConfigurationsAsync(IEnumerable<Configuration> configurations)
 		{
-			var dirInfo = new FileInfo(WorkspaceFile);
-			if (!dirInfo.Directory.Exists)
-				dirInfo.Directory.Create();
-
-			var serializer = new XmlSerializer(typeof(Storage));
-			using (var stream = new StreamWriter(new FileStream(WorkspaceFile, FileMode.Create)))
+			try
 			{
-				var storage = new Storage(){Configurations = configurations.ToList() };
-				serializer.Serialize(stream, storage);
+
+				var dirInfo = new FileInfo(WorkspaceFile);
+				if (!dirInfo.Directory.Exists)
+					dirInfo.Directory.Create();
+
+				var serializer = new XmlSerializer(typeof(Storage));
+				using (var stream = new StreamWriter(new FileStream(WorkspaceFile, FileMode.Create)))
+				{
+					var storage = new Storage(){Configurations = configurations.ToList() };
+					serializer.Serialize(stream, storage);
+					return true;
+				}
+			}
+			catch (Exception e)
+			{
+				Log.Error(e);
+				return false;
 			}
 		}
 

@@ -28,7 +28,7 @@
 
   <ItemGroup>
     <Folder Include="DependencyInjection\" />
-    <Folder Include="Applications\" />
+    <Folder Include="Test\" />
   </ItemGroup>
 
 </Project>

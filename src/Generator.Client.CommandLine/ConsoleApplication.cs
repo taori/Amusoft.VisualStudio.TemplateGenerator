@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -23,29 +24,20 @@ namespace Generator.Client.CommandLine
 			[Argument(
 				Name = "config",
 				Description = "Name of configuration within configuration store")]
-			string configurationName,
-
-			[Option(
-				Description = "Path to configuration store",
-				ShortName = "s",
-				LongName = "storage")]
-			string configurationStorePath)
+			string configurationId)
 		{
-			Log.Info($"Trying to build [{configurationName}].");
+			Log.Info($"Trying to build [{configurationId}].");
 
-			if(!string.IsNullOrEmpty(configurationStorePath))
-			Log.Info($"Loading configurations from [{configurationStorePath}].");
-			var configurations = await ConfigurationManager.LoadStorageContentAsync();
-			if (configurations.Length == 0)
+			Shared.Template.Configuration configuration;
+			try
 			{
-				Log.Error($"Cannot build. No configurations available.");
-				return 2;
+				configuration = await ConfigurationManager.GetConfigurationByIdAsync(configurationId);
 			}
-			var configuration = configurations.FirstOrDefault(d => string.Equals(d.Name, configurationName, StringComparison.OrdinalIgnoreCase));
-			if (configuration == null)
+			catch (Exception e)
 			{
-				Log.Error($"Found no configuration called [{configurationName}].");
-				return 3;
+				Log.Error($"No configuration called [{configurationId}] found.");
+				Log.Error(e);
+				return 2;
 			}
 
 			var rewriteTool = new RewriteTool(configuration);
@@ -62,15 +54,44 @@ namespace Generator.Client.CommandLine
 			}
 		}
 
-		public int Get(params string[] args)
+		[SubCommand]
+		[ApplicationMetadata(Description = "Entry point for obtaining informations")]
+		public class Get
 		{
-			var runner = new AppRunner<GetApplication>();
-			return runner.Run(args);
-		}
-	}
+			public async Task<int> Configurations()
+			{
+				var configurations = await ConfigurationManager.LoadStorageContentAsync();
+				for (var index = 0; index < configurations.Length; index++)
+				{
+					var configuration = configurations[index];
+					Console.WriteLine($"(#{index+1:00}): {configuration.ConfigurationName}");
+				}
 
-	public class GetApplication
-	{
-			
+				return 0;
+			}
+		}
+
+		[SubCommand]
+		[ApplicationMetadata(Description = "Entry point for modifying configurations")]
+		public class Configuration
+		{
+			public async Task<int> Rename(
+				[Argument(Description = "id of configuration which can be the position of the configuration, its guid, or the configuration name")]
+				string id, 
+				[Argument(Description = "New name of the configuration")]
+				string newName)
+			{
+				try
+				{
+					var configuration = await ConfigurationManager.GetConfigurationByIdAsync(id);
+					return await ConfigurationManager.UpdateConfigurationAsync(configuration) ? 0 : -1;
+				}
+				catch (Exception e)
+				{
+					Log.Error(e.Message);
+					return -1;
+				}
+			}
+		}
 	}
 }
