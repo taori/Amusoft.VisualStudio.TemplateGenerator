@@ -3,7 +3,7 @@ using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using JetBrains.Annotations;
 
-namespace Generator.Client.Desktop.ViewModels
+namespace Generator.Shared.ViewModels
 {
 	public class ViewModelBase : INotifyPropertyChanged
 	{

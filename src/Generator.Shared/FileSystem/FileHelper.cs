@@ -16,7 +16,7 @@ namespace Generator.Shared.FileSystem
 		
 		public static void CopyFolderContents(CancellationToken cancellationToken, string source, string destination)
 		{
-			Log.Debug($"Copying files from \"{source}\" to \"{destination}\".");
+			Log.Info($"Copying files from \"{source}\" to \"{destination}\".");
 			var sourcePaths = Directory
 				.EnumerateFiles(source, "*", SearchOption.AllDirectories);
 
@@ -37,7 +37,7 @@ namespace Generator.Shared.FileSystem
 				File.Copy(sourcePath, newPath);
 			}
 
-			Log.Debug($"Copy complete.");
+			Log.Info($"Copy complete.");
 		}
 
 		private static readonly Regex XmlRegex = new Regex("\\<\\?xml[^>]+\\>\\r?\\n?", RegexOptions.IgnoreCase | RegexOptions.Compiled);

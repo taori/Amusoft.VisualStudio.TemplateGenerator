@@ -2,10 +2,10 @@
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:local="clr-namespace:Generator.Client.Desktop"
-             xmlns:viewModels="clr-namespace:Generator.Client.Desktop.ViewModels"
              xmlns:view="clr-namespace:Generator.Client.Desktop.Views"
-             xmlns:utility="clr-namespace:Generator.Client.Desktop.Utility"
              xmlns:Interactions="http://schemas.microsoft.com/xaml/behaviors"
+             xmlns:viewModels="clr-namespace:Generator.Shared.ViewModels;assembly=Generator.Shared"
+             xmlns:utility="clr-namespace:Generator.Client.Desktop.Utility"
              ShutdownMode="OnMainWindowClose"
              StartupUri="Views\MainWindow.xaml">
 	<Application.Resources>

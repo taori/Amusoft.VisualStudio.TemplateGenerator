@@ -60,8 +60,10 @@ namespace Generator.Shared.Transformation
 			}
 
 			await DistributeArtifacts(cancellationToken, context, tempFolder);
-			Log.Debug($"Deleting temporary working folder {tempFolder}.");
+			Log.Info($"Deleting temporary working folder {tempFolder}.");
 			Directory.Delete(tempFolder, true);
+
+			Log.Info($"Execution finished succesfully.");
 		}
 
 		private string CreateTempFolder()
@@ -74,11 +76,11 @@ namespace Generator.Shared.Transformation
 
 		private async Task DistributeArtifacts(CancellationToken cancellationToken, SolutionRewriteContext context, string tempFolder)
 		{
-			if (Configuration.OutputFolders.Count > 1)
-				Log.Debug($"Copying to {Configuration.OutputFolders.Count - 1} additional output folders.");
+			Log.Info($"Deploying to the following destinations: {Environment.NewLine}{string.Join(Environment.NewLine, Configuration.OutputFolders)}");
 
 			if (Configuration.ZipContents)
 			{
+				Log.Info("Zip distribution is enabled.");
 				var zipName = Path.GetTempFileName();
 				try
 				{
@@ -89,7 +91,7 @@ namespace Generator.Shared.Transformation
 					foreach (var destinationFolder in Configuration.OutputFolders)
 					{
 						var destinationName = Path.Combine(destinationFolder, $"{Configuration.ArtifactName}.zip");
-						Log.Debug($"Copying file {zipName} to {destinationName}.");
+						Log.Info($"Copying file {zipName} to {destinationName}.");
 						File.Copy(zipName, destinationName, true);
 						await Task.Delay(20, cancellationToken);
 					}
@@ -101,7 +103,7 @@ namespace Generator.Shared.Transformation
 				}
 				finally
 				{
-					Log.Debug($"Deleting tmp file {zipName}.");
+					Log.Info($"Deleting tmp file {zipName}.");
 					File.Delete(zipName);
 				}
 			}
@@ -162,9 +164,7 @@ namespace Generator.Shared.Transformation
 					continue;
 
 				if (!fileInfo.Directory.Exists)
-				{
 					fileInfo.Directory.Create();
-				}
 				File.Copy(sourceFile, destFileName);
 			}
 

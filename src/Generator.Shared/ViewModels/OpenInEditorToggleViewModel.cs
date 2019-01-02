@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Generator.Client.Desktop.ViewModels
+namespace Generator.Shared.ViewModels
 {
 	public class OpenInEditorToggleViewModel : ViewModelBase
 	{

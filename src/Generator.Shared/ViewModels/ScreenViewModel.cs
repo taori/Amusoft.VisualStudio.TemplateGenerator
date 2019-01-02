@@ -1,4 +1,4 @@
-﻿namespace Generator.Client.Desktop.ViewModels
+﻿namespace Generator.Shared.ViewModels
 {
 	public abstract class ScreenViewModel : ViewModelBase
 	{

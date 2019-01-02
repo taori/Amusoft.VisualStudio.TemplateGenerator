@@ -11,7 +11,7 @@ using Generator.Shared.FileSystem;
 using NLog;
 using Reactive.Bindings;
 
-namespace Generator.Client.Desktop.ViewModels
+namespace Generator.Shared.ViewModels
 {
 	public class ManageOpenInEditorReferencesViewModel : ScreenViewModel
 	{

@@ -3,19 +3,15 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.ComponentModel.DataAnnotations;
 using System.IO;
 using System.Linq;
 using System.Reactive.Subjects;
 using System.Text.RegularExpressions;
-using System.Threading;
 using System.Threading.Tasks;
-using System.Windows;
 using System.Windows.Forms;
 using System.Windows.Input;
 using Generator.Client.Desktop.Utility;
-using Generator.Client.Desktop.Views;
-using Generator.Shared;
+using Generator.Shared.DependencyInjection;
 using Generator.Shared.Serialization;
 using Generator.Shared.Template;
 using Generator.Shared.Transformation;
@@ -23,7 +19,7 @@ using NLog;
 using Folder = Generator.Shared.Template.Folder;
 using MessageBox = System.Windows.Forms.MessageBox;
 
-namespace Generator.Client.Desktop.ViewModels
+namespace Generator.Shared.ViewModels
 {
 	public class ConfigurationViewModel : ViewModelBase, INotifyDataErrorInfo
 	{
@@ -84,24 +80,12 @@ namespace Generator.Client.Desktop.ViewModels
 
 		private async Task ManageOpenInEditorReferencesExecute(object arg)
 		{
-			var window = new ManageOpenInEditorReferencesWindow();
 			var viewModel = new ManageOpenInEditorReferencesViewModel(this);
-			viewModel.WhenConfirmed.Subscribe(model => window.Close());
-			viewModel.WhenDiscarded.Subscribe(model => window.Close());
-			window.DataContext = viewModel;
-			window.Loaded += WindowOnLoaded;
-			window.Show();
-		}
+			if(ServiceLocator.TryGetService(out IViewModelPresenter presenter))
+				presenter.Present(viewModel);
 
-		private async void WindowOnLoaded(object sender, RoutedEventArgs e)
-		{
-			if (sender is Window window)
-			{
-				window.Loaded -= WindowOnLoaded;
-				await Task.Delay(500);
-				if (window.DataContext is ManageOpenInEditorReferencesViewModel vm)
-					await vm.LoadAsync();
-			}
+			await Task.Delay(500);
+			await viewModel.LoadAsync();
 		}
 
 		private Task RemoveOpenInEditorReferenceExecute(string arg)
@@ -151,6 +135,9 @@ namespace Generator.Client.Desktop.ViewModels
 
 		private Subject<ConfigurationViewModel> _whenDiscard = new Subject<ConfigurationViewModel>();
 		public IObservable<ConfigurationViewModel> WhenDiscard => _whenDiscard;
+
+		private Subject<ConfigurationViewModel> _whenSaved = new Subject<ConfigurationViewModel>();
+		public IObservable<ConfigurationViewModel> WhenSaved => _whenSaved;
 
 		private string _solutionPath;
 
@@ -296,10 +283,11 @@ namespace Generator.Client.Desktop.ViewModels
 			set => SetValue(ref _commitChangesCommand, value, nameof(CommitChangesCommand));
 		}
 
-		private Task CommitChangesExecute(object arg)
+		private async Task CommitChangesExecute(object arg)
 		{
+			await SaveAsync();
 			_whenConfirm.OnNext(this);
-			return Task.CompletedTask;
+			_whenConfirm.OnCompleted();
 		}
 
 		private ICommand _undoChangesCommand;
@@ -313,6 +301,8 @@ namespace Generator.Client.Desktop.ViewModels
 		private Task UndoChangesExecute(object arg)
 		{
 			_whenDiscard.OnNext(this);
+			_whenConfirm.OnCompleted();
+			_whenDiscard.OnCompleted();
 			return Task.CompletedTask;
 		}
 
@@ -568,5 +558,26 @@ namespace Generator.Client.Desktop.ViewModels
 
 		/// <inheritdoc />
 		public event EventHandler<DataErrorsChangedEventArgs> ErrorsChanged;
+
+		public async Task<bool> SaveAsync()
+		{
+			Log.Info($"Saving configuration {Id}.");
+			UpdateModel();
+
+			if (await ConfigurationManager.UpdateConfigurationAsync(Model))
+			{
+				Log.Info($"Update successful.");
+				_whenSaved.OnNext(this);
+				_whenSaved.OnCompleted();
+				return true;
+			}
+
+			return false;
+		}
+
+		public void NotifySaved()
+		{
+			_whenSaved.OnNext(this);
+		}
 	}
 }

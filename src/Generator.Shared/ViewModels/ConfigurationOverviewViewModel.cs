@@ -6,19 +6,13 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Forms;
 using System.Windows.Input;
-using System.Windows.Threading;
 using Generator.Client.Desktop.Utility;
-using Generator.Client.Desktop.Views;
+using Generator.Shared.DependencyInjection;
 using Generator.Shared.Template;
 using Generator.Shared.Transformation;
-using MahApps.Metro.Controls;
-using MahApps.Metro.Controls.Dialogs;
-using Microsoft.Xaml.Behaviors;
 
-namespace Generator.Client.Desktop.ViewModels
+namespace Generator.Shared.ViewModels
 {
 	public class ConfigurationOverviewViewModel : ContentViewModel
 	{
@@ -56,68 +50,64 @@ namespace Generator.Client.Desktop.ViewModels
 			}
 			using (var cts = new CancellationTokenSource())
 			{
-				if (System.Windows.Application.Current.MainWindow is MetroWindow window)
+				if(!ServiceLocator.TryGetService(out IUIService uiService))
+					throw new Exception($"{nameof(IUIService)} not available.");
+
+				var progress = await uiService.ShowProgressAsync($"Building templates", "loading...", true);
+				try
 				{
-					var progress = await window.ShowProgressAsync($"Building templates", "loading...", true);
-					try
-					{
-						var rewriter = new RewriteTool(arg.Model);
-						progress.Canceled += ProgressOnCanceled(cts);
-						await Task.Delay(1000, cts.Token);
-						progress.SetIndeterminate();
-						await rewriter.ExecuteAsync(cts.Token, new Progress<string>(p => progress.SetMessage(p)));
-					}
-					catch (TaskCanceledException)
-					{
-					}
-					catch (OperationCanceledException)
-					{
-					}
-					finally
-					{
-						progress.Canceled -= ProgressOnCanceled(cts);
-						await progress.CloseAsync();
-					}
+					var rewriter = new RewriteTool(arg.Model);
+					progress.Canceled += ProgressOnCanceled(cts);
+					await Task.Delay(1000, cts.Token);
+					progress.SetIndeterminate();
+					await rewriter.ExecuteAsync(cts.Token, new Progress<string>(p => progress.SetMessage(p)));
+				}
+				catch (TaskCanceledException)
+				{
+				}
+				catch (OperationCanceledException)
+				{
+				}
+				finally
+				{
+					progress.Canceled -= ProgressOnCanceled(cts);
+					await progress.CloseAsync();
 				}
 			}
 		}
 
 		private async Task DeleteConfigurationExecute(ConfigurationViewModel arg)
 		{
-			if (System.Windows.MessageBox.Show("Delete for sure?", "Question", MessageBoxButton.YesNo) == MessageBoxResult.Yes
+			if (!ServiceLocator.TryGetService(out IUIService uiService))
+				throw new Exception($"{nameof(IUIService)} not available.");
+
+			if (uiService.GetYesNo("Delete for sure?", "Question") 
 				&& await ConfigurationManager.DeleteConfigurationAsync(arg.Id))
 				await ReloadConfigurationsAsync(null);
 		}
 
 		private Task EditConfigurationExecute(ConfigurationViewModel arg)
 		{
-			var window = new ConfigurationEditWindow();
-			Interaction.GetBehaviors(window).Add(new CloseOnEscapeBehavior());
-			var editModel = new ConfigurationViewModel(arg.Model);
-			window.DataContext = editModel;
-			editModel.WhenConfirm.Subscribe(SaveConfiguration);
-			editModel.WhenConfirm.Subscribe(_ => window.Close());
-			editModel.WhenDiscard.Subscribe(_ => window.Close());
-			window.Show();
+			if (!ServiceLocator.TryGetService(out IViewModelPresenter viewModelPresenter))
+				throw new Exception($"{nameof(IViewModelPresenter)} missing.");
+			
+			viewModelPresenter.Present(arg);
 			return Task.CompletedTask;
 		}
 
-		private async void SaveConfiguration(ConfigurationViewModel obj)
+		private async void ConfigurationSaved(ConfigurationViewModel obj)
 		{
-			Debug.WriteLine($"Saving configuration {obj.Id}.");
-			obj.UpdateModel();
-
-			if (await ConfigurationManager.UpdateConfigurationAsync(obj.Model))
-			{
-				Debug.WriteLine($"Update successful.");
-				await ReloadConfigurationsAsync(null);
-			}
+			await ReloadConfigurationsAsync(null);
 		}
 
 		private async Task ReloadConfigurationsAsync(object arg)
 		{
 			var configurations = await ConfigurationManager.LoadConfigurationsAsync();
 			Items = ConvertItems(configurations);
+			foreach (var item in Items)
+			{
+				item.WhenSaved.Subscribe(ConfigurationSaved);
+			}
 		}
 
 		private ObservableCollection<ConfigurationViewModel> ConvertItems(Configuration[] configurations)
@@ -127,22 +117,19 @@ namespace Generator.Client.Desktop.ViewModels
 
 		private async Task SetConfigurationStoreExecute(object arg)
 		{
-			using (var dialog = new FolderBrowserDialog())
-			{
-				dialog.Description = "Pick a folder for the storage to be located.";
-				dialog.ShowNewFolderButton = true;
-				if (Directory.Exists(ConfigurationManager.GetConfigurationFolder()))
-				{
-					dialog.SelectedPath = ConfigurationManager.GetConfigurationFolder();
-				}
+			if(!ServiceLocator.TryGetService(out IFilePathProvider filePathProvider))
+				throw new Exception($"{nameof(IFilePathProvider)} missing.");
 
-				if (dialog.ShowDialog() == DialogResult.OK)
-				{
-					ConfigurationManager.SetConfigurationStore(dialog.SelectedPath);
-					await Task.Delay(50);
-					CommandManager.InvalidateRequerySuggested();
-					await ReloadConfigurationsAsync(null);
-				}
+			ServiceLocator.TryGetService(out IUIFeedback uiFeedback);
+
+
+			if (filePathProvider.RequestFolderName(out var folder, 
+				"Pick a folder for the storage to be located.", 
+				ConfigurationManager.GetConfigurationFolder()))
+			{
+				ConfigurationManager.SetConfigurationStore(folder);
+				await ReloadConfigurationsAsync(null);
+				uiFeedback.RefreshControls();
 			}
 		}
 

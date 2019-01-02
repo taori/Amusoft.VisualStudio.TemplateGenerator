@@ -6,9 +6,8 @@ using System.Threading.Tasks;
 using System.Windows.Input;
 using Generator.Client.Desktop.Utility;
 using Generator.Shared.Template;
-using JetBrains.Annotations;
 
-namespace Generator.Client.Desktop.ViewModels
+namespace Generator.Shared.ViewModels
 {
 	public abstract class TemplateHierarchyViewModel : ViewModelBase
 	{
