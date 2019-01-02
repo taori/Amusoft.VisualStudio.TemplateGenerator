@@ -1,0 +1,42 @@
+﻿<mah:MetroWindow x:Class="Generator.Client.Desktop.Views.AddOutputFolderWindow"
+                 xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                 xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                 xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                 xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                 xmlns:local="clr-namespace:Generator.Client.Desktop"
+                 xmlns:system="clr-namespace:System;assembly=mscorlib"
+                 xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
+                 xmlns:controls="clr-namespace:Generator.Client.Desktop.Controls"
+                 xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
+                 xmlns:utility="clr-namespace:Generator.Client.Desktop.Utility"
+                 xmlns:Interactions="http://schemas.microsoft.com/xaml/behaviors"
+                 xmlns:viewModels="clr-namespace:Generator.Shared.ViewModels;assembly=Generator.Shared"
+                 mc:Ignorable="d"
+                 d:DataContext="{d:DesignInstance viewModels:SelectOutputFolderViewModel}"
+                 SizeToContent="WidthAndHeight"
+                 x:Name="Self"
+				 Padding="10"
+                 Title="{Binding Path=Title}" Height="450" Width="800">
+	<Interactions:Interaction.Behaviors>
+		<utility:CloseOnEscapeBehavior/>
+	</Interactions:Interaction.Behaviors>
+	<DockPanel Margin="10,10,10,0">
+		<Button Content="Manual folder selection" 
+		        Background="{StaticResource AccentColorBrush3}"
+		        DockPanel.Dock="Top" 
+		        Command="{Binding Path=SelectManualCommand}" />
+		<GroupBox Header="Predefined" Margin="0,10">
+			<ItemsControl ItemsSource="{Binding Path=PresetOptions}">
+				<ItemsControl.ItemTemplate>
+					<DataTemplate>
+						<Button Content="{Binding Path=.}" 
+								Background="{StaticResource AccentColorBrush3}"
+						        Command="{Binding ElementName=Self, Path=DataContext.SelectWithPresetCommand}" 
+						        Margin="5"
+						        CommandParameter="{Binding Path=.}"/>
+					</DataTemplate>
+				</ItemsControl.ItemTemplate>
+			</ItemsControl>
+		</GroupBox>
+	</DockPanel>
+</mah:MetroWindow>

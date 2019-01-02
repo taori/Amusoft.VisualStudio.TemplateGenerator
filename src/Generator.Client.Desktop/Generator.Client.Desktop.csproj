@@ -12,6 +12,7 @@
 	  <None Remove="Application.manifest" />
 	  <None Remove="Controls\LabeledControl.xaml" />
 	  <None Remove="NLog.config" />
+	  <None Remove="Views\AddOutputFolderWindow.xaml" />
 	  <None Remove="Views\ConfigurationOverviewView.xaml" />
 	  <None Remove="Views\ConfigurationEditWindow.xaml" />
 	  <None Remove="Views\MainWindow.xaml" />
@@ -45,6 +46,9 @@
 	  <Compile Update="Controls\LabeledControl.xaml.cs">
 	    <SubType>Code</SubType>
 	  </Compile>
+	  <Compile Update="Views\AddOutputFolderWindow.xaml.cs">
+	    <SubType>Code</SubType>
+	  </Compile>
 	  <Compile Update="Views\ManageOpenInEditorReferencesWindow.xaml.cs">
 	    <SubType>Code</SubType>
 	  </Compile>
@@ -63,6 +67,9 @@
 	  <Page Update="Controls\LabeledControl.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </Page>
+	  <Page Update="Views\AddOutputFolderWindow.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </Page>
 	  <Page Update="Views\ManageOpenInEditorReferencesWindow.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </Page>
@@ -78,10 +85,6 @@
 	  <Page Update="Views\ConfigurationOverviewView.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </Page>
-	</ItemGroup>
-
-	<ItemGroup>
-	  <Folder Include="ViewModels\" />
 	</ItemGroup>
 
 </Project>

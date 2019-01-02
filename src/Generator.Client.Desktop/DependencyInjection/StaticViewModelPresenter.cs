@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Windows;
 using Generator.Client.Desktop.Utility;
 using Generator.Client.Desktop.Views;
 using Generator.Shared.DependencyInjection;
@@ -25,6 +26,20 @@ namespace Generator.Client.Desktop.DependencyInjection
 		{
 			mappings.Add(typeof(ConfigurationViewModel), ConfigurationViewModel);
 			mappings.Add(typeof(ManageOpenInEditorReferencesViewModel), ManageOpenInEditorReferencesViewModel);
+			mappings.Add(typeof(SelectOutputFolderViewModel), SelectOutputFolderViewModel);
+		}
+
+		private void SelectOutputFolderViewModel(object obj)
+		{
+			if (obj is SelectOutputFolderViewModel viewModel)
+			{
+				var window = new AddOutputFolderWindow();
+				viewModel.WhenFolderSelected.Subscribe(_ => window.Close());
+				viewModel.WhenAborted.Subscribe(_ => window.Close());
+				window.WindowStartupLocation = WindowStartupLocation.CenterScreen;
+				window.DataContext = viewModel;
+				window.ShowDialog();
+			}
 		}
 
 		private void ManageOpenInEditorReferencesViewModel(object obj)

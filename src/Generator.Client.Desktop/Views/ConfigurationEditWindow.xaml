@@ -106,7 +106,9 @@
 							<DockPanel>
 								<Button DockPanel.Dock="Right" Margin="5,0,0,0" Content="+" Padding="5,0" VerticalAlignment="Top"
 								        Command="{Binding Path=AddOutputFolderCommand}" />
-								<ListView ItemsSource="{Binding Path=OutputFolders, ValidatesOnNotifyDataErrors=True}">
+								<ListView 
+									IsSynchronizedWithCurrentItem="True"
+									ItemsSource="{Binding Path=OutputFolders}">
 									<ListView.Template>
 										<ControlTemplate>
 											<ItemsPresenter/>

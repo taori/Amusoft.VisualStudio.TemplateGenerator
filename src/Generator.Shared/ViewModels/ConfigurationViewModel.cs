@@ -101,15 +101,12 @@ namespace Generator.Shared.ViewModels
 		
 		private Task AddOutputFolderExecute(object arg)
 		{
-			using (var dialog = new FolderBrowserDialog())
-			{
-				dialog.Description = "Select an output folder";
-				dialog.ShowNewFolderButton = true;
-				if (dialog.ShowDialog() == DialogResult.OK)
-				{
-					OutputFolders.Add(dialog.SelectedPath);
-				}
-			}
+			if(!ServiceLocator.TryGetService(out IViewModelPresenter presenter))
+				throw new Exception($"{nameof(IViewModelPresenter)} missing.");
+
+			var viewModel = new SelectOutputFolderViewModel();
+			viewModel.WhenFolderSelected.Subscribe(folder => OutputFolders.Add(folder));
+			presenter.Present(viewModel);
 
 			return Task.CompletedTask;
 		}
@@ -396,6 +393,8 @@ namespace Generator.Shared.ViewModels
 		{
 			if (Model.IconPackageReference == null)
 				Model.IconPackageReference = new VisualStudioIcon();
+			Icon.UpdateModel();
+			Model.IconPackageReference = Icon.Model;
 
 			Model.ConfigurationName = ConfigurationName;
 			Model.Id = Id;
