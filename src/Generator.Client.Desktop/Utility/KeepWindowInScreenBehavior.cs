@@ -16,7 +16,7 @@ namespace Generator.Client.Desktop.Utility
 		protected override void OnAttached()
 		{
 			WhenChanged
-				.Throttle(TimeSpan.FromMilliseconds(1000))
+				.Throttle(TimeSpan.FromMilliseconds(100))
 				.ObserveOnUIDispatcher()
 				.Subscribe(UpdateRequired);
 			this.AssociatedObject.Loaded += Loaded;
