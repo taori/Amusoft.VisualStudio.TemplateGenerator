@@ -163,7 +163,7 @@ namespace Generator.Shared.ViewModels
 			set => SetValue(ref _startupProjectOptions, value, nameof(ProjectNamespaces));
 		}
 
-		private IconPackageViewModel _icon = new IconPackageViewModel();
+		private IconPackageViewModel _icon;
 
 		public IconPackageViewModel Icon
 		{
@@ -395,12 +395,11 @@ namespace Generator.Shared.ViewModels
 		public void UpdateModel()
 		{
 			if (Model.IconPackageReference == null)
-				Model.IconPackageReference = new IconPackageReference();
+				Model.IconPackageReference = new VisualStudioIcon();
 
 			Model.ConfigurationName = ConfigurationName;
 			Model.Id = Id;
-			Model.IconPackageReference.Id = Icon.Id;
-			Model.IconPackageReference.Package = Icon.Package;
+			Model.IconPackageReference = Icon.Model;
 			Model.SolutionPath = SolutionPath;
 			Model.CreateInPlace = CreateInPlace;
 			Model.CreateNewFolder = CreateNewFolder;
@@ -424,11 +423,7 @@ namespace Generator.Shared.ViewModels
 		{
 			ConfigurationName = Model.ConfigurationName;
 			Id = Model.Id;
-			Icon = new IconPackageViewModel()
-			{
-				Id = Model.IconPackageReference?.Id ?? 0,
-				Package = Model.IconPackageReference?.Package
-			};
+			Icon = IconPackageViewModel.Create(Model.IconPackageReference);
 			SolutionPath = Model.SolutionPath;
 			CreateInPlace = Model.CreateInPlace;
 			CreateNewFolder = Model.CreateNewFolder;

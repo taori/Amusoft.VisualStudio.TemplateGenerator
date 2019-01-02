@@ -2,15 +2,13 @@
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.IO;
-using System.IO.Compression;
 using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Security.AccessControl;
 using System.Threading;
 using System.Threading.Tasks;
 using Generator.Shared.FileSystem;
 using Generator.Shared.Template;
 using Generator.Shared.Utilities;
+using Generator.Shared.ViewModels;
 using NLog;
 
 namespace Generator.Shared.Transformation
@@ -30,14 +28,25 @@ namespace Generator.Shared.Transformation
 			Configuration = configuration;
 		}
 
-		public async Task ExecuteAsync(CancellationToken cancellationToken, IProgress<string> progress)
+		public async Task<bool> ExecuteAsync(CancellationToken cancellationToken, IProgress<string> progress)
 		{
+			var viewModel = new ConfigurationViewModel(Configuration);
+			if (!viewModel.CanBuild())
+			{
+				Log.Error($"cannot build the configuration [{Configuration.Name}] because of validation errors.");
+				foreach (var error in viewModel.ValidationErrors)
+				{
+					Log.Error(error);
+				}
+
+				return false;
+			}
 			if (Configuration.OutputFolders.Count == 0)
 			{
 				Log.Error($"No output paths specified.");
 				progress.Report($"No output paths specified.");
 				await Task.Delay(3000, cancellationToken);
-				return;
+				return false;
 			}
 
 			var tempFolder = CreateTempFolder();
@@ -47,7 +56,7 @@ namespace Generator.Shared.Transformation
 				progress.Report($"Failed to create temp folder");
 				await Task.Delay(3000, cancellationToken);
 				Log.Error($"Failed to create temp folder");
-				return;
+				return false;
 			}
 
 			var explorer = await SolutionExplorer.CreateAsync(SolutionPath, progress, cancellationToken);
@@ -56,7 +65,7 @@ namespace Generator.Shared.Transformation
 			if (!await RewriteSolutionAsync(context, tempFolder))
 			{
 				progress.Report($"Solution rewrite of {SolutionPath} failed.{Environment.NewLine}See logs for details.");
-				return;
+				return false;
 			}
 
 			await DistributeArtifacts(cancellationToken, context, tempFolder);
@@ -64,6 +73,8 @@ namespace Generator.Shared.Transformation
 			Directory.Delete(tempFolder, true);
 
 			Log.Info($"Execution finished succesfully.");
+
+			return true;
 		}
 
 		private string CreateTempFolder()

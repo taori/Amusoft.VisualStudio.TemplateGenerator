@@ -28,6 +28,7 @@
 
   <ItemGroup>
     <Folder Include="DependencyInjection\" />
+    <Folder Include="Applications\" />
   </ItemGroup>
 
 </Project>

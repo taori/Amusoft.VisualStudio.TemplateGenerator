@@ -1,14 +1,10 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Configuration;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Generator.Shared.FileSystem;
-using Generator.Shared.Resources;
 using Microsoft.Build.Construction;
 using Microsoft.Build.Definition;
 using Microsoft.CodeAnalysis;

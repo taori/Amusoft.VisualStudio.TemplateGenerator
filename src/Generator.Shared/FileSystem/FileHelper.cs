@@ -9,6 +9,14 @@ namespace Generator.Shared.FileSystem
 {
 	public static class FileHelper
 	{
+		public static string DomainFileRoot =>
+			Path.Combine(
+				Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+				"Amusoft.MultiTemplateGenerator"
+			);
+
+		public static string GetDomainFile(string fileName) => Path.Combine(DomainFileRoot, fileName);
+
 		private static readonly ILogger Log = LogManager.GetLogger(nameof(FileHelper));
 
 		public static string FindSolutionAsync(string folder)

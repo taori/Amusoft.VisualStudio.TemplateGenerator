@@ -1,14 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-using System.Xml.Serialization;
 using Generator.Shared.FileSystem;
 using Generator.Shared.Resources;
 using Generator.Shared.Serialization;
-using Generator.Shared.Utilities;
 using NLog;
 
 namespace Generator.Shared.Transformation
@@ -89,8 +84,7 @@ namespace Generator.Shared.Transformation
 			template.TemplateData.Name = context.Configuration.Name;
 			template.TemplateData.ProvideDefaultName = context.Configuration.ProvideDefaultName;
 			template.TemplateData.CodeLanguage = context.Configuration.CodeLanguage;
-			template.TemplateData.Icon.Id = context.Configuration.IconPackageReference.Id;
-			template.TemplateData.Icon.Package = context.Configuration.IconPackageReference.Package;
+			template.TemplateData.Icon = context.Configuration.IconPackageReference;
 			
 			template.TemplateContent = BuildRootTemplateContent(cache);
 

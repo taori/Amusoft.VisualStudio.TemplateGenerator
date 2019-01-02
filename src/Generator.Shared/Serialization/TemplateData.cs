@@ -16,7 +16,8 @@ namespace Generator.Shared.Serialization
 		public string Description { get; set; }
 
 		/// <remarks/>
-		public IconPackageReference Icon { get; set; } = new IconPackageReference();
+		[XmlElement(typeof(VisualStudioIcon))]
+		public IconPackageReference Icon { get; set; } = new VisualStudioIcon();
 
 		/// <remarks/>
 		[XmlElement("ProjectType")]

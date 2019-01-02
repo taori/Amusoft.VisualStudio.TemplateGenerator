@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Diagnostics;
-using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -22,8 +20,6 @@ namespace Generator.Shared.ViewModels
 				new[]
 				{
 					new TextCommand("New configuration", new TaskCommand(NewConfigurationExecute, d => ConfigurationManager.CanOperate())),
-					new TextCommand("Open Configuration folder", new TaskCommand(OpenConfigurationFolderExecute, d => ConfigurationManager.CanOperate())),
-					new TextCommand("Change configuration store", new TaskCommand(SetConfigurationStoreExecute)),
 				}
 			);
 
@@ -32,13 +28,6 @@ namespace Generator.Shared.ViewModels
 			BuildTemplateCommand = new TaskCommand<ConfigurationViewModel>(BuildTemplateExecute, d => d?.CanBuild() ?? false);
 
 			ReloadConfigurationsAsync(null);
-		}
-
-		private Task OpenConfigurationFolderExecute(object arg)
-		{
-			if (ConfigurationManager.GetConfigurationFolder() is var folder && Directory.Exists(folder))
-				Process.Start(folder);
-			return Task.CompletedTask;
 		}
 
 		private async Task BuildTemplateExecute(ConfigurationViewModel arg)
@@ -102,7 +91,7 @@ namespace Generator.Shared.ViewModels
 
 		private async Task ReloadConfigurationsAsync(object arg)
 		{
-			var configurations = await ConfigurationManager.LoadConfigurationsAsync();
+			var configurations = await ConfigurationManager.LoadStorageContentAsync();
 			Items = ConvertItems(configurations);
 			foreach (var item in Items)
 			{
@@ -114,28 +103,10 @@ namespace Generator.Shared.ViewModels
 		{
 			return new ObservableCollection<ConfigurationViewModel>(configurations.Select(s => new ConfigurationViewModel(s)));
 		}
-
-		private async Task SetConfigurationStoreExecute(object arg)
-		{
-			if(!ServiceLocator.TryGetService(out IFilePathProvider filePathProvider))
-				throw new Exception($"{nameof(IFilePathProvider)} missing.");
-
-			ServiceLocator.TryGetService(out IUIFeedback uiFeedback);
-
-
-			if (filePathProvider.RequestFolderName(out var folder, 
-				"Pick a folder for the storage to be located.", 
-				ConfigurationManager.GetConfigurationFolder()))
-			{
-				ConfigurationManager.SetConfigurationStore(folder);
-				await ReloadConfigurationsAsync(null);
-				uiFeedback.RefreshControls();
-			}
-		}
-
+		
 		private async Task NewConfigurationExecute(object arg)
 		{
-			var configurations = new List<Configuration>(await ConfigurationManager.LoadConfigurationsAsync());
+			var configurations = new List<Configuration>(await ConfigurationManager.LoadStorageContentAsync());
 			configurations.Add(new Configuration() { Id = Guid.NewGuid(), ConfigurationName = "New configuration", ZipContents = true });
 			await ConfigurationManager.SaveConfigurationsAsync(configurations);
 			await ReloadConfigurationsAsync(null);

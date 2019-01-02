@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text.RegularExpressions;
+using System.Xml.Serialization;
 using Generator.Shared.Serialization;
 
 namespace Generator.Shared.Template
@@ -21,40 +21,57 @@ namespace Generator.Shared.Template
 			}
 		}
 
+		[XmlAttribute]
 		public Guid Id { get; set; }
 
+		[XmlAttribute]
 		public string SolutionPath { get; set; }
 
+		[XmlAttribute]
 		public string ConfigurationName { get; set; }
 
-		public IconPackageReference IconPackageReference { get; set; } = new IconPackageReference();
+		[XmlElement(typeof(VisualStudioIcon), ElementName = "Icon")]
+		public IconPackageReference IconPackageReference { get; set; } = new VisualStudioIcon();
 
+		[XmlArrayItem(typeof(string))]
 		public List<string> OpenInEditorReferences { get; set; } = new List<string>();
 
+		[XmlArrayItem(typeof(string))]
 		public List<string> OutputFolders { get; set; } = new List<string>();
 
 		public Folder TemplateHierarchy { get; set; } = new Folder() { IsRoot = true, Name = "Solution root"};
 
+		[XmlAttribute]
 		public bool CreateInPlace { get; set; }
 
+		[XmlAttribute]
 		public bool CreateNewFolder { get; set; }
 
+		[XmlAttribute]
 		public bool ZipContents { get; set; }
 
+		[XmlAttribute]
 		public string ArtifactName { get; set; }
 
+		[XmlAttribute]
 		public string FileCopyBlacklist { get; set; }
 
+		[XmlAttribute]
 		public string DefaultName { get; set; }
 
+		[XmlAttribute]
 		public string Description { get; set; }
 
+		[XmlAttribute]
 		public string CodeLanguage { get; set; }
 
+		[XmlAttribute]
 		public bool ProvideDefaultName { get; set; }
 
+		[XmlAttribute]
 		public string PrimaryProject { get; set; }
 
+		[XmlAttribute]
 		public string Name { get; set; }
 
 		/// <inheritdoc />

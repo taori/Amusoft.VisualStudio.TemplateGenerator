@@ -4,7 +4,6 @@ using System.Text;
 using System.Xml.Serialization;
 using Generator.Shared.FileSystem;
 using Generator.Shared.Serialization;
-using Generator.Shared.Utilities;
 using NLog;
 
 namespace Generator.Shared.Transformation

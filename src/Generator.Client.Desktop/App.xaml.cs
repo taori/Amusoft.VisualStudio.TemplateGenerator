@@ -38,7 +38,6 @@ namespace Generator.Client.Desktop
 			viewModelPresenter.Build();
 			services.AddSingleton<IViewModelPresenter>(viewModelPresenter);
 			services.AddSingleton<IUIService, UIService>();
-			services.AddSingleton<IFilePathProvider, FilePathProvider>();
 		}
 	}
 }

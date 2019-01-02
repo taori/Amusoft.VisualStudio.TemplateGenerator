@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using CommandDotNet;
 using CommandDotNet.Attributes;
 using Generator.Shared.Template;
 using Generator.Shared.Transformation;
@@ -34,7 +35,7 @@ namespace Generator.Client.CommandLine
 
 			if(!string.IsNullOrEmpty(configurationStorePath))
 			Log.Info($"Loading configurations from [{configurationStorePath}].");
-			var configurations = await ConfigurationManager.LoadConfigurationsAsync(configurationStorePath);
+			var configurations = await ConfigurationManager.LoadStorageContentAsync();
 			if (configurations.Length == 0)
 			{
 				Log.Error($"Cannot build. No configurations available.");
@@ -51,8 +52,8 @@ namespace Generator.Client.CommandLine
 			try
 			{
 				Log.Info($"Executing build tool.");
-				await rewriteTool.ExecuteAsync(CancellationToken.None, new Progress<string>(message => Console.WriteLine(message)));
-				return 0;
+				var result = await rewriteTool.ExecuteAsync(CancellationToken.None, new Progress<string>(message => Console.WriteLine(message)));
+				return result ? 0 : 4;
 			}
 			catch (Exception e)
 			{
@@ -60,5 +61,16 @@ namespace Generator.Client.CommandLine
 				return 1;
 			}
 		}
+
+		public int Get(params string[] args)
+		{
+			var runner = new AppRunner<GetApplication>();
+			return runner.Run(args);
+		}
+	}
+
+	public class GetApplication
+	{
+			
 	}
 }

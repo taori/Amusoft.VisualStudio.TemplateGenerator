@@ -7,7 +7,15 @@ namespace Generator.Shared.Serialization
 	[Serializable]
 	[System.ComponentModel.DesignerCategory("code")]
 	[XmlType(AnonymousType = true, Namespace = "http://schemas.microsoft.com/developer/vstemplate/2005")]
-	public class IconPackageReference
+	public abstract class IconPackageReference
+	{
+	}
+
+	/// <remarks/>
+	[Serializable]
+	[System.ComponentModel.DesignerCategory("code")]
+	[XmlType(AnonymousType = true, Namespace = "http://schemas.microsoft.com/developer/vstemplate/2005")]
+	public class VisualStudioIcon : IconPackageReference
 	{
 		/// <remarks/>
 		[XmlAttribute]
