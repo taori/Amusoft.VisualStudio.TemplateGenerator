@@ -107,7 +107,13 @@ namespace Generator.Shared.ViewModels
 		private async Task NewConfigurationExecute(object arg)
 		{
 			var configurations = new List<Configuration>(await ConfigurationManager.LoadStorageContentAsync());
-			configurations.Add(new Configuration() { Id = Guid.NewGuid(), ConfigurationName = "New configuration", ZipContents = true });
+			configurations.Add(new Configuration()
+			{
+				Id = Guid.NewGuid(),
+				FileCopyBlacklist = "*.user",
+				ConfigurationName = "New configuration",
+				ZipContents = true
+			});
 			await ConfigurationManager.SaveConfigurationsAsync(configurations);
 			await ReloadConfigurationsAsync(null);
 		}

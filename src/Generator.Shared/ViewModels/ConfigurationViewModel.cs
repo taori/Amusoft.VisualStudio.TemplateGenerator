@@ -459,11 +459,11 @@ namespace Generator.Shared.ViewModels
 		private bool ValidateFileCopyBlacklist()
 		{
 			if (
-				string.IsNullOrEmpty(FileCopyBlacklist)
-				|| string.IsNullOrWhiteSpace(FileCopyBlacklist)
-				|| !Configuration.FileCopyBlacklistRegex.IsMatch(FileCopyBlacklist))
+				(!string.IsNullOrEmpty(FileCopyBlacklist)
+				|| !string.IsNullOrWhiteSpace(FileCopyBlacklist))
+				&& !Configuration.FileCopyBlacklistRegex.IsMatch(FileCopyBlacklist))
 			{
-				AddError(nameof(FileCopyBlacklist), $"Invalid values for FileCopyBlacklist.");
+				AddError(nameof(FileCopyBlacklist), $"Invalid values for FileCopyBlacklist {FileCopyBlacklist}.");
 				return false;
 			}
 
