@@ -17,7 +17,6 @@ namespace Generator.Client.CommandLine
 
 		[ApplicationMetadata(
 			Description = "Tries to build a template according the the specified configuration",
-			Name = "build",
 			Syntax = "build [configName] [option: -s pathToStorage]"
 		)]
 		public async Task<int> Build(
@@ -58,6 +57,7 @@ namespace Generator.Client.CommandLine
 		[ApplicationMetadata(Description = "Entry point for obtaining informations")]
 		public class Get
 		{
+			[ApplicationMetadata(Description = "Retrieves a list of all configurations contained in the storage.")]
 			public async Task<int> Configurations()
 			{
 				var configurations = await ConfigurationManager.LoadStorageContentAsync();
@@ -75,10 +75,11 @@ namespace Generator.Client.CommandLine
 		[ApplicationMetadata(Description = "Entry point for modifying configurations")]
 		public class Configuration
 		{
+			[ApplicationMetadata(Description = "Renames the configuration if it can be found through the given id.")]
 			public async Task<int> Rename(
 				[Argument(Description = "id of configuration which can be the position of the configuration, its guid, or the configuration name")]
 				string id, 
-				[Argument(Description = "New name of the configuration")]
+				[Argument(Description = "new name of the configuration")]
 				string newName)
 			{
 				try
