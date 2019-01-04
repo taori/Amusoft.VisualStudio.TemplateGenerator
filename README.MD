@@ -24,3 +24,10 @@
 ## template configuration
 
 <img src="https://user-images.githubusercontent.com/5545184/50557135-5d5c8f00-0ce2-11e9-9397-8808c04bdcdd.png"/>
+
+## CLI support
+
+you can also execute this program from the command line for the purpose of build automation.
+
+```build configuration [configurationId]```
+is the command for that.
