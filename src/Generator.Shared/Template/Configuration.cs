@@ -31,6 +31,7 @@ namespace Generator.Shared.Template
 		public string ConfigurationName { get; set; }
 
 		[XmlElement(typeof(VisualStudioIcon), ElementName = "Icon")]
+		[XmlElement(typeof(AbsolutePathIcon), ElementName = "Icon")]
 		public IconPackageReference IconPackageReference { get; set; } = new VisualStudioIcon();
 
 		[XmlArrayItem(typeof(string))]

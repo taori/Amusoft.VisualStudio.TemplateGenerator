@@ -111,6 +111,7 @@
 										<controls:LabeledControl LabelText="Icon type:" Grid.Column="0">
 											<ComboBox SelectedValue="{Binding Path=Type}" SelectedValuePath="Tag" >
 												<ComboBoxItem Content="Visual Studio" Tag="{x:Static viewModels:IconType.VisualStudioIcon}"/>
+												<ComboBoxItem Content="Path to icon" Tag="{x:Static viewModels:IconType.Path}"/>
 											</ComboBox>
 										</controls:LabeledControl>
 										<ContentPresenter Content="{Binding Path=CurrentIcon}" Grid.Column="2"/>
