@@ -16,6 +16,10 @@
                  SizeToContent="WidthAndHeight"
                  x:Name="Self"
                  Title="Configuration editor" Height="450" Width="800">
+	<mah:MetroWindow.Resources>
+		<GridLength x:Key="SmallGridLength">200</GridLength>
+		<GridLength x:Key="GridPaddingLength">10</GridLength>
+	</mah:MetroWindow.Resources>
 	<Interactions:Interaction.Behaviors>
 		<utility:KeepWindowInScreenBehavior/>
 	</Interactions:Interaction.Behaviors>
@@ -39,8 +43,8 @@
 					<Grid>
 						<Grid.ColumnDefinitions>
 							<ColumnDefinition Width="*" />
-							<ColumnDefinition Width="10" />
-							<ColumnDefinition Width="200" />
+							<ColumnDefinition Width="{StaticResource GridPaddingLength}" />
+							<ColumnDefinition Width="{StaticResource SmallGridLength}" />
 						</Grid.ColumnDefinitions>
 						<Grid.RowDefinitions>
 							<RowDefinition Height="Auto" />
@@ -72,12 +76,49 @@
 							         AcceptsReturn="True" />
 						</controls:LabeledControl>
 
-						<controls:LabeledControl LabelText="Icon package:" Grid.Row="3" Grid.Column="0">
-							<TextBox Text="{Binding Path=Icon.Package, UpdateSourceTrigger=PropertyChanged}" />
-						</controls:LabeledControl>
-						<controls:LabeledControl LabelText="Icon id:" Grid.Row="3" Grid.Column="2">
-							<TextBox Text="{Binding Path=Icon.Id, UpdateSourceTrigger=PropertyChanged}" />
-						</controls:LabeledControl>
+						<Grid ColumnSpan="3" Grid.Row="3">
+							<Grid.Resources>
+								<DataTemplate DataType="{x:Type viewModels:VisualStudioIconViewModel}">
+									<Grid>
+										<Grid.ColumnDefinitions>
+											<ColumnDefinition Width="*" />
+											<ColumnDefinition Width="{StaticResource GridPaddingLength}"/>
+											<ColumnDefinition Width="{StaticResource SmallGridLength}"/>
+										</Grid.ColumnDefinitions>
+										<controls:LabeledControl LabelText="Icon package:" Grid.Column="0">
+											<TextBox Text="{Binding Path=Package, UpdateSourceTrigger=PropertyChanged}" />
+										</controls:LabeledControl>
+										<controls:LabeledControl LabelText="Icon id:" Grid.Column="2">
+											<TextBox Text="{Binding Path=Id, UpdateSourceTrigger=PropertyChanged}" />
+										</controls:LabeledControl>
+									</Grid>
+								</DataTemplate>
+								<DataTemplate DataType="{x:Type viewModels:AbsolutePathIconViewModel}">
+									<DockPanel VerticalAlignment="Bottom">
+										<Button Margin="5,0,0,0" Content="..." Command="{Binding Path=PickImageCommand}" DockPanel.Dock="Right" VerticalAlignment="Bottom"/>
+										<controls:LabeledControl LabelText="Icon path">
+											<TextBox Text="{Binding Path=AbsolutePath}" Background="LightGray" IsReadOnly="True"/>
+										</controls:LabeledControl>
+									</DockPanel>
+								</DataTemplate>
+								<DataTemplate DataType="{x:Type viewModels:IconManageViewModel}">
+									<Grid>
+										<Grid.ColumnDefinitions>
+											<ColumnDefinition Width="{StaticResource SmallGridLength}" />
+											<ColumnDefinition Width="{StaticResource GridPaddingLength}" />
+											<ColumnDefinition Width="*" />
+										</Grid.ColumnDefinitions>
+										<controls:LabeledControl LabelText="Icon type:" Grid.Column="0">
+											<ComboBox SelectedValue="{Binding Path=Type}" SelectedValuePath="Tag" >
+												<ComboBoxItem Content="Visual Studio" Tag="{x:Static viewModels:IconType.VisualStudioIcon}"/>
+											</ComboBox>
+										</controls:LabeledControl>
+										<ContentPresenter Content="{Binding Path=CurrentIcon}" Grid.Column="2"/>
+									</Grid>
+								</DataTemplate>
+							</Grid.Resources>
+							<ContentPresenter Content="{Binding Path=Icon}"/>
+						</Grid>
 
 						<controls:LabeledControl LabelText="Solution path:" Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="3">
 							<DockPanel>

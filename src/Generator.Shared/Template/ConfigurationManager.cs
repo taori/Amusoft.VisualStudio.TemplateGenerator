@@ -51,9 +51,17 @@ namespace Generator.Shared.Template
 
 			using (var stream = new StreamReader(new FileStream(WorkspaceFile, FileMode.Open)))
 			{
-				var serializer = new XmlSerializer(typeof(Storage));
-				var storage = serializer.Deserialize(stream) as Storage;
-				return storage.Configurations.ToArray();
+				try
+				{
+					var serializer = new XmlSerializer(typeof(Storage));
+					var storage = serializer.Deserialize(stream) as Storage;
+					return storage.Configurations.ToArray();
+				}
+				catch (Exception e)
+				{
+					Log.Error(e);
+					return Array.Empty<Configuration>();
+				}
 			}
 		}
 
@@ -103,12 +111,6 @@ namespace Generator.Shared.Template
 			}
 
 			return false;
-		}
-
-		public static bool CanOperate()
-		{
-			return !string.IsNullOrEmpty(ApplicationSettings.Default.ConfigurationStorePath)
-			       && Directory.Exists(ApplicationSettings.Default.ConfigurationStorePath);
 		}
 
 		public static async Task<bool> CopyConfigurationAsync(Configuration configuration)

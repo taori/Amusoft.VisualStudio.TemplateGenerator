@@ -160,9 +160,9 @@ namespace Generator.Shared.ViewModels
 			set => SetValue(ref _startupProjectOptions, value, nameof(ProjectNamespaces));
 		}
 
-		private IconPackageViewModel _icon;
+		private IconManageViewModel _icon;
 
-		public IconPackageViewModel Icon
+		public IconManageViewModel Icon
 		{
 			get => _icon;
 			set => SetValue(ref _icon, value, nameof(Icon));
@@ -391,14 +391,9 @@ namespace Generator.Shared.ViewModels
 
 		public void UpdateModel()
 		{
-			if (Model.IconPackageReference == null)
-				Model.IconPackageReference = new VisualStudioIcon();
-			Icon.UpdateModel();
-			Model.IconPackageReference = Icon.Model;
-
 			Model.ConfigurationName = ConfigurationName;
 			Model.Id = Id;
-			Model.IconPackageReference = Icon.Model;
+			Model.IconPackageReference = Icon.GetModel();
 			Model.SolutionPath = SolutionPath;
 			Model.CreateInPlace = CreateInPlace;
 			Model.CreateNewFolder = CreateNewFolder;
@@ -422,7 +417,7 @@ namespace Generator.Shared.ViewModels
 		{
 			ConfigurationName = Model.ConfigurationName;
 			Id = Model.Id;
-			Icon = IconPackageViewModel.Create(Model.IconPackageReference);
+			Icon = IconManageViewModel.Create(Model.IconPackageReference, Model.ArtifactName);
 			SolutionPath = Model.SolutionPath;
 			CreateInPlace = Model.CreateInPlace;
 			CreateNewFolder = Model.CreateNewFolder;
@@ -473,10 +468,12 @@ namespace Generator.Shared.ViewModels
 		private static readonly Regex ArtifactNameRegex = new Regex(@"[\w_\d-\.]+");
 		private bool ValidateArtifactName()
 		{
-			if (
-				string.IsNullOrEmpty(ArtifactName)
-				|| string.IsNullOrWhiteSpace(ArtifactName)
-				|| !ArtifactNameRegex.IsMatch(ArtifactName))
+			if (string.IsNullOrEmpty(ArtifactName) || string.IsNullOrWhiteSpace(ArtifactName))
+			{
+				AddError(nameof(ArtifactName), $"Artifact name can not be empty.");
+				return false;
+			}
+			if (!ArtifactNameRegex.IsMatch(ArtifactName))
 			{
 				AddError(nameof(ArtifactName), $"Invalid artifact name.");
 				return false;

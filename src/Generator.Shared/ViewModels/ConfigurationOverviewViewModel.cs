@@ -19,7 +19,7 @@ namespace Generator.Shared.ViewModels
 			Commands = new ObservableCollection<TextCommand>(
 				new[]
 				{
-					new TextCommand("New configuration", new TaskCommand(NewConfigurationExecute, d => ConfigurationManager.CanOperate())),
+					new TextCommand("New configuration", new TaskCommand(NewConfigurationExecute)),
 				}
 			);
 

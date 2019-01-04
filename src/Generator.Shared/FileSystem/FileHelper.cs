@@ -15,7 +15,7 @@ namespace Generator.Shared.FileSystem
 				"Amusoft.MultiTemplateGenerator"
 			);
 
-		public static string GetDomainFile(string fileName) => Path.Combine(DomainFileRoot, fileName);
+		public static string GetDomainFile(params string[] paths) => Path.Combine(new[] {DomainFileRoot}.Concat(paths).ToArray());
 
 		private static readonly ILogger Log = LogManager.GetLogger(nameof(FileHelper));
 
