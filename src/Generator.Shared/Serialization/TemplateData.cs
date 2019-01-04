@@ -17,6 +17,7 @@ namespace Generator.Shared.Serialization
 
 		/// <remarks/>
 		[XmlElement(typeof(VisualStudioIcon))]
+		[XmlElement(typeof(AbsolutePathIcon))]
 		public IconPackageReference Icon { get; set; } = new VisualStudioIcon();
 
 		/// <remarks/>
