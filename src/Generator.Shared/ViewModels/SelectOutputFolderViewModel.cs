@@ -43,7 +43,7 @@ namespace Generator.Shared.ViewModels
 			var section = all
 				.Where(d => !defaults.Contains(d))
 				.OrderByDescending(d => string.Equals(d, latest, StringComparison.OrdinalIgnoreCase))
-				.Take(3)
+				.Take(5)
 				.ToArray();
 
 			ApplicationSettings.Default.LatestOutputFolderSelections = JsonConvert.SerializeObject(section, Formatting.Indented);
