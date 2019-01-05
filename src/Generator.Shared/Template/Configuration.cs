@@ -30,9 +30,7 @@ namespace Generator.Shared.Template
 		[XmlAttribute]
 		public string ConfigurationName { get; set; }
 
-		[XmlElement(typeof(VisualStudioIcon), ElementName = "Icon")]
-		[XmlElement(typeof(AbsolutePathIcon), ElementName = "Icon")]
-		public IconPackageReference IconPackageReference { get; set; } = new VisualStudioIcon();
+		public IconPackageReference IconPackageReference { get; set; } = new IconPackageReference(string.Empty);
 
 		[XmlArrayItem(typeof(string))]
 		public List<string> OpenInEditorReferences { get; set; } = new List<string>();
