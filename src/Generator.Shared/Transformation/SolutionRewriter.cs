@@ -84,11 +84,19 @@ namespace Generator.Shared.Transformation
 			template.TemplateData.Name = context.Configuration.Name;
 			template.TemplateData.ProvideDefaultName = context.Configuration.ProvideDefaultName;
 			template.TemplateData.CodeLanguage = context.Configuration.CodeLanguage;
-			template.TemplateData.Icon = context.Configuration.Icon;
+			template.TemplateData.Icon = GetConfigurationIcon(context);
 			
 			template.TemplateContent = BuildRootTemplateContent(cache);
 
 			SaveTemplate(template, templatePath);
+		}
+
+		private static IconPackageReference GetConfigurationIcon(SolutionRewriteContext context)
+		{
+			if(context.Configuration.Icon.Id == 0 || string.IsNullOrEmpty(context.Configuration.Icon.Package))
+				return new IconPackageReference("{b3bae735-386c-4030-8329-ef48eeda4036}", 4602);
+
+			return context.Configuration.Icon;
 		}
 
 		private TemplateContent BuildRootTemplateContent(ProjectRewriteCache cache)
