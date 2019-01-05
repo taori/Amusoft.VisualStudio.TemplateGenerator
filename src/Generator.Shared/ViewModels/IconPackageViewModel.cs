@@ -63,35 +63,37 @@ namespace Generator.Shared.ViewModels
 				throw new ArgumentNullException(nameof(reference));
 
 			IconManageViewModel vm = new IconManageViewModel();
-			vm.VsIcon = new VisualStudioIconViewModel(new VisualStudioIcon());
-			vm.AbsoluteIcon = new AbsolutePathIconViewModel(new AbsolutePathIcon(), artifactName);
+			vm.VsIcon = new VisualStudioIconViewModel(new IconPackageReference(reference.Package, reference.Id));
+			vm.AbsoluteIcon = new AbsolutePathIconViewModel(new IconPackageReference(reference.Path), artifactName);
 
-			if (reference is VisualStudioIcon vsIcon)
+			if (reference.IsVisualStudioIcon())
 			{
-				vm.VsIcon = new VisualStudioIconViewModel(vsIcon);
+				vm.VsIcon = new VisualStudioIconViewModel(reference);
 				vm.CurrentIcon = vm.VsIcon;
 				vm.Type = IconType.VisualStudioIcon;
+				return vm;
 			}
 
-			if (reference is AbsolutePathIcon pathIcon)
+			if (reference.IsPathIcon())
 			{
-				vm.AbsoluteIcon = new AbsolutePathIconViewModel(pathIcon, artifactName);
+				vm.AbsoluteIcon = new AbsolutePathIconViewModel(reference, artifactName);
 				vm.CurrentIcon = vm.AbsoluteIcon;
 				vm.Type = IconType.Path;
+				return vm;
 			}
 
-			return vm;
+			throw new NotSupportedException($"Unsupported type.");
 		}
 
 		public IconPackageReference GetModel()
 		{
 			if (CurrentIcon is VisualStudioIconViewModel vsIcon)
 			{
-				return new VisualStudioIcon(vsIcon.Package, vsIcon.Id);
+				return new IconPackageReference(vsIcon.Package, vsIcon.Id);
 			}
 			if (CurrentIcon is AbsolutePathIconViewModel absolutePathIcon)
 			{
-				return new AbsolutePathIcon(absolutePathIcon.AbsolutePath);
+				return new IconPackageReference(absolutePathIcon.AbsolutePath);
 			}
 
 			throw new NotSupportedException($"Unexpected datatype {CurrentIcon.GetType()}.");
@@ -123,14 +125,8 @@ namespace Generator.Shared.ViewModels
 		/// <inheritdoc />
 		public VisualStudioIconViewModel(IconPackageReference model)
 		{
-			if (model is VisualStudioIcon vsIcon)
-			{
-				Package = vsIcon.Package;
-				Id = vsIcon.Id;
-				return;
-			}
-
-			throw new Exception($"{model.GetType().FullName} not supported for {nameof(VisualStudioIconViewModel)}.");
+			Package = model.Package;
+			Id = model.Id;
 		}
 	}
 
@@ -193,19 +189,13 @@ namespace Generator.Shared.ViewModels
 		{
 			ArtifactName = artifactName;
 
-			if (model is AbsolutePathIcon icon)
+			if (string.IsNullOrEmpty(model.Path) && !string.IsNullOrEmpty(artifactName))
 			{
-				if (string.IsNullOrEmpty(icon.Path) && !string.IsNullOrEmpty(artifactName))
-				{
-					var suggestedPath = GetSuggestedIconPath(artifactName);
-					if (File.Exists(suggestedPath))
-						icon.Path = suggestedPath;
-				}
-				AbsolutePath = icon.Path;
-				return;
+				var suggestedPath = GetSuggestedIconPath(artifactName);
+				if (File.Exists(suggestedPath))
+					model.Path = suggestedPath;
 			}
-
-			throw new Exception($"{model.GetType().FullName} not supported for {nameof(AbsolutePathIconViewModel)}.");
+			AbsolutePath = model.Path;
 		}
 	}
 }
