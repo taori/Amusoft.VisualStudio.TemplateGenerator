@@ -84,7 +84,7 @@ namespace Generator.Shared.Transformation
 			template.TemplateData.Name = context.Configuration.Name;
 			template.TemplateData.ProvideDefaultName = context.Configuration.ProvideDefaultName;
 			template.TemplateData.CodeLanguage = context.Configuration.CodeLanguage;
-			template.TemplateData.Icon = context.Configuration.IconPackageReference;
+			template.TemplateData.Icon = context.Configuration.Icon;
 			
 			template.TemplateContent = BuildRootTemplateContent(cache);
 

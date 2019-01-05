@@ -42,7 +42,8 @@ namespace Generator.Shared.Serialization
 		/// <inheritdoc />
 		public void ReadXml(XmlReader reader)
 		{
-			var content = reader.ReadString();
+			reader.Read();
+			var content = reader.Value;
 			if (string.IsNullOrEmpty(content))
 			{
 				Package = reader.GetAttribute("Package");
@@ -71,17 +72,13 @@ namespace Generator.Shared.Serialization
 
 		private void WritePathIcon(XmlWriter writer)
 		{
-			writer.WriteStartElement("Icon");
 			writer.WriteString(Path);
-			writer.WriteEndElement();
 		}
 
 		private void WriteVsIcon(XmlWriter writer)
 		{
-			writer.WriteStartElement("Icon");
 			writer.WriteAttributeString("Package", Package);
-			writer.WriteAttributeString("ID", Package);
-			writer.WriteEndElement();
+			writer.WriteAttributeString("ID", Id.ToString());
 		}
 
 		public bool IsVisualStudioIcon()

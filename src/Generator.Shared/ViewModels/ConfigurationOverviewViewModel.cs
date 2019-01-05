@@ -47,38 +47,38 @@ namespace Generator.Shared.ViewModels
 				{
 					var remoteConfigurations = await ConfigurationManager.LoadStorageContentAsync(dialog.FileName);
 					var localConfigurations = await ConfigurationManager.LoadStorageContentAsync();
-					var remoteByConfigName = remoteConfigurations.ToDictionary(d => d.Id);
-					var mergedConfigurations = new HashSet<Configuration>();
+					var remoteById = remoteConfigurations.ToDictionary(d => d.Id);
+					var mergedConfigurations = new Dictionary<Guid, Configuration>();
 					var overwriteLocalMergeConflicts = (bool?) null;
 
 					foreach (var localConfiguration in localConfigurations)
 					{
-						if (remoteByConfigName.TryGetValue(localConfiguration.Id, out var remote))
+						if (remoteById.TryGetValue(localConfiguration.Id, out var remote))
 						{
 							if (!overwriteLocalMergeConflicts.HasValue)
 								overwriteLocalMergeConflicts = uiService.GetYesNo("Overwrite local configurations in case of duplicate id's?", "Question");
 							if (overwriteLocalMergeConflicts.Value)
 							{
-								mergedConfigurations.Add(remote);
+								mergedConfigurations.Add(remote.Id, remote);
 							}
 							else
 							{
-								mergedConfigurations.Add(localConfiguration);
+								mergedConfigurations.Add(remote.Id, localConfiguration);
 							}
 						}
 						else
 						{
-							mergedConfigurations.Add(localConfiguration);
+							mergedConfigurations.Add(remote.Id, localConfiguration);
 						}
 					}
 
-					var remoteOrphans = mergedConfigurations.Where(d => !remoteByConfigName.ContainsKey(d.Id));
-					foreach (var orphan in remoteOrphans)
+					foreach (var remotePair in remoteById)
 					{
-						mergedConfigurations.Add(orphan);
+						if(!mergedConfigurations.ContainsKey(remotePair.Key))
+							mergedConfigurations.Add(remotePair.Key, remotePair.Value);
 					}
 
-					await ConfigurationManager.SaveConfigurationsAsync(mergedConfigurations, dialog.FileName);
+					await ConfigurationManager.SaveConfigurationsAsync(mergedConfigurations.Values);
 					await ReloadConfigurationsAsync(null);
 				}
 			}
@@ -99,8 +99,7 @@ namespace Generator.Shared.ViewModels
 
 		private bool CanExportConfiguration(object obj)
 		{
-			return File.Exists(FileHelper.GetDomainFile("storage.json"))
-				|| File.Exists(FileHelper.GetDomainFile("storage.xml"));
+			return File.Exists(FileHelper.GetDomainFile("storage.xml"));
 		}
 
 		private async Task BuildTemplateExecute(ConfigurationViewModel arg)

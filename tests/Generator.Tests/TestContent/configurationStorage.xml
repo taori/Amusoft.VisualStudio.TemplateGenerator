@@ -1,0 +1,93 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Storage xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+	<Configurations>
+		<Configuration Id="d898aaac-64bd-4996-ab31-15a43419a1d9" SolutionPath="D:\GitHub\Amusoft.VisualStudio.Extensions\templateSources\WpfApplication\Company.Desktop.Application.sln" ConfigurationName="WPF-boilerplate-local" CreateInPlace="true" CreateNewFolder="true" ZipContents="true" ArtifactName="MetroDILogging-local" FileCopyBlacklist="*.user" DefaultName="Company.Desktop" Description="MahApps, NLog, basic Inline MVVM framework, control library" CodeLanguage="CSharp" ProvideDefaultName="true" PrimaryProject="Company.Desktop.Application" Name="WPF-boilerplate-local">
+			<!-- <Icon Package="{b3bae735-386c-4030-8329-ef48eeda4036}" ID="4602" /> -->
+			<Icon>C:\Users\Andreas\AppData\Roaming\Amusoft.MultiTemplateGenerator\Images\MetroDILogging-local\Icon.png</Icon>
+			<OpenInEditorReferences>
+				<string>Company.Desktop.Application/Dependencies/Registrars/ShellRegistrar.cs</string>
+			</OpenInEditorReferences>
+			<OutputFolders>
+				<string>C:\Users\Andreas\Documents\Visual Studio 2017\Templates\ProjectTemplates\Visual C#</string>
+				<string>C:\Users\Andreas\Documents\Visual Studio 2019\Templates\ProjectTemplates\Visual C#</string>
+			</OutputFolders>
+			<TemplateHierarchy IsRoot="true" Name="Solution root">
+				<Folder IsRoot="false" Name="framework">
+					<Project>
+						<Namespace>Company.Desktop.Framework</Namespace>
+					</Project>
+					<Project>
+						<Namespace>Company.Desktop.Framework.Controls</Namespace>
+					</Project>
+					<Project>
+						<Namespace>Company.Desktop.Framework.Mvvm</Namespace>
+					</Project>
+					<Project>
+						<Namespace>Company.Desktop.Framework.Mvvm.Abstraction</Namespace>
+					</Project>
+				</Folder>
+				<Folder IsRoot="false" Name="project">
+					<Project>
+						<Namespace>Company.Desktop.Application</Namespace>
+					</Project>
+					<Project>
+						<Namespace>Company.Desktop.Models</Namespace>
+					</Project>
+					<Project>
+						<Namespace>Company.Desktop.Models.Abstraction</Namespace>
+					</Project>
+					<Project>
+						<Namespace>Company.Desktop.Shared</Namespace>
+					</Project>
+					<Project>
+						<Namespace>Company.Desktop.ViewModels</Namespace>
+					</Project>
+				</Folder>
+			</TemplateHierarchy>
+		</Configuration>
+		<Configuration Id="cea2edcc-d852-42f9-8117-23c7267b0d6b" SolutionPath="D:\GitHub\Amusoft.VisualStudio.Extensions\templateSources\WpfApplication\Company.Desktop.Application.sln" ConfigurationName="WPF-boilerplate-release" CreateInPlace="true" CreateNewFolder="true" ZipContents="true" ArtifactName="MetroDILogging" FileCopyBlacklist="*.user" DefaultName="Company.Desktop" Description="MahApps, NLog, basic Inline MVVM framework, control library" CodeLanguage="CSharp" ProvideDefaultName="true" PrimaryProject="Company.Desktop.Application" Name="WPF-boilerplate-release">
+			<Icon Package="{b3bae735-386c-4030-8329-ef48eeda4036}" ID="4602" > </Icon>
+			<OpenInEditorReferences>
+				<string>Company.Desktop.Application/Dependencies/Registrars/ShellRegistrar.cs</string>
+			</OpenInEditorReferences>
+			<OutputFolders>
+				<string>C:\Users\Andreas\Documents\Visual Studio 2017\Templates\ProjectTemplates\Visual C#</string>
+				<string>C:\Users\Andreas\Documents\Visual Studio 2019\Templates\ProjectTemplates\Visual C#</string>
+				<string>D:\GitHub\Amusoft.VisualStudio.Extensions\src\ProjectTemplates\ProjectTemplates</string>
+			</OutputFolders>
+			<TemplateHierarchy IsRoot="true" Name="Solution root">
+				<Folder IsRoot="false" Name="framework">
+					<Project>
+						<Namespace>Company.Desktop.Framework</Namespace>
+					</Project>
+					<Project>
+						<Namespace>Company.Desktop.Framework.Controls</Namespace>
+					</Project>
+					<Project>
+						<Namespace>Company.Desktop.Framework.Mvvm</Namespace>
+					</Project>
+					<Project>
+						<Namespace>Company.Desktop.Framework.Mvvm.Abstraction</Namespace>
+					</Project>
+				</Folder>
+				<Folder IsRoot="false" Name="project">
+					<Project>
+						<Namespace>Company.Desktop.Application</Namespace>
+					</Project>
+					<Project>
+						<Namespace>Company.Desktop.Models</Namespace>
+					</Project>
+					<Project>
+						<Namespace>Company.Desktop.Models.Abstraction</Namespace>
+					</Project>
+					<Project>
+						<Namespace>Company.Desktop.Shared</Namespace>
+					</Project>
+					<Project>
+						<Namespace>Company.Desktop.ViewModels</Namespace>
+					</Project>
+				</Folder>
+			</TemplateHierarchy>
+		</Configuration>
+	</Configurations>
+</Storage>

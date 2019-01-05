@@ -30,7 +30,7 @@ namespace Generator.Shared.Template
 		[XmlAttribute]
 		public string ConfigurationName { get; set; }
 
-		public IconPackageReference IconPackageReference { get; set; } = new IconPackageReference(string.Empty);
+		public IconPackageReference Icon { get; set; } = new IconPackageReference(string.Empty);
 
 		[XmlArrayItem(typeof(string))]
 		public List<string> OpenInEditorReferences { get; set; } = new List<string>();
@@ -38,6 +38,7 @@ namespace Generator.Shared.Template
 		[XmlArrayItem(typeof(string))]
 		public List<string> OutputFolders { get; set; } = new List<string>();
 
+		[XmlElement]
 		public Folder TemplateHierarchy { get; set; } = new Folder() { IsRoot = true, Name = "Solution root"};
 
 		[XmlAttribute]

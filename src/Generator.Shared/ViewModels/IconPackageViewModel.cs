@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Windows.Input;
 using Generator.Client.Desktop.Utility;
+using Generator.Shared.DependencyInjection;
 using Generator.Shared.FileSystem;
 using Generator.Shared.Serialization;
 using NLog;
@@ -57,14 +58,14 @@ namespace Generator.Shared.ViewModels
 		private VisualStudioIconViewModel VsIcon;
 		private AbsolutePathIconViewModel AbsoluteIcon;
 
-		public static IconManageViewModel Create(IconPackageReference reference, string artifactName)
+		public static IconManageViewModel Create(IconPackageReference reference, ConfigurationViewModel configuration)
 		{
 			if (reference == null)
 				throw new ArgumentNullException(nameof(reference));
 
 			IconManageViewModel vm = new IconManageViewModel();
 			vm.VsIcon = new VisualStudioIconViewModel(new IconPackageReference(reference.Package, reference.Id));
-			vm.AbsoluteIcon = new AbsolutePathIconViewModel(new IconPackageReference(reference.Path), artifactName);
+			vm.AbsoluteIcon = new AbsolutePathIconViewModel(new IconPackageReference(reference.Path), configuration);
 
 			if (reference.IsVisualStudioIcon())
 			{
@@ -76,13 +77,15 @@ namespace Generator.Shared.ViewModels
 
 			if (reference.IsPathIcon())
 			{
-				vm.AbsoluteIcon = new AbsolutePathIconViewModel(reference, artifactName);
+				vm.AbsoluteIcon = new AbsolutePathIconViewModel(reference, configuration);
 				vm.CurrentIcon = vm.AbsoluteIcon;
 				vm.Type = IconType.Path;
 				return vm;
 			}
 
-			throw new NotSupportedException($"Unsupported type.");
+			vm.Type = IconType.Path;
+			vm.CurrentIcon = vm.AbsoluteIcon;
+			return vm;
 		}
 
 		public IconPackageReference GetModel()
@@ -134,7 +137,7 @@ namespace Generator.Shared.ViewModels
 	{
 		private static readonly ILogger Log = LogManager.GetLogger(nameof(IconPackageViewModel));
 
-		public string ArtifactName { get; }
+		public ConfigurationViewModel ConfigurationViewModel { get; }
 
 		private string _absolutePath;
 
@@ -154,15 +157,21 @@ namespace Generator.Shared.ViewModels
 
 		private Task PickImageExecute(object arg)
 		{
+			if (string.IsNullOrEmpty(ConfigurationViewModel.ArtifactName))
+			{
+				MessageBox.Show($"{nameof(ConfigurationViewModel.ArtifactName)} can not be empty.", "Notice", MessageBoxButtons.OK, MessageBoxIcon.Error);
+				return Task.CompletedTask;
+			}
+
 			using (var dialog = new OpenFileDialog())
 			{
 				dialog.CheckFileExists = true;
 				dialog.Multiselect = false;
-				dialog.Filter = "ICO-File|*.ico|PNG-File|*.png";
+				dialog.Filter = "PNG-File|*.png|ICO-File|*.ico";
 
 				if (dialog.ShowDialog() == DialogResult.OK)
 				{
-					var targetName = GetSuggestedIconPath(ArtifactName);
+					var targetName = GetSuggestedIconPath(ConfigurationViewModel.ArtifactName);
 					var targetFileInfo = new FileInfo(targetName);
 					if(targetFileInfo.Directory == null)
 						throw new Exception($"FileInfo.Directory unavailable.");
@@ -182,16 +191,19 @@ namespace Generator.Shared.ViewModels
 			return Task.CompletedTask;
 		}
 
-		public static string GetSuggestedIconPath(string artifactName) => FileHelper.GetDomainFile("Images", artifactName, "Icon.png");
+		public static string GetSuggestedIconPath(string artifactName)
+		{
+			return FileHelper.GetDomainFile("Images", artifactName, "Icon.png");
+		}
 
 		/// <inheritdoc />
-		public AbsolutePathIconViewModel(IconPackageReference model, string artifactName)
+		public AbsolutePathIconViewModel(IconPackageReference model, ConfigurationViewModel configurationViewModel)
 		{
-			ArtifactName = artifactName;
+			ConfigurationViewModel = configurationViewModel;
 
-			if (string.IsNullOrEmpty(model.Path) && !string.IsNullOrEmpty(artifactName))
+			if (string.IsNullOrEmpty(model.Path) && !string.IsNullOrEmpty(configurationViewModel.ArtifactName))
 			{
-				var suggestedPath = GetSuggestedIconPath(artifactName);
+				var suggestedPath = GetSuggestedIconPath(configurationViewModel.ArtifactName);
 				if (File.Exists(suggestedPath))
 					model.Path = suggestedPath;
 			}

@@ -393,7 +393,7 @@ namespace Generator.Shared.ViewModels
 		{
 			Model.ConfigurationName = ConfigurationName;
 			Model.Id = Id;
-			Model.IconPackageReference = Icon.GetModel();
+			Model.Icon = Icon.GetModel();
 			Model.SolutionPath = SolutionPath;
 			Model.CreateInPlace = CreateInPlace;
 			Model.CreateNewFolder = CreateNewFolder;
@@ -417,7 +417,7 @@ namespace Generator.Shared.ViewModels
 		{
 			ConfigurationName = Model.ConfigurationName;
 			Id = Model.Id;
-			Icon = IconManageViewModel.Create(Model.IconPackageReference, Model.ArtifactName);
+			Icon = IconManageViewModel.Create(Model.Icon, this);
 			SolutionPath = Model.SolutionPath;
 			CreateInPlace = Model.CreateInPlace;
 			CreateNewFolder = Model.CreateNewFolder;
