@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Windows.Input;
 using Generator.Client.Desktop.Utility;
+using Newtonsoft.Json;
 
 namespace Generator.Shared.ViewModels
 {
@@ -24,8 +25,42 @@ namespace Generator.Shared.ViewModels
 
 		private ObservableCollection<string> GetOptions()
 		{
-			var directories = Directory.GetDirectories(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments));
-			return new ObservableCollection<string>(FilterExpand(directories));
+			return new ObservableCollection<string>(GetDefaultTemplateDirectories().Concat(GetLatestOutputFolderSelections()));
+		}
+
+		private IEnumerable<string> GetDefaultTemplateDirectories()
+		{
+			return FilterExpand(Directory.GetDirectories(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)));
+		}
+
+		private void SaveLatestFolderSelections(IEnumerable<string> items, string latest)
+		{
+			items = items ?? Enumerable.Empty<string>();
+
+			var all = new HashSet<string>(items);
+			all.Add(latest);
+			var defaults = new HashSet<string>(GetDefaultTemplateDirectories());
+			var section = all
+				.Where(d => !defaults.Contains(d))
+				.OrderByDescending(d => string.Equals(d, latest, StringComparison.OrdinalIgnoreCase))
+				.Take(3)
+				.ToArray();
+
+			ApplicationSettings.Default.LatestOutputFolderSelections = JsonConvert.SerializeObject(section, Formatting.Indented);
+			ApplicationSettings.Default.Save();
+		}
+
+		private IEnumerable<string> GetLatestOutputFolderSelections()
+		{
+			var values = ApplicationSettings.Default.LatestOutputFolderSelections;
+			if(string.IsNullOrEmpty(values))
+				yield break;
+
+			var deserialized = JsonConvert.DeserializeObject<string[]>(values);
+			foreach (var folder in deserialized.Where(Directory.Exists))
+			{
+				yield return folder;
+			}
 		}
 
 		private readonly Regex FolderPattern = new Regex(@"visual studio [\d]+", RegexOptions.Compiled | RegexOptions.IgnoreCase);
@@ -62,6 +97,8 @@ namespace Generator.Shared.ViewModels
 				if (dialog.ShowDialog() == DialogResult.OK)
 				{
 					_whenFolderSelected.OnNext(dialog.SelectedPath);
+					var all = new HashSet<string>(GetLatestOutputFolderSelections());
+					SaveLatestFolderSelections(all, dialog.SelectedPath);
 				}
 				else
 				{
@@ -73,7 +110,6 @@ namespace Generator.Shared.ViewModels
 				return Task.CompletedTask;
 			}
 		}
-
 
 		private ObservableCollection<string> _presetOptions;
 
