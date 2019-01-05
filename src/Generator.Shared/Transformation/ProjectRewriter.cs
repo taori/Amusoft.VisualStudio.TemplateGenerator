@@ -97,9 +97,9 @@ namespace Generator.Shared.Transformation
 			var template = new VsTemplate();
 			template.Type = Constants.VsTemplate.ProjectTypes.Project;
 			template.TemplateData = new TemplateData();
-			template.TemplateData.Icon = null;
-			template.TemplateData.Name = "Fill";
-			template.TemplateData.DefaultName = "Fill";
+			template.TemplateData.Icon = PackageHelper.GetConfigurationIcon(Context.Configuration);
+			template.TemplateData.Name = "$safeprojectname$";
+			template.TemplateData.DefaultName = "Project";
 			template.TemplateData.ProvideDefaultName = true;
 			template.TemplateData.CreateNewFolder = true;
 			template.TemplateData.CreateInPlace = true;
