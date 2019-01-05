@@ -42,8 +42,7 @@ namespace Generator.Shared.Serialization
 		/// <inheritdoc />
 		public void ReadXml(XmlReader reader)
 		{
-			reader.Read();
-			var content = reader.Value;
+			var content = reader.ReadString();
 			if (string.IsNullOrEmpty(content))
 			{
 				Package = reader.GetAttribute("Package");
