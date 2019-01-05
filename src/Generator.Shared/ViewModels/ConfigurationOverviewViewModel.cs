@@ -1,12 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 using System.Windows.Input;
 using Generator.Client.Desktop.Utility;
 using Generator.Shared.DependencyInjection;
+using Generator.Shared.FileSystem;
 using Generator.Shared.Template;
 using Generator.Shared.Transformation;
 
@@ -20,6 +23,8 @@ namespace Generator.Shared.ViewModels
 				new[]
 				{
 					new TextCommand("New configuration", new TaskCommand(NewConfigurationExecute)),
+					new TextCommand("Export configurations", new TaskCommand(ExportConfigurationExecute, CanExportConfiguration)),
+					new TextCommand("Import Configurations", new TaskCommand(ImportConfigurationExecute)),
 				}
 			);
 
@@ -28,6 +33,74 @@ namespace Generator.Shared.ViewModels
 			BuildTemplateCommand = new TaskCommand<ConfigurationViewModel>(BuildTemplateExecute, d => d?.CanBuild() ?? false);
 
 			ReloadConfigurationsAsync(null);
+		}
+
+		private async Task ImportConfigurationExecute(object arg)
+		{
+			if(!ServiceLocator.TryGetService(out IUIService uiService))
+				throw new Exception($"No implementation for {nameof(IUIService)} available.");
+
+			using (var dialog = new OpenFileDialog())
+			{
+				dialog.Filter = "xml|*.xml";
+				if (dialog.ShowDialog() == DialogResult.OK)
+				{
+					var remoteConfigurations = await ConfigurationManager.LoadStorageContentAsync(dialog.FileName);
+					var localConfigurations = await ConfigurationManager.LoadStorageContentAsync();
+					var remoteByConfigName = remoteConfigurations.ToDictionary(d => d.Id);
+					var mergedConfigurations = new HashSet<Configuration>();
+					var overwriteLocalMergeConflicts = (bool?) null;
+
+					foreach (var localConfiguration in localConfigurations)
+					{
+						if (remoteByConfigName.TryGetValue(localConfiguration.Id, out var remote))
+						{
+							if (!overwriteLocalMergeConflicts.HasValue)
+								overwriteLocalMergeConflicts = uiService.GetYesNo("Overwrite local configurations in case of duplicate id's?", "Question");
+							if (overwriteLocalMergeConflicts.Value)
+							{
+								mergedConfigurations.Add(remote);
+							}
+							else
+							{
+								mergedConfigurations.Add(localConfiguration);
+							}
+						}
+						else
+						{
+							mergedConfigurations.Add(localConfiguration);
+						}
+					}
+
+					var remoteOrphans = mergedConfigurations.Where(d => !remoteByConfigName.ContainsKey(d.Id));
+					foreach (var orphan in remoteOrphans)
+					{
+						mergedConfigurations.Add(orphan);
+					}
+
+					await ConfigurationManager.SaveConfigurationsAsync(mergedConfigurations, dialog.FileName);
+					await ReloadConfigurationsAsync(null);
+				}
+			}
+		}
+
+		private async Task ExportConfigurationExecute(object arg)
+		{
+			using (var dialog = new SaveFileDialog())
+			{
+				dialog.Filter = "xml|*.xml";
+				if (dialog.ShowDialog() == DialogResult.OK)
+				{
+					var configurations = await ConfigurationManager.LoadStorageContentAsync();
+					await ConfigurationManager.SaveConfigurationsAsync(configurations, dialog.FileName);
+				}
+			}
+		}
+
+		private bool CanExportConfiguration(object obj)
+		{
+			return File.Exists(FileHelper.GetDomainFile("storage.json"))
+				|| File.Exists(FileHelper.GetDomainFile("storage.xml"));
 		}
 
 		private async Task BuildTemplateExecute(ConfigurationViewModel arg)
