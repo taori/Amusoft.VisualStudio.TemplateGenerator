@@ -1,6 +1,12 @@
 # Visual Studio Multi project template generator
 
-## features
+## CI
+
+[![Build status](https://ci.appveyor.com/api/projects/status/e9147nfvdyl9d139?svg=true)](https://ci.appveyor.com/project/taori/amusoft-visualstudio-templategenerator)
+
+
+
+## Features
 
 - Build multi project template from a raw visual studio solution
     - No need to export anything from within VS
@@ -17,11 +23,11 @@
 - OpenInEditor configuration
     - Mark the files you want to be opened after a template was scaffolded and is being opened
 
-## entry screen
+## Entry screen
 
 <img src="https://user-images.githubusercontent.com/5545184/50557093-0060d900-0ce2-11e9-8bf8-1b8076816853.png"/>
 
-## template configuration
+## Template configuration
 
 <img src="https://user-images.githubusercontent.com/5545184/50557135-5d5c8f00-0ce2-11e9-9397-8808c04bdcdd.png"/>
 
