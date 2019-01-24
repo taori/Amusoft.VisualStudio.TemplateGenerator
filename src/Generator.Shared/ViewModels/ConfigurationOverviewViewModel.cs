@@ -17,6 +17,8 @@ namespace Generator.Shared.ViewModels
 {
 	public class ConfigurationOverviewViewModel : ContentViewModel
 	{
+		private readonly ConfigurationManager _configurationManager = ConfigurationManager.Default();
+
 		public ConfigurationOverviewViewModel()
 		{
 			Commands = new ObservableCollection<TextCommand>(
@@ -45,8 +47,8 @@ namespace Generator.Shared.ViewModels
 				dialog.Filter = "xml|*.xml";
 				if (dialog.ShowDialog() == DialogResult.OK)
 				{
-					var remoteConfigurations = await ConfigurationManager.LoadStorageContentAsync(dialog.FileName);
-					var localConfigurations = await ConfigurationManager.LoadStorageContentAsync();
+					var remoteConfigurations = await ConfigurationManager.FromPath(dialog.FileName).LoadStorageContentAsync();
+					var localConfigurations = await _configurationManager.LoadStorageContentAsync();
 					var remoteById = remoteConfigurations.ToDictionary(d => d.Id);
 					var mergedConfigurations = new Dictionary<Guid, Configuration>();
 					var overwriteLocalMergeConflicts = (bool?) null;
@@ -78,7 +80,7 @@ namespace Generator.Shared.ViewModels
 							mergedConfigurations.Add(remotePair.Key, remotePair.Value);
 					}
 
-					await ConfigurationManager.SaveConfigurationsAsync(mergedConfigurations.Values);
+					await _configurationManager.SaveConfigurationsAsync(mergedConfigurations.Values);
 					await ReloadConfigurationsAsync(null);
 				}
 			}
@@ -91,8 +93,8 @@ namespace Generator.Shared.ViewModels
 				dialog.Filter = "xml|*.xml";
 				if (dialog.ShowDialog() == DialogResult.OK)
 				{
-					var configurations = await ConfigurationManager.LoadStorageContentAsync();
-					await ConfigurationManager.SaveConfigurationsAsync(configurations, dialog.FileName);
+					var configurations = await _configurationManager.LoadStorageContentAsync();
+					await _configurationManager.SaveConfigurationsAsync(configurations, dialog.FileName);
 				}
 			}
 		}
@@ -143,7 +145,7 @@ namespace Generator.Shared.ViewModels
 				throw new Exception($"{nameof(IUIService)} not available.");
 
 			if (uiService.GetYesNo("Delete for sure?", "Question") 
-				&& await ConfigurationManager.DeleteConfigurationAsync(arg.Id))
+				&& await _configurationManager.DeleteConfigurationAsync(arg.Id))
 				await ReloadConfigurationsAsync(null);
 		}
 
@@ -163,7 +165,7 @@ namespace Generator.Shared.ViewModels
 
 		private async Task ReloadConfigurationsAsync(object arg)
 		{
-			var configurations = await ConfigurationManager.LoadStorageContentAsync();
+			var configurations = await _configurationManager.LoadStorageContentAsync();
 			Items = ConvertItems(configurations);
 			foreach (var item in Items)
 			{
@@ -178,7 +180,7 @@ namespace Generator.Shared.ViewModels
 		
 		private async Task NewConfigurationExecute(object arg)
 		{
-			var configurations = new List<Configuration>(await ConfigurationManager.LoadStorageContentAsync());
+			var configurations = new List<Configuration>(await _configurationManager.LoadStorageContentAsync());
 			configurations.Add(new Configuration()
 			{
 				Id = Guid.NewGuid(),
@@ -186,7 +188,7 @@ namespace Generator.Shared.ViewModels
 				ConfigurationName = "New configuration",
 				ZipContents = true
 			});
-			await ConfigurationManager.SaveConfigurationsAsync(configurations);
+			await _configurationManager.SaveConfigurationsAsync(configurations);
 			await ReloadConfigurationsAsync(null);
 		}
 
@@ -240,7 +242,7 @@ namespace Generator.Shared.ViewModels
 
 		private async Task CopyConfigurationExecute(ConfigurationViewModel arg)
 		{
-			if (await ConfigurationManager.CopyConfigurationAsync(arg.Model))
+			if (await _configurationManager.CopyConfigurationAsync(arg.Model))
 				await ReloadConfigurationsAsync(null);
 		}
 	}

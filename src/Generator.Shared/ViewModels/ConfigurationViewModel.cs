@@ -23,6 +23,8 @@ namespace Generator.Shared.ViewModels
 {
 	public class ConfigurationViewModel : ViewModelBase, INotifyDataErrorInfo
 	{
+		private readonly ConfigurationManager _configurationManager = ConfigurationManager.Default();
+
 		public Configuration Model { get; }
 
 		private static readonly ILogger Log = LogManager.GetLogger(nameof(ConfigurationViewModel));
@@ -555,7 +557,7 @@ namespace Generator.Shared.ViewModels
 			Log.Info($"Saving configuration {Id}.");
 			UpdateModel();
 
-			if (await ConfigurationManager.UpdateConfigurationAsync(Model))
+			if (await _configurationManager.UpdateConfigurationAsync(Model))
 			{
 				Log.Info($"Update successful.");
 				_whenSaved.OnNext(this);

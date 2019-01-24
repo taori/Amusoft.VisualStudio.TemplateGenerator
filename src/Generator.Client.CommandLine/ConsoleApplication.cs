@@ -23,14 +23,20 @@ namespace Generator.Client.CommandLine
 			[Argument(
 				Name = "config",
 				Description = "Name of configuration within configuration store")]
-			string configurationId)
+			string configurationId,
+			[Option(ShortName = "s")]
+			string storage = null
+			)
 		{
+			if (!ConsoleUtils.TryGetManager(storage, out var manager))
+				return 3;
+
 			Log.Info($"Trying to build [{configurationId}].");
 
 			Shared.Template.Configuration configuration;
 			try
 			{
-				configuration = await ConfigurationManager.GetConfigurationByIdAsync(configurationId);
+				configuration = await manager.GetConfigurationByIdAsync(configurationId);
 			}
 			catch (Exception e)
 			{
@@ -58,9 +64,13 @@ namespace Generator.Client.CommandLine
 		public class Get
 		{
 			[ApplicationMetadata(Description = "Retrieves a list of all configurations contained in the storage.")]
-			public async Task<int> Configurations()
+			public async Task<int> Configurations(
+				[Option(ShortName = "s")]
+				string storage = null)
 			{
-				var configurations = await ConfigurationManager.LoadStorageContentAsync();
+				if (!ConsoleUtils.TryGetManager(storage, out var manager))
+					return 1;
+				var configurations = await manager.LoadStorageContentAsync();
 				for (var index = 0; index < configurations.Length; index++)
 				{
 					var configuration = configurations[index];
@@ -80,17 +90,21 @@ namespace Generator.Client.CommandLine
 				[Argument(Description = "id of configuration which can be the position of the configuration, its guid, or the configuration name")]
 				string id, 
 				[Argument(Description = "new name of the configuration")]
-				string newName)
+				string newName,
+				[Option(ShortName = "s")]
+				string storage = null)
 			{
+				if (!ConsoleUtils.TryGetManager(storage, out var manager))
+					return 1;
 				try
 				{
-					var configuration = await ConfigurationManager.GetConfigurationByIdAsync(id);
-					return await ConfigurationManager.UpdateConfigurationAsync(configuration) ? 0 : -1;
+					var configuration = await manager.GetConfigurationByIdAsync(id);
+					return await manager.UpdateConfigurationAsync(configuration) ? 0 : 3;
 				}
 				catch (Exception e)
 				{
 					Log.Error(e.Message);
-					return -1;
+					return 2;
 				}
 			}
 		}
