@@ -50,48 +50,21 @@ namespace Generator.Shared.Transformation
 
 		private void AdjustReferenceNames(IEnumerable<ProjectRewriteCacheEntry> items)
 		{
-			var sep = new[] { '.' };
-			var parts = items
-				.Select(s => s.OriginalAssemblyName.Split(sep, StringSplitOptions.RemoveEmptyEntries))
-				.OrderByDescending(d => d.Length)
-				.ToList();
-
-			var matchLength = 0;
-			for (int column = 0; column < parts[0].Length; column++)
+			var options = Items.Values.Select(s => s.OriginalAssemblyName).ToList();
+			foreach (var item in Items.Values)
 			{
-				for (int row = 1; row < parts.Count; row++)
+				var aligned = AssemblyNameAligner.Execute(item.OriginalAssemblyName, options);
+				if (string.IsNullOrEmpty(aligned))
 				{
-					if (parts[row].Length < column)
-						goto endMatching;
-
-					if(!string.Equals(parts[row][column], parts[0][column]))
-						goto endMatching;
+					item.RootTemplateNamespace = $"$safeprojectname$";
+					item.ProjectTemplateReference = $"$ext_safeprojectname${Path.GetExtension(item.ProjectFilePath)}";
+					item.ProjectTemplateNamespace = $"$ext_safeprojectname$";
 				}
-
-				matchLength++;
-			}
-
-		endMatching:
-			if (matchLength > 0)
-			{
-				foreach (var item in Items.Values)
+				else
 				{
-					var fixedName = item
-						.OriginalAssemblyName
-						.Split(sep, StringSplitOptions.RemoveEmptyEntries)
-						.Skip(matchLength);
-					item.RootTemplateNamespace = $"$safeprojectname$.{string.Join(".", fixedName)}";
-					item.ProjectTemplateReference = $"$ext_safeprojectname$.{string.Join(".", fixedName)}{Path.GetExtension(item.ProjectFilePath)}";
-					item.ProjectTemplateNamespace = $"$ext_safeprojectname$.{string.Join(".", fixedName)}";
-				}
-			}
-			else
-			{
-				foreach (var item in Items.Values)
-				{
-					item.RootTemplateNamespace = $"$safeprojectname$.{item.OriginalAssemblyName}";
-					item.ProjectTemplateReference = $"$ext_safeprojectname$.{item.OriginalAssemblyName}{Path.GetExtension(item.ProjectFilePath)}";
-					item.ProjectTemplateNamespace = $"$ext_safeprojectname$.{item.OriginalAssemblyName}";
+					item.RootTemplateNamespace = $"$safeprojectname$.{aligned}";
+					item.ProjectTemplateReference = $"$ext_safeprojectname$.{aligned}{Path.GetExtension(item.ProjectFilePath)}";
+					item.ProjectTemplateNamespace = $"$ext_safeprojectname$.{aligned}";
 				}
 			}
 		}
