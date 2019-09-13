@@ -182,6 +182,9 @@
 								<controls:LabeledControl LabelText="Zip contents?:">
 									<CheckBox IsChecked="{Binding Path=ZipContents, UpdateSourceTrigger=PropertyChanged}" />
 								</controls:LabeledControl>
+								<controls:LabeledControl LabelText="Hide subprojects?:" Tooltip="Hides child projects from the template selection.">
+									<CheckBox IsChecked="{Binding Path=ZipContents, UpdateSourceTrigger=PropertyChanged}" />
+								</controls:LabeledControl>
 							</StackPanel>
 						</Border>
 

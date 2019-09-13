@@ -226,6 +226,14 @@ namespace Generator.Shared.ViewModels
 			set => SetValue(ref _zipContents, value, nameof(ZipContents));
 		}
 
+		private bool _hideSubProjects;
+
+		public bool HideSubProjects
+		{
+			get => _hideSubProjects;
+			set => SetValue(ref _hideSubProjects, value, nameof(_hideSubProjects));
+		}
+
 		private string _artifactName;
 
 		public string ArtifactName
@@ -400,6 +408,7 @@ namespace Generator.Shared.ViewModels
 			Model.CreateInPlace = CreateInPlace;
 			Model.CreateNewFolder = CreateNewFolder;
 			Model.ZipContents = ZipContents;
+			Model.HideSubProjects = HideSubProjects;
 			Model.ArtifactName = ArtifactName;
 			Model.FileCopyBlacklist = FileCopyBlacklist;
 			Model.DefaultName = DefaultName;
@@ -424,6 +433,7 @@ namespace Generator.Shared.ViewModels
 			CreateInPlace = Model.CreateInPlace;
 			CreateNewFolder = Model.CreateNewFolder;
 			ZipContents = Model.ZipContents;
+			HideSubProjects = Model.HideSubProjects;
 			ArtifactName = Model.ArtifactName;
 			FileCopyBlacklist = Model.FileCopyBlacklist;
 			DefaultName = Model.DefaultName;
