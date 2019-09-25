@@ -6,6 +6,9 @@
 		<UseWPF>true</UseWPF>
 		<LangVersion>latest</LangVersion>
 		<ApplicationManifest>Application.manifest</ApplicationManifest>
+		<Version>1.1.0</Version>
+		<Authors>Andreas Müller</Authors>
+		<Product>Multi-Project template generator</Product>
 	</PropertyGroup>
 
 	<ItemGroup>
