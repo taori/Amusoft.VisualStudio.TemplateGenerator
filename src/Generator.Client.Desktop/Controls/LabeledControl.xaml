@@ -10,9 +10,11 @@
     <DockPanel>
 		<Label 
 			DockPanel.Dock="Top" 
+			ToolTip="{Binding ElementName=Self, Path=Tooltip}"
 			Style="{StaticResource LabelSmallStyle}" 
 			Content="{Binding ElementName=Self, Path=LabelText}" />
 		<ContentPresenter 
+			ToolTip="{Binding ElementName=Self, Path=Tooltip}"
 			Content="{Binding ElementName=Self, Path=ContentControl}" />
     </DockPanel>
 </UserControl>

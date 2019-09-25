@@ -10,18 +10,33 @@ using NLog;
 
 namespace Generator.Shared.Template
 {
-	public class Storage
+	public class ConfigurationManager
 	{
-		public List<Configuration> Configurations { get; set; }
-	}
+		private readonly string _workspaceFile;
 
-	public static class ConfigurationManager
-	{
 		private static readonly ILogger Log = LogManager.GetLogger(nameof(ConfigurationManager));
 
-		private static string WorkspaceFile => FileHelper.GetDomainFile("storage.xml");
+		private ConfigurationManager(string workspaceFile)
+		{
+			_workspaceFile = workspaceFile;
+		}
 
-		public static async Task<Configuration> GetConfigurationByIdAsync(string id)
+		public static ConfigurationManager Default()
+		{
+			return new ConfigurationManager(FileHelper.GetDomainFile("storage.xml"));
+		}
+
+		public static ConfigurationManager FromPath([NotNull] string path)
+		{
+			if (path == null)
+				throw new ArgumentNullException(nameof(path));
+			if (!File.Exists(path))
+				throw new FileNotFoundException(path);
+
+			return new ConfigurationManager(path);
+		}
+
+		public async Task<Configuration> GetConfigurationByIdAsync(string id)
 		{
 			var configurations = await LoadStorageContentAsync();
 			if (int.TryParse(id, out var parsedNumber))
@@ -42,11 +57,9 @@ namespace Generator.Shared.Template
 			return configurations.FirstOrDefault(d => d.ConfigurationName == id) ?? throw new Exception($"No configuration name matches [{id}]");
 		}
 		
-		public static async Task<Configuration[]> LoadStorageContentAsync(string filePath = null)
+		public async Task<Configuration[]> LoadStorageContentAsync()
 		{
-			filePath = filePath ?? WorkspaceFile;
-
-			var fileInfo = new FileInfo(filePath);
+			var fileInfo = new FileInfo(_workspaceFile);
 			if (!fileInfo.Exists)
 			{
 				Log.Error($"No configuration storage located at {fileInfo.FullName}.");
@@ -69,11 +82,11 @@ namespace Generator.Shared.Template
 			}
 		}
 
-		public static async Task<bool> SaveConfigurationsAsync(IEnumerable<Configuration> configurations, string targetPath = null)
+		public async Task<bool> SaveConfigurationsAsync(IEnumerable<Configuration> configurations, string targetPath = null)
 		{
 			try
 			{
-				var fileInfo = new FileInfo(targetPath ?? WorkspaceFile);
+				var fileInfo = new FileInfo(_workspaceFile);
 				if (!fileInfo.Directory.Exists)
 					fileInfo.Directory.Create();
 
@@ -92,7 +105,7 @@ namespace Generator.Shared.Template
 			}
 		}
 
-		public static async Task<bool> DeleteConfigurationAsync(Guid id)
+		public async Task<bool> DeleteConfigurationAsync(Guid id)
 		{
 			var configurations = await LoadStorageContentAsync();
 			var filtered = configurations.Where(d => d.Id != id).ToArray();
@@ -100,7 +113,7 @@ namespace Generator.Shared.Template
 			return configurations.Length != filtered.Length;
 		}
 
-		public static async Task<bool> UpdateConfigurationAsync(Configuration configuration)
+		public async Task<bool> UpdateConfigurationAsync(Configuration configuration)
 		{
 			var configurations = (await LoadStorageContentAsync()).ToList();
 			var index = configurations.FindIndex(d => d.Id == configuration.Id);
@@ -116,7 +129,7 @@ namespace Generator.Shared.Template
 			return false;
 		}
 
-		public static async Task<bool> CopyConfigurationAsync(Configuration configuration)
+		public async Task<bool> CopyConfigurationAsync(Configuration configuration)
 		{
 			var configurations = (await LoadStorageContentAsync()).ToList();
 			var index = configurations.FindIndex(d => d.Id == configuration.Id);

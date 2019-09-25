@@ -33,5 +33,7 @@ namespace Generator.Shared.Serialization
 
 		/// <remarks/>
 		public bool ProvideDefaultName { get; set; }
+
+		public bool Hidden { get; set; }
 	}
 }

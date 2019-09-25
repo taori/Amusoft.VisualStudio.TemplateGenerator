@@ -23,6 +23,8 @@ namespace Generator.Shared.ViewModels
 {
 	public class ConfigurationViewModel : ViewModelBase, INotifyDataErrorInfo
 	{
+		private readonly ConfigurationManager _configurationManager = ConfigurationManager.Default();
+
 		public Configuration Model { get; }
 
 		private static readonly ILogger Log = LogManager.GetLogger(nameof(ConfigurationViewModel));
@@ -224,6 +226,14 @@ namespace Generator.Shared.ViewModels
 			set => SetValue(ref _zipContents, value, nameof(ZipContents));
 		}
 
+		private bool _hideSubProjects;
+
+		public bool HideSubProjects
+		{
+			get => _hideSubProjects;
+			set => SetValue(ref _hideSubProjects, value, nameof(_hideSubProjects));
+		}
+
 		private string _artifactName;
 
 		public string ArtifactName
@@ -389,6 +399,14 @@ namespace Generator.Shared.ViewModels
 			set => SetValue(ref _templateHierarchy, value, nameof(TemplateHierarchy));
 		}
 
+		private string _canBuildMessage;
+
+		public string CanBuildMessage
+		{
+			get => _canBuildMessage;
+			set => SetValue(ref _canBuildMessage, value, nameof(CanBuildMessage));
+		}
+
 		public void UpdateModel()
 		{
 			Model.ConfigurationName = ConfigurationName;
@@ -398,6 +416,7 @@ namespace Generator.Shared.ViewModels
 			Model.CreateInPlace = CreateInPlace;
 			Model.CreateNewFolder = CreateNewFolder;
 			Model.ZipContents = ZipContents;
+			Model.HideSubProjects = HideSubProjects;
 			Model.ArtifactName = ArtifactName;
 			Model.FileCopyBlacklist = FileCopyBlacklist;
 			Model.DefaultName = DefaultName;
@@ -422,6 +441,7 @@ namespace Generator.Shared.ViewModels
 			CreateInPlace = Model.CreateInPlace;
 			CreateNewFolder = Model.CreateNewFolder;
 			ZipContents = Model.ZipContents;
+			HideSubProjects = Model.HideSubProjects;
 			ArtifactName = Model.ArtifactName;
 			FileCopyBlacklist = Model.FileCopyBlacklist;
 			DefaultName = Model.DefaultName;
@@ -439,16 +459,17 @@ namespace Generator.Shared.ViewModels
 		{
 			_errors.Clear();
 
-			if (!ValidateSolutionFile())
-				return false;
-			if (!ValidateOutputFolders())
-				return false;
-			if (!ValidateArtifactName())
-				return false;
-			if (!ValidateFileCopyBlacklist())
-				return false;
+			bool error = !ValidateSolutionFile();
+			if (error || !ValidateOutputFolders())
+				error = true;
+			if (error || !ValidateArtifactName())
+				error = true;
+			if (error || !ValidateFileCopyBlacklist())
+				error = true;
 
-			return true;
+			CanBuildMessage = error ? string.Join(", ", _errors.SelectMany(d => d.Value)) : null;
+
+			return !error;
 		}
 
 		private bool ValidateFileCopyBlacklist()
@@ -555,7 +576,7 @@ namespace Generator.Shared.ViewModels
 			Log.Info($"Saving configuration {Id}.");
 			UpdateModel();
 
-			if (await ConfigurationManager.UpdateConfigurationAsync(Model))
+			if (await _configurationManager.UpdateConfigurationAsync(Model))
 			{
 				Log.Info($"Update successful.");
 				_whenSaved.OnNext(this);

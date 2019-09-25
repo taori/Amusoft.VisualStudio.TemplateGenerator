@@ -44,5 +44,14 @@ namespace Generator.Client.Desktop.Controls
 	        get { return (Visual) GetValue(ContentControlProperty); }
 	        set { SetValue(ContentControlProperty, value); }
         }
+
+        public static readonly DependencyProperty TooltipProperty = DependencyProperty.Register(
+	        nameof(Tooltip), typeof(object), typeof(LabeledControl), new PropertyMetadata(default(object)));
+
+        public object Tooltip
+        {
+	        get { return (object) GetValue(TooltipProperty); }
+	        set { SetValue(TooltipProperty, value); }
+        }
     }
 }

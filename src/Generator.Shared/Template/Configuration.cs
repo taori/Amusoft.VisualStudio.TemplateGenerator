@@ -74,6 +74,9 @@ namespace Generator.Shared.Template
 		[XmlAttribute]
 		public string Name { get; set; }
 
+		[XmlAttribute]
+		public bool HideSubProjects { get; set; }
+
 		/// <inheritdoc />
 		public object Clone()
 		{
