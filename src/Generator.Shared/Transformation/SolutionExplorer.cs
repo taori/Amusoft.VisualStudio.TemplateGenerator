@@ -144,8 +144,11 @@ namespace Generator.Shared.Transformation
 
 		private static Microsoft.Build.Evaluation.Project GetEvaluationProject(string projectFilePath)
 		{
-			return Microsoft.Build.Evaluation.ProjectCollection.GlobalProjectCollection.LoadedProjects.FirstOrDefault(d => d.FullPath == projectFilePath) ??
-				   Microsoft.Build.Evaluation.Project.FromFile(projectFilePath, new ProjectOptions());
+			// resolves relative paths
+			projectFilePath = new Uri(projectFilePath, UriKind.Absolute).LocalPath;
+
+			return Microsoft.Build.Evaluation.ProjectCollection.GlobalProjectCollection.LoadedProjects.FirstOrDefault(d => string.Equals(d.FullPath,projectFilePath, StringComparison.OrdinalIgnoreCase) ) ??
+			       Microsoft.Build.Evaluation.Project.FromFile(projectFilePath, new ProjectOptions());
 		}
 
 		public IEnumerable<string> GetAllProjectFiles()

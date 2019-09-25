@@ -469,7 +469,7 @@ namespace Generator.Shared.ViewModels
 
 			CanBuildMessage = error ? string.Join(", ", _errors.SelectMany(d => d.Value)) : null;
 
-			return true;
+			return !error;
 		}
 
 		private bool ValidateFileCopyBlacklist()
