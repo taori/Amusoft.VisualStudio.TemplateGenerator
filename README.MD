@@ -4,7 +4,9 @@
 
 [![Build status](https://ci.appveyor.com/api/projects/status/e9147nfvdyl9d139?svg=true)](https://ci.appveyor.com/project/taori/amusoft-visualstudio-templategenerator)
 
+## Download Release
 
+https://github.com/taori/Amusoft.VisualStudio.TemplateGenerator/releases/latest
 
 ## Features
 
