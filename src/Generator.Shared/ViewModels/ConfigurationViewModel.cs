@@ -399,6 +399,14 @@ namespace Generator.Shared.ViewModels
 			set => SetValue(ref _templateHierarchy, value, nameof(TemplateHierarchy));
 		}
 
+		private string _canBuildMessage;
+
+		public string CanBuildMessage
+		{
+			get => _canBuildMessage;
+			set => SetValue(ref _canBuildMessage, value, nameof(CanBuildMessage));
+		}
+
 		public void UpdateModel()
 		{
 			Model.ConfigurationName = ConfigurationName;
@@ -451,16 +459,17 @@ namespace Generator.Shared.ViewModels
 		{
 			_errors.Clear();
 
-			if (!ValidateSolutionFile())
-				return false;
-			if (!ValidateOutputFolders())
-				return false;
-			if (!ValidateArtifactName())
-				return false;
-			if (!ValidateFileCopyBlacklist())
-				return false;
+			bool error = !ValidateSolutionFile();
+			if (error || !ValidateOutputFolders())
+				error = true;
+			if (error || !ValidateArtifactName())
+				error = true;
+			if (error || !ValidateFileCopyBlacklist())
+				error = true;
 
-			return true;
+			CanBuildMessage = error ? string.Join(", ", _errors.SelectMany(d => d.Value)) : null;
+
+			return !error;
 		}
 
 		private bool ValidateFileCopyBlacklist()
