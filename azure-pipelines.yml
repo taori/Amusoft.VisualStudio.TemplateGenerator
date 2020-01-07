@@ -1,0 +1,112 @@
+# https://aka.ms/yaml
+
+trigger:
+ branches:
+   include:
+     - master
+     - features/*
+     - feature/*
+     - releases/*
+ paths:
+   exclude:
+     - README.md
+     - azure-pipelines.yml
+
+variables:
+  patch: $[counter('versioncounter', 100)]
+  buildPlatform: 'Any CPU'
+  buildConfiguration: 'Release'
+  GitHubApplicationName: 'Amusoft.VisualStudio.TemplateGenerator'
+  GitHubRepoName: 'Amusoft.VisualStudio.TemplateGenerator'
+  GitHubAssetsPattern : '$(build.artifactstagingdirectory)\**\*.vsix'
+  DOTNET_SKIP_FIRST_TIME_EXPERIENCE: 1
+
+pool:
+  vmImage: 'windows-2019'
+  
+jobs:
+- job: Build
+  displayName: change project and build
+  condition: succeeded()
+  steps:
+
+  - task: PowerShell@2
+    displayName: Get Projectversion from file
+    inputs:
+      filePath: 'build\csproj-version-to-pipeline.ps1'
+      arguments: '$(patch) $(Build.SourcesDirectory)\src\Generator.Client.Desktop\Generator.Client.Desktop.csproj PackageVersion'
+
+  - task: NuGetToolInstaller@1
+    inputs:
+      versionSpec: 5.4.0
+
+  - task: NuGetCommand@2
+    inputs:
+      command: 'restore'
+      restoreSolution: '**/*.sln'
+      feedsToUse: 'select'
+
+  - task: VSBuild@1
+    inputs:
+      solution: '**\*.sln'
+      vsVersion: '16.0'
+      platform: '$(buildPlatform)'
+      configuration: '$(buildConfiguration)'
+      maximumCpuCount: true
+
+  - task: CopyFiles@2
+    inputs:
+      SourceFolder: '$(Build.SourcesDirectory)'
+      Contents: |
+        README.md
+        build/**
+        src/Generator.Client.Desktop/Release/**
+      TargetFolder: '$(Build.ArtifactStagingDirectory)'
+
+  - task: VSTest@2
+    inputs:
+      testSelector: 'testAssemblies'
+      testAssemblyVer2: |
+        **\*test*.dll
+        !**\*TestAdapter.dll
+        !**\obj\**
+      searchFolder: '$(System.DefaultWorkingDirectory)'
+
+  - task: PublishPipelineArtifact@0
+    inputs:
+      artifactName: 'drop'
+      targetPath: '$(Build.ArtifactStagingDirectory)'
+
+  - task: PublishGitHubRelease@0
+    enabled: false
+    displayName: 'Publish-GitHub-Alpha'
+    condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))  
+    inputs:
+      applicationName: '$(GitHubApplicationName)'
+      gitSourceOption: 'github'
+      token: '$($gitAccessToken)'
+      repo: '$(GitHubRepoName)'
+      owner: 'taori'
+      tagName: 'alpha-$(PackageVersion)'
+      releaseName: 'alpha-$(PackageVersion)'
+      releaseBody: 'automated release from Azure DevOps'
+      draft: false
+      prerelease: true
+      assetsPattern: '$(GitHubAssetsPattern)'
+
+  - task: PublishGitHubRelease@0
+    enabled: false
+    displayName: 'Publish-GitHub-Release'
+    condition: and(succeeded(), startsWith(variables['Build.SourceBranch'], 'refs/heads/releases/')) 
+    inputs:
+      applicationName: '$(GitHubApplicationName)'
+      gitSourceOption: 'github'
+      token: '$($gitAccessToken)'
+      repo: '$(GitHubRepoName)'
+      owner: 'taori'
+      tagName: 'release-$(PackageVersion)'
+      releaseName: 'release-$(PackageVersion)'
+      releaseBody: 'automated release from Azure DevOps'
+      draft: false
+      prerelease: false
+      assetsPattern: '$(GitHubAssetsPattern)'
