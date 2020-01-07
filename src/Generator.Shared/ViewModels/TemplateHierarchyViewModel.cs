@@ -120,6 +120,27 @@ namespace Generator.Shared.ViewModels
 				folder.Items = new List<TemplateHierarchyElement>(this.Items.Select(s => s.Model));
 			}
 		}
+
+		public IEnumerable<FolderViewModel> GetChildren(bool recursive, bool self)
+		{
+			if (self)
+				yield return this;
+
+			foreach (var child in Items)
+			{
+				if (child is FolderViewModel folder)
+				{
+					yield return folder;
+					if (recursive)
+					{
+						foreach (var subFolder in folder.GetChildren(recursive, false))
+						{
+							yield return subFolder;
+						}
+					}
+				}
+			}
+		}
 	}
 
 	public class ProjectViewModel : TemplateHierarchyViewModel

@@ -7,6 +7,7 @@ using System.IO;
 using System.Linq;
 using System.Reactive.Subjects;
 using System.Text.RegularExpressions;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Windows.Input;
@@ -18,6 +19,7 @@ using Generator.Shared.Transformation;
 using NLog;
 using Folder = Generator.Shared.Template.Folder;
 using MessageBox = System.Windows.Forms.MessageBox;
+using Project = Generator.Shared.Template.Project;
 
 namespace Generator.Shared.ViewModels
 {
@@ -113,7 +115,7 @@ namespace Generator.Shared.ViewModels
 			return Task.CompletedTask;
 		}
 
-		private Task SelectSolutionExecute(object arg)
+		private async Task SelectSolutionExecute(object arg)
 		{
 			using (var dialog = new OpenFileDialog())
 			{
@@ -126,7 +128,23 @@ namespace Generator.Shared.ViewModels
 				}
 			}
 
-			return Task.CompletedTask;
+			if (MessageBox.Show("Add all projects? You can also do this manually to create a custom hierarchy",
+				    "Question", MessageBoxButtons.YesNo) == DialogResult.Yes)
+			{
+				AddAllReferencesProjects(SolutionPath);
+			}
+		}
+
+		private void AddAllReferencesProjects(string solutionPath)
+		{
+			var assemblyNames = GetAssemblyNamesOfSolution(solutionPath);
+			this.TemplateHierarchy.Items.Clear();
+			foreach (var assemblyName in assemblyNames)
+			{
+				var project = new Project();
+				project.Namespace = assemblyName;
+				TemplateHierarchy.Items.Add(new ProjectViewModel(project));
+			}
 		}
 
 		private Subject<ConfigurationViewModel> _whenConfirm = new Subject<ConfigurationViewModel>();
@@ -466,10 +484,27 @@ namespace Generator.Shared.ViewModels
 				error = true;
 			if (error || !ValidateFileCopyBlacklist())
 				error = true;
+			if (error || !ValidatePresentProjectReferences())
+				error = true;
 
 			CanBuildMessage = error ? string.Join(", ", _errors.SelectMany(d => d.Value)) : null;
 
 			return !error;
+		}
+
+		private bool ValidatePresentProjectReferences()
+		{
+			var folders = this.TemplateHierarchy.GetChildren(true, true);
+			var anyProjectReference = folders.Any(d =>
+				d.Items.Any(item => item is ProjectViewModel project && !string.IsNullOrEmpty(project.Namespace)));
+
+			if (!anyProjectReference)
+			{
+				AddError(nameof(TemplateHierarchy), "There is currently no referenced project in this configuration.");
+				return false;
+			}
+
+			return true;
 		}
 
 		private bool ValidateFileCopyBlacklist()

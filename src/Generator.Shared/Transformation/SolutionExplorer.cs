@@ -24,7 +24,7 @@ namespace Generator.Shared.Transformation
 
 			Log.Debug($"Creating {nameof(SolutionExplorer)} for {solutionPath}.");
 			var crawler = new SolutionExplorer(solutionPath);
-			await crawler.ExecuteAsync(progress, cancellationToken);
+			await crawler.ExecuteAsync(progress, cancellationToken).ConfigureAwait(false);
 			return crawler;
 		}
 
@@ -147,8 +147,9 @@ namespace Generator.Shared.Transformation
 			// resolves relative paths
 			projectFilePath = new Uri(projectFilePath, UriKind.Absolute).LocalPath;
 
-			return Microsoft.Build.Evaluation.ProjectCollection.GlobalProjectCollection.LoadedProjects.FirstOrDefault(d => string.Equals(d.FullPath,projectFilePath, StringComparison.OrdinalIgnoreCase) ) ??
-			       Microsoft.Build.Evaluation.Project.FromFile(projectFilePath, new ProjectOptions());
+			var matchingProject = Microsoft.Build.Evaluation.ProjectCollection.GlobalProjectCollection.LoadedProjects.FirstOrDefault(d => string.Equals(d.FullPath,projectFilePath, StringComparison.OrdinalIgnoreCase) );
+
+			return matchingProject ?? Microsoft.Build.Evaluation.Project.FromFile(projectFilePath, new ProjectOptions());
 		}
 
 		public IEnumerable<string> GetAllProjectFiles()
