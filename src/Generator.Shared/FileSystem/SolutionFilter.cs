@@ -5,7 +5,7 @@ using Microsoft.CodeAnalysis;
 
 namespace Generator.Shared.FileSystem
 {
-	public class SolutionFilter : FileWalkerFilter
+	public class SolutionFilter : FileWalkerFilter, IIgnoreFiles
 	{
 		public Solution Solution { get; }
 
@@ -16,12 +16,9 @@ namespace Generator.Shared.FileSystem
 			Solution = solution;
 		}
 
-		private HashSet<Uri> Ignored = new HashSet<Uri>();
-
 		/// <inheritdoc />
 		public override void Initialize(string root)
 		{
-			Ignored = new HashSet<Uri>();
 			if (FilterDocuments)
 			{
 				foreach (var uri in Solution
@@ -38,5 +35,8 @@ namespace Generator.Shared.FileSystem
 		{
 			return !Ignored.Contains(new Uri(file));
 		}
+
+		/// <inheritdoc />
+		public HashSet<Uri> Ignored { get; } = new HashSet<Uri>();
 	}
 }

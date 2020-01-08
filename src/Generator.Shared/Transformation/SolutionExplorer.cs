@@ -8,6 +8,7 @@ using Generator.Shared.FileSystem;
 using Microsoft.Build.Construction;
 using Microsoft.Build.Definition;
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.MSBuild;
 using NLog;
 
@@ -138,6 +139,19 @@ namespace Generator.Shared.Transformation
 				new HiddenFolderFilter(),
 				new SolutionFilter(Solution) { FilterDocuments = true }
 			};
+
+			var ignoredFiles = filters
+				.Select( d=> d as IIgnoreFiles)
+				.Where(d => d != null);
+			foreach (var ignoreFilter in ignoredFiles)
+			{
+				Log.Debug($"{ignoreFilter.GetType()} ignores the following files:");
+				foreach (var uri in ignoreFilter.Ignored)
+				{
+					Log.Debug(uri);
+				}
+			}
+
 			foreach (var p in FileWalker.FromFile(projectFilePath, filters))
 				yield return p;
 		}

@@ -7,10 +7,12 @@ using Microsoft.Build.Evaluation;
 
 namespace Generator.Shared.FileSystem
 {
-	public class BuildArtifactsFilter : FileWalkerFilter
+	public interface IIgnoreFiles
 	{
-		private readonly HashSet<Uri> Ignored = new HashSet<Uri>();
-
+		HashSet<Uri> Ignored { get; }
+	}
+	public class BuildArtifactsFilter : FileWalkerFilter, IIgnoreFiles
+	{
 		/// <inheritdoc />
 		public override void Initialize(string root)
 		{
@@ -44,5 +46,8 @@ namespace Generator.Shared.FileSystem
 			var uri = new Uri(file, UriKind.Absolute);
 			return Ignored.All(ignored => !ignored.IsBaseOf(uri));
 		}
+
+		/// <inheritdoc />
+		public HashSet<Uri> Ignored { get; } = new HashSet<Uri>();
 	}
 }

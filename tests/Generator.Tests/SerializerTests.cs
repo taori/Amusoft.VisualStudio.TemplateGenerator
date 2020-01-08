@@ -14,23 +14,25 @@ namespace Generator.Tests
 	public class SerializerTests
 	{
 		private const string SerializedPathIcon = @"<?xml version=""1.0"" encoding=""utf-16""?>
-<VSTemplate xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"" xmlns:xsd=""http://www.w3.org/2001/XMLSchema"" Version=""3.0.0"" xmlns=""http://schemas.microsoft.com/developer/vstemplate/2005"">
+<VSTemplate xmlns:xsd=""http://www.w3.org/2001/XMLSchema"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"" Version=""3.0.0"" xmlns=""http://schemas.microsoft.com/developer/vstemplate/2005"">
   <TemplateData>
     <Icon>Just some test path</Icon>
     <CreateNewFolder>false</CreateNewFolder>
     <CreateInPlace>false</CreateInPlace>
     <ProvideDefaultName>false</ProvideDefaultName>
+    <Hidden>false</Hidden>
   </TemplateData>
   <TemplateContent />
 </VSTemplate>";
 
 		private const string SerializedVisualStudioIcon = @"<?xml version=""1.0"" encoding=""utf-16""?>
-<VSTemplate xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"" xmlns:xsd=""http://www.w3.org/2001/XMLSchema"" Version=""3.0.0"" xmlns=""http://schemas.microsoft.com/developer/vstemplate/2005"">
+<VSTemplate xmlns:xsd=""http://www.w3.org/2001/XMLSchema"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"" Version=""3.0.0"" xmlns=""http://schemas.microsoft.com/developer/vstemplate/2005"">
   <TemplateData>
     <Icon Package=""packagecontent"" ID=""404"" />
     <CreateNewFolder>false</CreateNewFolder>
     <CreateInPlace>false</CreateInPlace>
     <ProvideDefaultName>false</ProvideDefaultName>
+    <Hidden>false</Hidden>
   </TemplateData>
   <TemplateContent />
 </VSTemplate>";

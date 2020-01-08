@@ -91,6 +91,14 @@ namespace Generator.Shared.ViewModels
 			using (var dialog = new SaveFileDialog())
 			{
 				dialog.Filter = "xml|*.xml";
+				dialog.AddExtension = true;
+
+				if (string.IsNullOrEmpty(dialog.FileName))
+				{
+					MessageBox.Show("Export aborted");
+					return;
+				}
+
 				if (dialog.ShowDialog() == DialogResult.OK)
 				{
 					var configurations = await _configurationManager.LoadStorageContentAsync();

@@ -1,7 +1,11 @@
-﻿namespace Generator.Shared.FileSystem
+﻿using NLog;
+
+namespace Generator.Shared.FileSystem
 {
 	public abstract class FileWalkerFilter
 	{
+		protected static readonly ILogger Log = LogManager.GetLogger(nameof(FileWalkerFilter));
+
 		public abstract void Initialize(string root);
 
 		public abstract bool IsValid(string file);

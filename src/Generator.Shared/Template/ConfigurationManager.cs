@@ -86,12 +86,12 @@ namespace Generator.Shared.Template
 		{
 			try
 			{
-				var fileInfo = new FileInfo(_workspaceFile);
+				var fileInfo = new FileInfo(targetPath ?? _workspaceFile);
 				if (!fileInfo.Directory.Exists)
 					fileInfo.Directory.Create();
 
 				var serializer = new XmlSerializer(typeof(Storage));
-				using (var stream = new StreamWriter(new FileStream(fileInfo.FullName, FileMode.Create)))
+				using (var stream = new StreamWriter(new FileStream(fileInfo.FullName, FileMode.Create, FileAccess.Write)))
 				{
 					var storage = new Storage(){Configurations = configurations.ToList() };
 					serializer.Serialize(stream, storage);

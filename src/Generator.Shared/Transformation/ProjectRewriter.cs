@@ -102,7 +102,8 @@ namespace Generator.Shared.Transformation
 			template.TemplateData.DefaultName = "Project";
 			template.TemplateData.ProvideDefaultName = true;
 			template.TemplateData.CreateNewFolder = true;
-			template.TemplateData.CreateInPlace = true;
+			template.TemplateData.CreateInPlace = true; 
+			template.TemplateData.Hidden = Context.Configuration.HideSubProjects; 
 			template.TemplateData.CodeLanguage = Context.Configuration.CodeLanguage;
 			template.TemplateContent = CreateContent(projectInfos);
 			return template;

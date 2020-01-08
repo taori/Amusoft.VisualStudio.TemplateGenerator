@@ -78,7 +78,7 @@ namespace Generator.Shared.Transformation
 		{
 			var template = new VsTemplate();
 			template.Type = Constants.VsTemplate.ProjectTypes.ProjectGroup;
-			template.TemplateData.Hidden = context.Configuration.HideSubProjects;
+			template.TemplateData.Hidden = false;
 			template.TemplateData.CreateInPlace = context.Configuration.CreateInPlace;
 			template.TemplateData.CreateNewFolder = context.Configuration.CreateNewFolder;
 			template.TemplateData.DefaultName = context.Configuration.DefaultName;
