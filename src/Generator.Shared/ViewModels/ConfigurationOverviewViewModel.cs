@@ -93,14 +93,14 @@ namespace Generator.Shared.ViewModels
 				dialog.Filter = "xml|*.xml";
 				dialog.AddExtension = true;
 
-				if (string.IsNullOrEmpty(dialog.FileName))
-				{
-					MessageBox.Show("Export aborted");
-					return;
-				}
-
 				if (dialog.ShowDialog() == DialogResult.OK)
 				{
+					if (string.IsNullOrEmpty(dialog.FileName))
+					{
+						MessageBox.Show("Export aborted");
+						return;
+					}
+
 					var configurations = await _configurationManager.LoadStorageContentAsync();
 					await _configurationManager.SaveConfigurationsAsync(configurations, dialog.FileName);
 				}
