@@ -140,21 +140,8 @@ namespace Generator.Shared.Transformation
 				new SolutionFilter(Solution) { FilterDocuments = true }
 			};
 
-
 			foreach (var p in FileWalker.FromFile(projectFilePath, filters))
 				yield return p;
-
-			var ignoredFiles = filters
-				.Select(d => d as IIgnoreFiles)
-				.Where(d => d != null);
-			foreach (var ignoreFilter in ignoredFiles)
-			{
-				Log.Debug($"{ignoreFilter.GetType().Name} ignores the following files:");
-				foreach (var uri in ignoreFilter.Ignored)
-				{
-					Log.Debug(uri);
-				}
-			}
 		}
 
 		private static Microsoft.Build.Evaluation.Project GetEvaluationProject(string projectFilePath)
