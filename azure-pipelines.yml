@@ -18,7 +18,7 @@ variables:
   buildConfiguration: 'Release'
   GitHubApplicationName: 'Amusoft.VisualStudio.TemplateGenerator'
   GitHubRepoName: 'Amusoft.VisualStudio.TemplateGenerator'
-  GitHubAssetsPattern : '$(build.ArtifactStagingDirectory)\*.zip'
+  GitHubAssetsPattern : '$(Build.ArtifactStagingDirectory)\*.zip'
   DOTNET_SKIP_FIRST_TIME_EXPERIENCE: 1
 
 pool:
@@ -45,8 +45,7 @@ jobs:
         & dotnet --info
         & dotnet build $(Build.SourcesDirectory)\src\Generator.Client.Desktop\Generator.Client.Desktop.csproj -r win-x64 -c Release
         & dotnet test $(Build.SourcesDirectory)\src\Generator.sln
-        & dotnet publish $(Build.SourcesDirectory)\src\Generator.Client.Desktop\Generator.Client.Desktop.csproj -r win-x64 -c Release --self-contained --no-build -o $(Build.ArtifactStagingDirectory) /p:PublishSingleFile=true /p:PublishTrimmed=true
-        & dir $(Build.SourcesDirectory)\src\Generator.Client.Desktop\bin\Release\net472\win-x64\
+        & dotnet publish $(Build.SourcesDirectory)\src\Generator.Client.Desktop\Generator.Client.Desktop.csproj -v n -r win-x64 -c Release --self-contained --no-build -o $(Build.ArtifactStagingDirectory) /p:PublishSingleFile=true /p:PublishTrimmed=true
         & dir $(Build.ArtifactStagingDirectory)\
         & 7z a $(Build.ArtifactStagingDirectory)\Release.zip $(Build.ArtifactStagingDirectory)\*
 
