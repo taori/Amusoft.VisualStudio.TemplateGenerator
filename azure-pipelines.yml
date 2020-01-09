@@ -36,6 +36,10 @@ jobs:
       filePath: 'build\csproj-version-to-pipeline.ps1'
       arguments: '$(patch) $(Build.SourcesDirectory)\src\Generator.Client.Desktop\Generator.Client.Desktop.csproj PackageVersion'
 
+  - task: NuGetToolInstaller@1
+    inputs:
+      versionSpec: '4.x'
+
   - task: NuGetCommand@2
     inputs:
       command: 'restore'
