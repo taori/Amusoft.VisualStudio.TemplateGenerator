@@ -18,7 +18,7 @@ variables:
   buildConfiguration: 'Release'
   GitHubApplicationName: 'Amusoft.VisualStudio.TemplateGenerator'
   GitHubRepoName: 'Amusoft.VisualStudio.TemplateGenerator'
-  GitHubAssetsPattern : '$(build.artifactstagingdirectory)\**\*.zip'
+  GitHubAssetsPattern : '$(build.ArtifactStagingDirectory)\**\*.zip'
   DOTNET_SKIP_FIRST_TIME_EXPERIENCE: 1
 
 pool:
@@ -36,14 +36,18 @@ jobs:
       filePath: 'build\csproj-version-to-pipeline.ps1'
       arguments: '$(patch) $(Build.SourcesDirectory)\src\Generator.Client.Desktop\Generator.Client.Desktop.csproj PackageVersion'
 
-  - script: |  
-      dotnet restore $(Build.SourcesDirectory)\src\Generator.sln
-      dotnet --info
-      dotnet build $(Build.SourcesDirectory)\src\Generator.Client.Desktop\Generator.Client.Desktop.csproj -r win-x64 -c Release
-      dotnet test $(Build.SourcesDirectory)\src\Generator.sln
-      dotnet publish $(Build.SourcesDirectory)\src\Generator.Client.Desktop\Generator.Client.Desktop.csproj -r win-x64 -c Release --self-contained --no-build -o $(Build.ArtifactStagingDirectory) /p:PublishSingleFile=true /p:PublishTrimmed=true
-      dir $(Build.ArtifactStagingDirectory)
-      7z a Release.zip $(Build.ArtifactStagingDirectory)\*
+  - task: PowerShell@2
+    inputs:
+      targetType: 'inline'
+      script: |
+        
+        & dotnet restore $(Build.SourcesDirectory)\src\Generator.sln
+        & dotnet --info
+        & dotnet build $(Build.SourcesDirectory)\src\Generator.Client.Desktop\Generator.Client.Desktop.csproj -r win-x64 -c Release
+        & dotnet test $(Build.SourcesDirectory)\src\Generator.sln
+        & dotnet publish $(Build.SourcesDirectory)\src\Generator.Client.Desktop\Generator.Client.Desktop.csproj -r win-x64 -c Release --self-contained --no-build -o $(Build.ArtifactStagingDirectory) /p:PublishSingleFile=true /p:PublishTrimmed=true
+        & dir $(Build.ArtifactStagingDirectory)
+        & 7z a Release.zip $(Build.ArtifactStagingDirectory)\*
 
   - task: NuGetToolInstaller@1
     enabled: false
