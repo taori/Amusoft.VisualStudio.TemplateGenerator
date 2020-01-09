@@ -61,23 +61,26 @@ jobs:
         !**\obj\**
       searchFolder: '$(System.DefaultWorkingDirectory)'
 
-  - task: PowerShell@2
-    inputs:
-      targetType: 'inline'
-      script: |
-        
-        & dotnet publish $(Build.SourcesDirectory)\src\Generator.Client.Desktop\Generator.Client.Desktop.csproj -v n -r win-x64 -c Release --self-contained -o $(Build.ArtifactStagingDirectory) /p:PublishSingleFile=true /p:PublishTrimmed=true
-        & dir $(Build.ArtifactStagingDirectory)\
-        & 7z a $(Build.ArtifactStagingDirectory)\Release.zip $(Build.ArtifactStagingDirectory)\*
+  - script: |
+      dotnet publish $(Build.SourcesDirectory)\src\Generator.Client.Desktop\Generator.Client.Desktop.csproj -v n -r win-x64 -c Release --self-contained -o $(Build.ArtifactStagingDirectory) /p:PublishSingleFile=true /p:PublishTrimmed=true
 
   - task: CopyFiles@2
     enabled: false
     inputs:
       SourceFolder: '$(Build.SourcesDirectory)'
       Contents: |
-        README.md
-        src/Generator.Client.Desktop/**/*.exe
+        **/*.md
       TargetFolder: '$(Build.ArtifactStagingDirectory)'
+
+  - script: |
+      7z a $(Build.ArtifactStagingDirectory)\Release.zip $(Build.ArtifactStagingDirectory)\*
+
+  - task: DeleteFiles@1
+    inputs:
+      SourceFolder: '$(Build.ArtifactStagingDirectory)'
+      Contents: |
+        *.exe
+        *.pdb
 
   - task: PublishPipelineArtifact@0
     inputs:
