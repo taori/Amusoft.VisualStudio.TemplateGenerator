@@ -46,8 +46,8 @@ jobs:
         & dotnet build $(Build.SourcesDirectory)\src\Generator.Client.Desktop\Generator.Client.Desktop.csproj -r win-x64 -c Release
         & dotnet test $(Build.SourcesDirectory)\src\Generator.sln
         & dotnet publish $(Build.SourcesDirectory)\src\Generator.Client.Desktop\Generator.Client.Desktop.csproj -r win-x64 -c Release --self-contained --no-build -o $(Build.ArtifactStagingDirectory) /p:PublishSingleFile=true /p:PublishTrimmed=true
-        & dir $(Build.SourcesDirectory)\src\Generator.Client.Desktop\bin\Release\net472\
-        & dir $(Build.ArtifactStagingDirectory)
+        & dir $(Build.SourcesDirectory)\src\Generator.Client.Desktop\bin\Release\net472\win-x64\
+        & dir $(Build.ArtifactStagingDirectory)\
         & 7z a $(Build.ArtifactStagingDirectory)\Release.zip $(Build.ArtifactStagingDirectory)\*
 
   - task: NuGetToolInstaller@1
