@@ -71,7 +71,7 @@ jobs:
         & 7z a $(Build.ArtifactStagingDirectory)\Release.zip $(Build.ArtifactStagingDirectory)\*
 
   - task: CopyFiles@2
-    enabled: true
+    enabled: false
     inputs:
       SourceFolder: '$(Build.SourcesDirectory)'
       Contents: |
