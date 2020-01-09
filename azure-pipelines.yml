@@ -35,18 +35,14 @@ jobs:
     inputs:
       filePath: 'build\csproj-version-to-pipeline.ps1'
       arguments: '$(patch) $(Build.SourcesDirectory)\src\Generator.Client.Desktop\Generator.Client.Desktop.csproj PackageVersion'
-    
-  - task: PowerShell@2
+  - task: VSBuild@1
     inputs:
-      targetType: 'inline'
-      script: |
-        
-        & dotnet restore $(Build.SourcesDirectory)\src\Generator.sln
-        & dotnet build $(Build.SourcesDirectory)\src\Generator.Client.Desktop\Generator.Client.Desktop.csproj -r win-x64 -c Release
-        & dotnet test $(Build.SourcesDirectory)\src\Generator.sln
-        
+      solution: '**\*.sln'
+      platform: '$(buildPlatform)'
+      configuration: '$(buildConfiguration)'
+
   - task: VSTest@2
-    enabled: false
+    enabled: true
     inputs:
       testSelector: 'testAssemblies'
       testAssemblyVer2: |
@@ -60,7 +56,7 @@ jobs:
       targetType: 'inline'
       script: |
         
-        & dotnet publish $(Build.SourcesDirectory)\src\Generator.Client.Desktop\Generator.Client.Desktop.csproj -v n -r win-x64 -c Release --self-contained --no-build -o $(Build.ArtifactStagingDirectory) /p:PublishSingleFile=true /p:PublishTrimmed=true
+        & dotnet publish $(Build.SourcesDirectory)\src\Generator.Client.Desktop\Generator.Client.Desktop.csproj -v n -r win-x64 -c Release --self-contained -o $(Build.ArtifactStagingDirectory) /p:PublishSingleFile=true /p:PublishTrimmed=true
         & dir $(Build.ArtifactStagingDirectory)\
         & 7z a $(Build.ArtifactStagingDirectory)\Release.zip $(Build.ArtifactStagingDirectory)\*
 
