@@ -23,10 +23,10 @@ variables:
 
 pool:
   vmImage: 'windows-2019'
-  
+
 jobs:
-- job: Build
-  displayName: change project and build
+- job: Prepare
+  displayName: Prepare build environment
   condition: succeeded()
   steps:
 
@@ -36,42 +36,27 @@ jobs:
       filePath: 'build\csproj-version-to-pipeline.ps1'
       arguments: '$(patch) $(Build.SourcesDirectory)\src\Generator.Client.Desktop\Generator.Client.Desktop.csproj PackageVersion'
 
+- job: Build
+  displayName: Build
+  dependsOn: Prepare
+  condition: succeeded()
+
+  steps:
+    
   - task: PowerShell@2
     inputs:
       targetType: 'inline'
       script: |
         
         & dotnet restore $(Build.SourcesDirectory)\src\Generator.sln
-        & dotnet --info
         & dotnet build $(Build.SourcesDirectory)\src\Generator.Client.Desktop\Generator.Client.Desktop.csproj -r win-x64 -c Release
         & dotnet test $(Build.SourcesDirectory)\src\Generator.sln
         & dotnet publish $(Build.SourcesDirectory)\src\Generator.Client.Desktop\Generator.Client.Desktop.csproj -v n -r win-x64 -c Release --self-contained --no-build -o $(Build.ArtifactStagingDirectory) /p:PublishSingleFile=true /p:PublishTrimmed=true
         & dir $(Build.ArtifactStagingDirectory)\
         & 7z a $(Build.ArtifactStagingDirectory)\Release.zip $(Build.ArtifactStagingDirectory)\*
 
-  - task: NuGetToolInstaller@1
-    enabled: false
-    inputs:
-      versionSpec: 5.4.0
-
-  - task: NuGetCommand@2
-    enabled: false
-    inputs:
-      command: 'restore'
-      restoreSolution: '**/*.sln'
-      feedsToUse: 'select'
-
-  - task: VSBuild@1
-    enabled: false
-    inputs:
-      solution: '**\*.sln'
-      vsVersion: '16.0'
-      platform: '$(buildPlatform)'
-      configuration: '$(buildConfiguration)'
-      maximumCpuCount: true
-
   - task: CopyFiles@2
-    enabled: false
+    enabled: true
     inputs:
       SourceFolder: '$(Build.SourcesDirectory)'
       Contents: |
@@ -80,6 +65,12 @@ jobs:
         src/Generator.Client.Desktop/Release/**
       TargetFolder: '$(Build.ArtifactStagingDirectory)'
 
+- job: Test
+  displayName: Test
+  dependsOn: Build
+  condition: succeeded()
+
+  steps:
   - task: VSTest@2
     enabled: false
     inputs:
