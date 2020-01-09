@@ -61,9 +61,12 @@ jobs:
         !**\obj\**
       searchFolder: '$(System.DefaultWorkingDirectory)'
 
-  - script: |
-      dotnet publish $(Build.SourcesDirectory)\src\Generator.Client.Desktop\Generator.Client.Desktop.csproj -v n -r win-x64 -c Release --self-contained -o $(Build.ArtifactStagingDirectory) /p:PublishSingleFile=true /p:PublishTrimmed=true
-
+  - task: PowerShell@2
+    inputs:
+      targetType: 'inline'
+      script: |
+        dotnet publish $(Build.SourcesDirectory)\src\Generator.Client.Desktop\Generator.Client.Desktop.csproj -v n -r win-x64 -c Release --self-contained -o $(Build.ArtifactStagingDirectory) /p:PublishSingleFile=true /p:PublishTrimmed=true
+    
   - task: CopyFiles@2
     enabled: false
     inputs:
@@ -72,8 +75,11 @@ jobs:
         **/*.md
       TargetFolder: '$(Build.ArtifactStagingDirectory)'
 
-  - script: |
-      7z a $(Build.ArtifactStagingDirectory)\Release.zip $(Build.ArtifactStagingDirectory)\*
+  - task: PowerShell@2
+    inputs:
+      targetType: 'inline'
+      script: |
+        7z a $(Build.ArtifactStagingDirectory)\Release.zip $(Build.ArtifactStagingDirectory)\*
 
   - task: DeleteFiles@1
     inputs:
