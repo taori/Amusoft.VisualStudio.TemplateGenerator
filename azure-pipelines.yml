@@ -41,20 +41,23 @@ jobs:
       dotnet --info
       dotnet build $(Build.SourcesDirectory)\src\Generator.Client.Desktop\Generator.Client.Desktop.csproj -r win-x64 -c Release
       dotnet test $(Build.SourcesDirectory)\src\Generator.sln
-      dotnet publish $(Build.SourcesDirectory)\src\Generator.Client.Desktop\Generator.Client.Desktop.csproj -r win-x64 -c Release --self-contained --no-build -o $(Build.ArtifactStagingDirectory) /p:PublishSingleFile=true /p:PublishTrimmed=true
+      dotnet publish $(Build.SourcesDirectory)\src\Generator.Client.Desktop\Generator.Client.Desktop.csproj -r win-x64 -c Release --self-contained --no-build -o $(Build.ArtifactStagingDirectory)\ /p:PublishSingleFile=true /p:PublishTrimmed=true
       7z a Release.zip $(Build.ArtifactStagingDirectory)\*  
 
   - task: NuGetToolInstaller@1
+    enabled: false
     inputs:
       versionSpec: 5.4.0
 
   - task: NuGetCommand@2
+    enabled: false
     inputs:
       command: 'restore'
       restoreSolution: '**/*.sln'
       feedsToUse: 'select'
 
   - task: VSBuild@1
+    enabled: false
     inputs:
       solution: '**\*.sln'
       vsVersion: '16.0'
@@ -63,6 +66,7 @@ jobs:
       maximumCpuCount: true
 
   - task: CopyFiles@2
+    enabled: false
     inputs:
       SourceFolder: '$(Build.SourcesDirectory)'
       Contents: |
@@ -72,6 +76,7 @@ jobs:
       TargetFolder: '$(Build.ArtifactStagingDirectory)'
 
   - task: VSTest@2
+    enabled: false
     inputs:
       testSelector: 'testAssemblies'
       testAssemblyVer2: |
