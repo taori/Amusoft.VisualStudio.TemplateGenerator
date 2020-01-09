@@ -23,3 +23,6 @@ dotnet_naming_style.end_in_async.required_prefix =
 dotnet_naming_style.end_in_async.required_suffix = Async
 dotnet_naming_style.end_in_async.capitalization = pascal_case
 dotnet_naming_style.end_in_async.word_separator = 
+
+# CS0067: Das Ereignis "CloseOnEscapeBehavior.CanExecuteChanged" wird nie verwendet.
+dotnet_diagnostic.CS0067.severity = silent

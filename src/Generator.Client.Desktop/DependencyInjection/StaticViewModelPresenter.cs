@@ -62,7 +62,7 @@ namespace Generator.Client.Desktop.DependencyInjection
 				Interaction.GetBehaviors(window).Add(new CloseOnEscapeBehavior());
 				var editModel = new ConfigurationViewModel(viewModel.Model);
 				window.DataContext = editModel;
-				editModel.WhenSaved.Subscribe(async(_) =>
+				editModel.WhenSaved.Subscribe((_) =>
 				{
 					viewModel.NotifySaved();
 				});
