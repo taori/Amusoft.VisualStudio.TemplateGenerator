@@ -35,6 +35,13 @@ jobs:
     inputs:
       filePath: 'build\csproj-version-to-pipeline.ps1'
       arguments: '$(patch) $(Build.SourcesDirectory)\src\Generator.Client.Desktop\Generator.Client.Desktop.csproj PackageVersion'
+
+  - task: NuGetCommand@2
+    inputs:
+      command: 'restore'
+      restoreSolution: '**/*.sln'
+      feedsToUse: 'select'
+
   - task: VSBuild@1
     inputs:
       solution: '**\*.sln'
@@ -42,7 +49,6 @@ jobs:
       configuration: '$(buildConfiguration)'
 
   - task: VSTest@2
-    enabled: true
     inputs:
       testSelector: 'testAssemblies'
       testAssemblyVer2: |
@@ -66,9 +72,8 @@ jobs:
       SourceFolder: '$(Build.SourcesDirectory)'
       Contents: |
         README.md
-        src/Generator.Client.Desktop/Release/**/*.exe
+        src/Generator.Client.Desktop/**/*.exe
       TargetFolder: '$(Build.ArtifactStagingDirectory)'
-
 
   - task: PublishPipelineArtifact@0
     inputs:
