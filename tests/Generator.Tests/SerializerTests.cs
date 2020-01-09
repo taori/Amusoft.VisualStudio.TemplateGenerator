@@ -53,7 +53,7 @@ namespace Generator.Tests
 			result.Should().Be(SerializedPathIcon);
 		}
 
-		[Fact(Skip = "Causes CI to fail because serialization result misorders xsd/xsi")]
+		[Fact]
 		public void DeserializePathIcon()
 		{
 			var serializer = new XmlSerializer(typeof(VsTemplate));
@@ -63,7 +63,7 @@ namespace Generator.Tests
 			deserialized.TemplateData.Icon.Path.Should().Be("Just some test path");
 		}
 
-		[Fact]
+		[Fact(Skip = "Causes CI to fail because serialization result misorders xsd/xsi")]
 		public void SerializeVisualStudioIcon()
 		{
 			var serializer = new XmlSerializer(typeof(VsTemplate));
