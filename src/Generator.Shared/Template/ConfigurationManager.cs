@@ -57,13 +57,13 @@ namespace Generator.Shared.Template
 			return configurations.FirstOrDefault(d => d.ConfigurationName == id) ?? throw new Exception($"No configuration name matches [{id}]");
 		}
 		
-		public async Task<Configuration[]> LoadStorageContentAsync()
+		public Task<Configuration[]> LoadStorageContentAsync()
 		{
 			var fileInfo = new FileInfo(_workspaceFile);
 			if (!fileInfo.Exists)
 			{
 				Log.Error($"No configuration storage located at {fileInfo.FullName}.");
-				return Array.Empty<Configuration>();
+				return Task.FromResult(Array.Empty<Configuration>());
 			}
 
 			using (var stream = new StreamReader(new FileStream(fileInfo.FullName, FileMode.Open)))
@@ -72,17 +72,17 @@ namespace Generator.Shared.Template
 				{
 					var serializer = new XmlSerializer(typeof(Storage));
 					var storage = serializer.Deserialize(stream) as Storage;
-					return storage.Configurations.ToArray();
+					return Task.FromResult(storage.Configurations.ToArray());
 				}
 				catch (Exception e)
 				{
 					Log.Error(e);
-					return Array.Empty<Configuration>();
+					return Task.FromResult(Array.Empty<Configuration>());
 				}
 			}
 		}
 
-		public async Task<bool> SaveConfigurationsAsync(IEnumerable<Configuration> configurations, string targetPath = null)
+		public Task<bool> SaveConfigurationsAsync(IEnumerable<Configuration> configurations, string targetPath = null)
 		{
 			try
 			{
@@ -95,13 +95,13 @@ namespace Generator.Shared.Template
 				{
 					var storage = new Storage(){Configurations = configurations.ToList() };
 					serializer.Serialize(stream, storage);
-					return true;
+					return Task.FromResult(true);
 				}
 			}
 			catch (Exception e)
 			{
 				Log.Error(e);
-				return false;
+				return Task.FromResult(false);
 			}
 		}
 

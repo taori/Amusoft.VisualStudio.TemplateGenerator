@@ -34,7 +34,7 @@ namespace Generator.Shared.ViewModels
 			DeleteConfigurationCommand = new TaskCommand<ConfigurationViewModel>(DeleteConfigurationExecute);
 			BuildTemplateCommand = new TaskCommand<ConfigurationViewModel>(BuildTemplateExecute, d => d?.CanBuild() ?? false);
 
-			ReloadConfigurationsAsync(null);
+			ReloadConfigurationsAsync(null).GetAwaiter().GetResult();
 		}
 
 		private async Task ImportConfigurationExecute(object arg)

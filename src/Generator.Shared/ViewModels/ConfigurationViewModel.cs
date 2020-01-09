@@ -115,7 +115,7 @@ namespace Generator.Shared.ViewModels
 			return Task.CompletedTask;
 		}
 
-		private async Task SelectSolutionExecute(object arg)
+		private Task SelectSolutionExecute(object arg)
 		{
 			using (var dialog = new OpenFileDialog())
 			{
@@ -133,6 +133,8 @@ namespace Generator.Shared.ViewModels
 			{
 				AddAllReferencesProjects(SolutionPath);
 			}
+
+			return Task.CompletedTask;
 		}
 
 		private void AddAllReferencesProjects(string solutionPath)

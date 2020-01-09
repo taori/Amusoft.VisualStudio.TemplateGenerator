@@ -30,7 +30,9 @@ namespace Generator.Shared.FileSystem
 				yield return file;
 
 				skipFile:
+#pragma warning disable 219
 				var noop = 0;
+#pragma warning restore 219
 			}
 		}
 
