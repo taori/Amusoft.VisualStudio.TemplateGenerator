@@ -19,6 +19,7 @@ variables:
   GitHubApplicationName: 'Amusoft.VisualStudio.TemplateGenerator'
   GitHubRepoName: 'Amusoft.VisualStudio.TemplateGenerator'
   GitHubAssetsPattern : '$(Build.ArtifactStagingDirectory)\*.zip'
+  GitHubAccessToken : '$($gitAccessToken)'
   DOTNET_SKIP_FIRST_TIME_EXPERIENCE: 1
 
 pool:
@@ -66,8 +67,8 @@ jobs:
     inputs:
       targetType: 'inline'
       script: |
-        dotnet build $(Build.SourcesDirectory)\src\Generator.Client.Desktop\Generator.Client.Desktop.csproj -r win-x64 -c $(buildConfiguration)
-        dotnet publish $(Build.SourcesDirectory)\src\Generator.Client.Desktop\Generator.Client.Desktop.csproj -r win-x64 -c $(buildConfiguration) --self-contained --no-build -o $(Build.ArtifactStagingDirectory) /p:PublishSingleFile=true /p:PublishTrimmed=true
+        dotnet build $(Build.SourcesDirectory)\src\Generator.Client.Desktop\Generator.Client.Desktop.csproj -r win-x64 -c $(buildConfiguration) -v n
+        dotnet publish $(Build.SourcesDirectory)\src\Generator.Client.Desktop\Generator.Client.Desktop.csproj -r win-x64 -c $(buildConfiguration) -v n --self-contained --no-build -o $(Build.ArtifactStagingDirectory) /p:PublishSingleFile=true /p:PublishTrimmed=true
 
   - task: CopyFiles@2
     enabled: true
@@ -82,7 +83,7 @@ jobs:
     inputs:
       targetType: 'inline'
       script: |
-        7z a $(Build.ArtifactStagingDirectory)\Release.zip $(Build.ArtifactStagingDirectory)\*
+        7z a $(Build.ArtifactStagingDirectory)\TemplateGenerator_$(PackageVersion).zip $(Build.ArtifactStagingDirectory)\*
 
   - task: DeleteFiles@1
     inputs:
@@ -103,7 +104,7 @@ jobs:
     inputs:
       applicationName: '$(GitHubApplicationName)'
       gitSourceOption: 'github'
-      token: '$($gitAccessToken)'
+      token: '$(GitHubAccessToken)'
       repo: '$(GitHubRepoName)'
       owner: 'taori'
       tagName: 'alpha-$(PackageVersion)'
@@ -120,7 +121,7 @@ jobs:
     inputs:
       applicationName: '$(GitHubApplicationName)'
       gitSourceOption: 'github'
-      token: '$($gitAccessToken)'
+      token: '$(GitHubAccessToken)'
       repo: '$(GitHubRepoName)'
       owner: 'taori'
       tagName: 'release-$(PackageVersion)'
