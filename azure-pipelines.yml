@@ -67,9 +67,9 @@ jobs:
     inputs:
       targetType: 'inline'
       script: |
-        dotnet restore $(Build.SourcesDirectory)\src\Generator.sln
-        dotnet build $(Build.SourcesDirectory)\src\Generator.Client.Desktop\Generator.Client.Desktop.csproj -r win-x64 -c $(buildConfiguration) -v n
-        dotnet publish $(Build.SourcesDirectory)\src\Generator.Client.Desktop\Generator.Client.Desktop.csproj -r win-x64 -c $(buildConfiguration) -v n --self-contained --no-build -o $(Build.ArtifactStagingDirectory) /p:PublishSingleFile=true /p:PublishTrimmed=true
+        # dotnet restore $(Build.SourcesDirectory)\src\Generator.sln
+        # dotnet build $(Build.SourcesDirectory)\src\Generator.Client.Desktop\Generator.Client.Desktop.csproj -r win-x64 -c $(buildConfiguration) -v n
+        & dotnet publish $(Build.SourcesDirectory)\src\Generator.Client.Desktop\Generator.Client.Desktop.csproj -r win-x64 -c $(buildConfiguration) -v n --self-contained --no-build -o $(Build.ArtifactStagingDirectory) /p:PublishSingleFile=true /p:PublishTrimmed=true
 
   - task: CopyFiles@2
     enabled: true
