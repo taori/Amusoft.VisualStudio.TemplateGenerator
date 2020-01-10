@@ -13,14 +13,34 @@ trigger:
      - azure-pipelines.yml
 
 variables:
-  patch: $[counter('versioncounter', 100)]
-  buildPlatform: 'Any CPU'
-  buildConfiguration: 'Release'
-  GitHubApplicationName: 'Amusoft.VisualStudio.TemplateGenerator'
-  GitHubRepoName: 'Amusoft.VisualStudio.TemplateGenerator'
-  GitHubAssetsPattern : '$(Build.ArtifactStagingDirectory)\*.zip'
-  GitHubAccessToken : '$($gitAccessToken)'
-  DOTNET_SKIP_FIRST_TIME_EXPERIENCE: 1
+  - group: GitRelease
+
+  - name: patch
+    value: $[counter('versioncounter', 100)]
+  - name: buildPlatform
+    value: 'Any CPU'
+  - name: buildConfiguration
+    value: 'Release'
+  - name: GitHubApplicationName
+    value: 'Amusoft.VisualStudio.TemplateGenerator'
+  - name: GitHubRepoName
+    value: 'Amusoft.VisualStudio.TemplateGenerator'
+  - name: GitHubAssetsPattern
+    value: '$(Build.ArtifactStagingDirectory)\*.zip'
+  - name: GitHubAccessToken
+    value: '$($gitAccessToken)'
+  - name: DOTNET_SKIP_FIRST_TIME_EXPERIENCE
+    value: 1
+
+  #patch: $[counter('versioncounter', 100)]
+  #buildPlatform: 'Any CPU'
+  #buildConfiguration: 'Release'
+  #GitHubApplicationName: 'Amusoft.VisualStudio.TemplateGenerator'
+  #GitHubRepoName: 'Amusoft.VisualStudio.TemplateGenerator'
+  #GitHubAssetsPattern : '$(Build.ArtifactStagingDirectory)\*.zip'
+  #GitHubAccessToken : '$($gitAccessToken)'
+  #DOTNET_SKIP_FIRST_TIME_EXPERIENCE: 1
+  
 
 pool:
   vmImage: 'windows-2019'
