@@ -28,7 +28,7 @@ variables:
   - name: GitHubAssetsPattern
     value: '$(Build.ArtifactStagingDirectory)\*.zip'
   - name: GitHubAccessToken
-    value: '$($gitAccessToken)'
+    value: '$(gitAccessToken)'
   - name: DOTNET_SKIP_FIRST_TIME_EXPERIENCE
     value: 1
 
