@@ -68,9 +68,9 @@ jobs:
     inputs:
       targetType: 'inline'
       script: |
-        mkdir $(Build.ArtifactStagingDirectory)\publish
+        mkdir $(Build.ArtifactStagingDirectory)\application
         & dotnet build $(Build.SourcesDirectory)\src\Generator.Client.Desktop\Generator.Client.Desktop.csproj -r win-x64 -c $(buildConfiguration)
-        & dotnet publish $(Build.SourcesDirectory)\src\Generator.Client.Desktop\Generator.Client.Desktop.csproj -r win-x64 -c $(buildConfiguration) --self-contained --no-build -o $(Build.ArtifactStagingDirectory)\publish
+        & dotnet publish $(Build.SourcesDirectory)\src\Generator.Client.Desktop\Generator.Client.Desktop.csproj -r win-x64 -c $(buildConfiguration) --self-contained --no-build -o $(Build.ArtifactStagingDirectory)\application
 
   - task: CopyFiles@2
     inputs:
@@ -86,16 +86,10 @@ jobs:
       script: |
         7z a $(Build.ArtifactStagingDirectory)\TemplateGenerator_$(PackageVersion)_win64.zip $(Build.ArtifactStagingDirectory)\*
 
-  - task: DeleteFiles@1
-    inputs:
-      SourceFolder: '$(Build.ArtifactStagingDirectory)'
-      Contents: |
-        !*.zip
-
   - task: PublishPipelineArtifact@0
     inputs:
       artifactName: 'drop'
-      targetPath: '$(Build.ArtifactStagingDirectory)'
+      targetPath: '$(Build.ArtifactStagingDirectory)\TemplateGenerator_$(PackageVersion)_win64.zip'
 
   - task: PublishGitHubRelease@0
     enabled: false
