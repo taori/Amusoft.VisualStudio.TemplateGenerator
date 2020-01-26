@@ -6,17 +6,24 @@ using System.Linq;
 using System.Reactive.Subjects;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using System.Windows.Forms;
 using System.Windows.Input;
 using Generator.Client.Desktop.Utility;
+using Generator.Shared.DependencyInjection;
 using Newtonsoft.Json;
 
 namespace Generator.Shared.ViewModels
 {
 	public class SelectOutputFolderViewModel : ScreenViewModel
 	{
+		private readonly IFileDialogService _fileDialogService;
+
 		public SelectOutputFolderViewModel()
 		{
+			if (!ServiceLocator.TryGetService(out _fileDialogService))
+			{
+				throw new Exception(nameof(IFileDialogService));
+			}
+
 			Title = "Select an output folder";
 			SelectManualCommand = new TaskCommand(SelectManualExecute);
 			SelectWithPresetCommand = new TaskCommand<string>(SelectWithPresetExecute);
@@ -53,7 +60,7 @@ namespace Generator.Shared.ViewModels
 		private IEnumerable<string> GetLatestOutputFolderSelections()
 		{
 			var values = ApplicationSettings.Default.LatestOutputFolderSelections;
-			if(string.IsNullOrEmpty(values))
+			if (string.IsNullOrEmpty(values))
 				yield break;
 
 			var deserialized = JsonConvert.DeserializeObject<string[]>(values);
@@ -69,7 +76,7 @@ namespace Generator.Shared.ViewModels
 			var baseDirectories = directories.Where(d => FolderPattern.IsMatch(d));
 			foreach (var directory in baseDirectories)
 			{
-				var assumedPath = Path.Combine(directory, "Templates","ProjectTemplates");
+				var assumedPath = Path.Combine(directory, "Templates", "ProjectTemplates");
 				if (Directory.Exists(assumedPath))
 					yield return assumedPath;
 			}
@@ -87,28 +94,24 @@ namespace Generator.Shared.ViewModels
 
 		private Task GetFolderBrowserResult(string presetFolder = null)
 		{
-			using (var dialog = new FolderBrowserDialog())
+			if (_fileDialogService.OpenFolderDialog(out var path, "Select an output folder", presetFolder, true))
 			{
-				dialog.Description = "Select an output folder";
-				dialog.ShowNewFolderButton = true;
-				if (presetFolder != null)
-					dialog.SelectedPath = presetFolder;
-
-				if (dialog.ShowDialog() == DialogResult.OK)
-				{
-					_whenFolderSelected.OnNext(dialog.SelectedPath);
-					var all = new HashSet<string>(GetLatestOutputFolderSelections());
-					SaveLatestFolderSelections(all, dialog.SelectedPath);
-				}
-				else
-				{
-					_whenAborted.OnNext(null);
-				}
+				_whenFolderSelected.OnNext(path);
+				var all = new HashSet<string>(GetLatestOutputFolderSelections());
+				SaveLatestFolderSelections(all, path);
 
 				_whenAborted.OnCompleted();
 				_whenFolderSelected.OnCompleted();
 				return Task.CompletedTask;
 			}
+			else
+			{
+				_whenAborted.OnNext(null);
+			}
+
+			_whenAborted.OnCompleted();
+			_whenFolderSelected.OnCompleted();
+			return Task.CompletedTask;
 		}
 
 		private ObservableCollection<string> _presetOptions;

@@ -5,14 +5,21 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using Generator.Client.Desktop.Utility;
+using Generator.Shared.DependencyInjection;
 using Generator.Shared.Serialization;
 
 namespace Generator.Shared.ViewModels
 {
 	public class MainViewModel : ScreenViewModel
 	{
+		private readonly IUIService _uiService;
+
 		public MainViewModel()
 		{
+			if (!ServiceLocator.TryGetService(out _uiService))
+			{
+				throw new Exception($"Failed to find service for {nameof(IUIService)}.");
+			}
 			Title = "Multi Project Template Generator";
 			Content = new ConfigurationOverviewViewModel();
 			ShowVersionsCommand = new TaskCommand(ShowVersionsExecute);
@@ -25,7 +32,8 @@ namespace Generator.Shared.ViewModels
 			var message = $"app: {FileVersionInfo.GetVersionInfo(app.Location).FileVersion}{Environment.NewLine}"
 			              + $"shared: {FileVersionInfo.GetVersionInfo(shared.Location).FileVersion}";
 
-			MessageBox.Show(message, "Versions");
+			_uiService.DisplayMessage(message, "Versions");
+
 			return Task.CompletedTask;
 		}
 

@@ -20,6 +20,7 @@ namespace Generator.Client.Desktop
 		/// <inheritdoc />
 		protected override void OnStartup(StartupEventArgs e)
 		{
+			CommandManagerDelegate.Instance = new WpfCommandManager();
 			ServiceLocatorInitializer.Initialize();
 			base.OnStartup(e);
 		}
@@ -38,6 +39,7 @@ namespace Generator.Client.Desktop
 			viewModelPresenter.Build();
 			services.AddSingleton<IViewModelPresenter>(viewModelPresenter);
 			services.AddSingleton<IUIService, UIService>();
+			services.AddSingleton<IFileDialogService, FileDialogService>();
 		}
 	}
 }

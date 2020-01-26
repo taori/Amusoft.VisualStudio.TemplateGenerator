@@ -29,5 +29,17 @@ namespace Generator.Client.Desktop.DependencyInjection
 	    {
 		    return MessageBox.Show(question, title, MessageBoxButtons.YesNo) == DialogResult.Yes;
 	    }
+
+	    /// <inheritdoc />
+	    public void DisplayMessage(string message, string title)
+	    {
+		    MessageBox.Show(message, title);
+	    }
+
+	    /// <inheritdoc />
+	    public void DisplayError(string message, string title)
+	    {
+		    MessageBox.Show(message, title, MessageBoxButtons.OK, MessageBoxIcon.Error);
+	    }
     }
 }
