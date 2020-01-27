@@ -92,9 +92,10 @@ jobs:
         & dotnet build $(Build.SourcesDirectory)\src\Generator.Client.Desktop\Generator.Client.Desktop.csproj -r win-x64 -c $(buildConfiguration)
         & dotnet publish $(Build.SourcesDirectory)\src\Generator.Client.Desktop\Generator.Client.Desktop.csproj -r win-x64 -c $(buildConfiguration) --self-contained --no-build -o $(Build.ArtifactStagingDirectory)\desktop
         
-        mkdir $(Build.ArtifactStagingDirectory)\cli
-        & dotnet build $(Build.SourcesDirectory)\src\Generator.Client.CommandLine\Generator.Client.CommandLine.csproj -r win-x64 -c $(buildConfiguration)
-        & dotnet publish $(Build.SourcesDirectory)\src\Generator.Client.CommandLine\Generator.Client.CommandLine.csproj -r win-x64 -c $(buildConfiguration) --self-contained --no-build -o $(Build.ArtifactStagingDirectory)\cli
+        mkdir $(Build.ArtifactStagingDirectory)\cli-netcore2.1-standalone
+        mkdir $(Build.ArtifactStagingDirectory)\cli-netcore2.1-shared
+        & dotnet publish $(Build.SourcesDirectory)\src\Generator.Client.CommandLine\Generator.Client.CommandLine.csproj -r win-x64 -f netcoreapp2.1 -c $(buildConfiguration) --self-contained -o $(Build.ArtifactStagingDirectory)\cli-netcore2.1-standalone
+        & dotnet publish $(Build.SourcesDirectory)\src\Generator.Client.CommandLine\Generator.Client.CommandLine.csproj -r win-x64 -f netcoreapp2.1 -c $(buildConfiguration) -o $(Build.ArtifactStagingDirectory)\cli-netcore2.1-shared
 
   - task: CopyFiles@2
     inputs:
