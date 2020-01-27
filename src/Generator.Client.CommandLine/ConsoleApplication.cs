@@ -60,7 +60,7 @@ namespace Generator.Client.CommandLine
 		}
 
 		[SubCommand]
-		[ApplicationMetadata(Description = "Entry point for obtaining informations")]
+		[ApplicationMetadata(Description = "Entry point for obtaining information")]
 		public class Get
 		{
 			[ApplicationMetadata(Description = "Retrieves a list of all configurations contained in the storage.")]
@@ -99,6 +99,7 @@ namespace Generator.Client.CommandLine
 				try
 				{
 					var configuration = await manager.GetConfigurationByIdAsync(id);
+					configuration.Name = newName;
 					return await manager.UpdateConfigurationAsync(configuration) ? 0 : 3;
 				}
 				catch (Exception e)

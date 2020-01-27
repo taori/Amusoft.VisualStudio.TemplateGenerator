@@ -16,6 +16,15 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="DependencyInjection\**" />
+    <Compile Remove="Test\**" />
+    <EmbeddedResource Remove="DependencyInjection\**" />
+    <EmbeddedResource Remove="Test\**" />
+    <None Remove="DependencyInjection\**" />
+    <None Remove="Test\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <None Remove="NLog.config" />
   </ItemGroup>
 
@@ -34,11 +43,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Generator.Shared\Generator.Shared.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="DependencyInjection\" />
-    <Folder Include="Test\" />
   </ItemGroup>
 
 </Project>
