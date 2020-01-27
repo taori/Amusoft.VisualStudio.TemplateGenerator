@@ -1,48 +1,49 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <OutputType>Exe</OutputType>
-    <TargetFrameworks>net472;netcoreapp2.1</TargetFrameworks>
-    <PackageId>Amusoft.VisualStudio.TemplateGenerator.CommandLine</PackageId>
-    <Authors>Andreas Müller</Authors>
-    <Company />
-    <Product>Amusoft.VisualStudio.TemplateGenerator.CommandLine</Product>
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Copyright>2020</Copyright>
-    <RepositoryType>git</RepositoryType>
-    <PackageTags>visual studio template generator</PackageTags>
-    <RepositoryUrl>https://github.com/taori/Amusoft.VisualStudio.TemplateGenerator.git</RepositoryUrl>
-    <PackageProjectUrl>https://github.com/taori/Amusoft.VisualStudio.TemplateGenerator.git</PackageProjectUrl>
-  </PropertyGroup>
+	<PropertyGroup>
+		<OutputType>Exe</OutputType>
+		<TargetFrameworks>netcoreapp2.1</TargetFrameworks>
+		<RuntimeIdentifier>win-x64</RuntimeIdentifier>
+		<PackageId>Amusoft.VisualStudio.TemplateGenerator.CommandLine</PackageId>
+		<Authors>Andreas Müller</Authors>
+		<Company />
+		<Product>Amusoft.VisualStudio.TemplateGenerator.CommandLine</Product>
+		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+		<Copyright>2020</Copyright>
+		<RepositoryType>git</RepositoryType>
+		<PackageTags>visual studio template generator</PackageTags>
+		<RepositoryUrl>https://github.com/taori/Amusoft.VisualStudio.TemplateGenerator.git</RepositoryUrl>
+		<PackageProjectUrl>https://github.com/taori/Amusoft.VisualStudio.TemplateGenerator.git</PackageProjectUrl>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <Compile Remove="DependencyInjection\**" />
-    <Compile Remove="Test\**" />
-    <EmbeddedResource Remove="DependencyInjection\**" />
-    <EmbeddedResource Remove="Test\**" />
-    <None Remove="DependencyInjection\**" />
-    <None Remove="Test\**" />
-  </ItemGroup>
+	<ItemGroup>
+		<Compile Remove="DependencyInjection\**" />
+		<Compile Remove="Test\**" />
+		<EmbeddedResource Remove="DependencyInjection\**" />
+		<EmbeddedResource Remove="Test\**" />
+		<None Remove="DependencyInjection\**" />
+		<None Remove="Test\**" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <None Remove="NLog.config" />
-  </ItemGroup>
+	<ItemGroup>
+		<None Remove="NLog.config" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <Content Include="NLog.config">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-  </ItemGroup>
+	<ItemGroup>
+		<Content Include="NLog.config">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</Content>
+	</ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Include="CommandDotNet" Version="2.7.5" />
-    <PackageReference Include="JetBrains.Annotations" Version="2018.2.1" />
-    <PackageReference Include="NLog" Version="4.5.11" />
-    <PackageReference Include="System.Configuration.ConfigurationManager" Version="4.5.0" />
-  </ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="CommandDotNet" Version="2.7.5" />
+		<PackageReference Include="JetBrains.Annotations" Version="2018.2.1" />
+		<PackageReference Include="NLog" Version="4.5.11" />
+		<PackageReference Include="System.Configuration.ConfigurationManager" Version="4.5.0" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\Generator.Shared\Generator.Shared.csproj" />
-  </ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\Generator.Shared\Generator.Shared.csproj" />
+	</ItemGroup>
 
 </Project>
