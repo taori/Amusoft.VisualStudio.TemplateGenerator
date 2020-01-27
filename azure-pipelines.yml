@@ -94,8 +94,8 @@ jobs:
         
         mkdir $(Build.ArtifactStagingDirectory)\cli-netcore2.1-standalone
         mkdir $(Build.ArtifactStagingDirectory)\cli-netcore2.1-shared
-        & dotnet publish $(Build.SourcesDirectory)\src\Generator.Client.CommandLine\Generator.Client.CommandLine.csproj -r win-x64 -f netcoreapp2.1 -c $(buildConfiguration) --self-contained -o $(Build.ArtifactStagingDirectory)\cli-netcore2.1-standalone
-        & dotnet publish $(Build.SourcesDirectory)\src\Generator.Client.CommandLine\Generator.Client.CommandLine.csproj -r win-x64 -f netcoreapp2.1 -c $(buildConfiguration) -o $(Build.ArtifactStagingDirectory)\cli-netcore2.1-shared
+        & dotnet publish $(Build.SourcesDirectory)\src\Generator.Client.CommandLine\Generator.Client.CommandLine.csproj -r win-x64 -f netcoreapp2.1 -c $(buildConfiguration) --self-contained true -o $(Build.ArtifactStagingDirectory)\cli-netcore2.1-standalone
+        & dotnet publish $(Build.SourcesDirectory)\src\Generator.Client.CommandLine\Generator.Client.CommandLine.csproj -r win-x64 -f netcoreapp2.1 -c $(buildConfiguration) --self-contained false -o $(Build.ArtifactStagingDirectory)\cli-netcore2.1-shared
 
   - task: CopyFiles@2
     inputs:
