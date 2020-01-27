@@ -2,8 +2,27 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>net472</TargetFramework>
+    <TargetFrameworks>net472;netcoreapp2.1</TargetFrameworks>
+    <PackageId>Amusoft.VisualStudio.TemplateGenerator.CommandLine</PackageId>
+    <Authors>Andreas Müller</Authors>
+    <Company />
+    <Product>Amusoft.VisualStudio.TemplateGenerator.CommandLine</Product>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Copyright>2020</Copyright>
+    <RepositoryType>git</RepositoryType>
+    <PackageTags>visual studio template generator</PackageTags>
+    <RepositoryUrl>https://github.com/taori/Amusoft.VisualStudio.TemplateGenerator.git</RepositoryUrl>
+    <PackageProjectUrl>https://github.com/taori/Amusoft.VisualStudio.TemplateGenerator.git</PackageProjectUrl>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="DependencyInjection\**" />
+    <Compile Remove="Test\**" />
+    <EmbeddedResource Remove="DependencyInjection\**" />
+    <EmbeddedResource Remove="Test\**" />
+    <None Remove="DependencyInjection\**" />
+    <None Remove="Test\**" />
+  </ItemGroup>
 
   <ItemGroup>
     <None Remove="NLog.config" />
@@ -24,11 +43,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Generator.Shared\Generator.Shared.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="DependencyInjection\" />
-    <Folder Include="Test\" />
   </ItemGroup>
 
 </Project>

@@ -5,7 +5,6 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Windows.Forms;
 using System.Windows.Input;
 using Generator.Client.Desktop.Utility;
 using Generator.Shared.DependencyInjection;
@@ -17,10 +16,16 @@ namespace Generator.Shared.ViewModels
 {
 	public class ConfigurationOverviewViewModel : ContentViewModel
 	{
+		private readonly IFileDialogService _fileDialogService;
 		private readonly ConfigurationManager _configurationManager = ConfigurationManager.Default();
 
 		public ConfigurationOverviewViewModel()
 		{
+			if (!ServiceLocator.TryGetService(out _fileDialogService))
+			{
+				throw new Exception($"Failed to find service for {nameof(IFileDialogService)}.");
+			}
+
 			Commands = new ObservableCollection<TextCommand>(
 				new[]
 				{
@@ -42,68 +47,52 @@ namespace Generator.Shared.ViewModels
 			if(!ServiceLocator.TryGetService(out IUIService uiService))
 				throw new Exception($"No implementation for {nameof(IUIService)} available.");
 
-			using (var dialog = new OpenFileDialog())
+			if (_fileDialogService.OpenFileDialog(out var path, "xml|*.xml"))
 			{
-				dialog.Filter = "xml|*.xml";
-				if (dialog.ShowDialog() == DialogResult.OK)
-				{
-					var remoteConfigurations = await ConfigurationManager.FromPath(dialog.FileName).LoadStorageContentAsync();
-					var localConfigurations = await _configurationManager.LoadStorageContentAsync();
-					var remoteById = remoteConfigurations.ToDictionary(d => d.Id);
-					var mergedConfigurations = new Dictionary<Guid, Configuration>();
-					var overwriteLocalMergeConflicts = (bool?) null;
+				var remoteConfigurations = await ConfigurationManager.FromPath(path).LoadStorageContentAsync();
+				var localConfigurations = await _configurationManager.LoadStorageContentAsync();
+				var remoteById = remoteConfigurations.ToDictionary(d => d.Id);
+				var mergedConfigurations = new Dictionary<Guid, Configuration>();
+				var overwriteLocalMergeConflicts = (bool?)null;
 
-					foreach (var localConfiguration in localConfigurations)
+				foreach (var localConfiguration in localConfigurations)
+				{
+					if (remoteById.TryGetValue(localConfiguration.Id, out var remote))
 					{
-						if (remoteById.TryGetValue(localConfiguration.Id, out var remote))
+						if (!overwriteLocalMergeConflicts.HasValue)
+							overwriteLocalMergeConflicts = uiService.GetYesNo("Overwrite local configurations in case of duplicate id's?", "Question");
+						if (overwriteLocalMergeConflicts.Value)
 						{
-							if (!overwriteLocalMergeConflicts.HasValue)
-								overwriteLocalMergeConflicts = uiService.GetYesNo("Overwrite local configurations in case of duplicate id's?", "Question");
-							if (overwriteLocalMergeConflicts.Value)
-							{
-								mergedConfigurations.Add(remote.Id, remote);
-							}
-							else
-							{
-								mergedConfigurations.Add(remote.Id, localConfiguration);
-							}
+							mergedConfigurations.Add(remote.Id, remote);
 						}
 						else
 						{
 							mergedConfigurations.Add(remote.Id, localConfiguration);
 						}
 					}
-
-					foreach (var remotePair in remoteById)
+					else
 					{
-						if(!mergedConfigurations.ContainsKey(remotePair.Key))
-							mergedConfigurations.Add(remotePair.Key, remotePair.Value);
+						mergedConfigurations.Add(remote.Id, localConfiguration);
 					}
-
-					await _configurationManager.SaveConfigurationsAsync(mergedConfigurations.Values);
-					await ReloadConfigurationsAsync(null);
 				}
+
+				foreach (var remotePair in remoteById)
+				{
+					if (!mergedConfigurations.ContainsKey(remotePair.Key))
+						mergedConfigurations.Add(remotePair.Key, remotePair.Value);
+				}
+
+				await _configurationManager.SaveConfigurationsAsync(mergedConfigurations.Values);
+				await ReloadConfigurationsAsync(null);
 			}
 		}
 
 		private async Task ExportConfigurationExecute(object arg)
 		{
-			using (var dialog = new SaveFileDialog())
+			if (_fileDialogService.SaveFileDialog(out var path, "xml|*.xml", true))
 			{
-				dialog.Filter = "xml|*.xml";
-				dialog.AddExtension = true;
-
-				if (dialog.ShowDialog() == DialogResult.OK)
-				{
-					if (string.IsNullOrEmpty(dialog.FileName))
-					{
-						MessageBox.Show("Export aborted");
-						return;
-					}
-
-					var configurations = await _configurationManager.LoadStorageContentAsync();
-					await _configurationManager.SaveConfigurationsAsync(configurations, dialog.FileName);
-				}
+				var configurations = await _configurationManager.LoadStorageContentAsync();
+				await _configurationManager.SaveConfigurationsAsync(configurations, path);
 			}
 		}
 

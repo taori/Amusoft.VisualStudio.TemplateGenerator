@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using System.Windows.Input;
+using Generator.Shared.DependencyInjection;
 using NLog;
 
 namespace Generator.Client.Desktop.Utility
@@ -46,8 +47,8 @@ namespace Generator.Client.Desktop.Utility
 
 		public event EventHandler CanExecuteChanged
 		{
-			add { CommandManager.RequerySuggested += value; }
-			remove { CommandManager.RequerySuggested -= value; }
+			add { CommandManagerDelegate.RequerySuggested += value; }
+			remove { CommandManagerDelegate.RequerySuggested -= value; }
 		}
 
 		public async void Execute(object parameter)

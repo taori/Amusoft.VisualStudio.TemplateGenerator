@@ -5,11 +5,11 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Reactive.Subjects;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Windows.Forms;
 using System.Windows.Input;
 using Generator.Client.Desktop.Utility;
 using Generator.Shared.DependencyInjection;
@@ -18,13 +18,14 @@ using Generator.Shared.Template;
 using Generator.Shared.Transformation;
 using NLog;
 using Folder = Generator.Shared.Template.Folder;
-using MessageBox = System.Windows.Forms.MessageBox;
 using Project = Generator.Shared.Template.Project;
 
 namespace Generator.Shared.ViewModels
 {
 	public class ConfigurationViewModel : ViewModelBase, INotifyDataErrorInfo
 	{
+		private readonly IFileDialogService _fileDialogService;
+		private readonly IUIService _uiService;
 		private readonly ConfigurationManager _configurationManager = ConfigurationManager.Default();
 
 		public Configuration Model { get; }
@@ -33,6 +34,14 @@ namespace Generator.Shared.ViewModels
 
 		public ConfigurationViewModel(Configuration model)
 		{
+			if(!ServiceLocator.TryGetService(out IFileDialogService fileDialogService))
+				throw new Exception($"{nameof(IFileDialogService)} not found.");
+			if(!ServiceLocator.TryGetService(out IUIService uiService))
+				throw new Exception($"{nameof(IUIService)} not found.");
+
+			_fileDialogService = fileDialogService;
+			_uiService = uiService;
+
 			SelectSolutionCommand = new TaskCommand(SelectSolutionExecute);
 			AddOutputFolderCommand = new TaskCommand(AddOutputFolderExecute);
 			RemoveOutputFolderCommand = new TaskCommand(RemoveOutputFolderExecute);
@@ -97,7 +106,8 @@ namespace Generator.Shared.ViewModels
 			if (string.IsNullOrEmpty(arg))
 				return Task.CompletedTask;
 
-			if (MessageBox.Show($"Remove for sure?", "Question", MessageBoxButtons.YesNo) == DialogResult.Yes)
+			
+			if (_uiService.GetYesNo($"Remove for sure?", "Question"))
 				OpenInEditorReferences.Remove(arg);
 
 			return Task.CompletedTask;
@@ -117,19 +127,13 @@ namespace Generator.Shared.ViewModels
 
 		private Task SelectSolutionExecute(object arg)
 		{
-			using (var dialog = new OpenFileDialog())
+			if (_fileDialogService.OpenFileDialog(out var path, "VisualStudio solution|*.sln"))
 			{
-				dialog.Filter = "VisualStudio solution|*.sln";
-				dialog.Multiselect = false;
-				dialog.ReadOnlyChecked = true;
-				if (dialog.ShowDialog() == DialogResult.OK)
-				{
-					SolutionPath = dialog.FileName;
-				}
+				SolutionPath = path;
 			}
 
-			if (MessageBox.Show("Add all projects? You can also do this manually to create a custom hierarchy",
-				    "Question", MessageBoxButtons.YesNo) == DialogResult.Yes)
+			if (_uiService.GetYesNo("Add all projects? You can also do this manually to create a custom hierarchy",
+				"Question"))
 			{
 				AddAllReferencesProjects(SolutionPath);
 			}

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.IO;
 using System.Threading.Tasks;
-using System.Windows.Forms;
 using System.Windows.Input;
 using Generator.Client.Desktop.Utility;
 using Generator.Shared.DependencyInjection;
@@ -135,6 +134,8 @@ namespace Generator.Shared.ViewModels
 
 	public class AbsolutePathIconViewModel : IconPackageViewModel
 	{
+		private readonly IFileDialogService _fileDialogService;
+		private readonly IUIService _uiService;
 		private static readonly ILogger Log = LogManager.GetLogger(nameof(IconPackageViewModel));
 
 		public ConfigurationViewModel ConfigurationViewModel { get; }
@@ -159,33 +160,27 @@ namespace Generator.Shared.ViewModels
 		{
 			if (string.IsNullOrEmpty(ConfigurationViewModel.ArtifactName))
 			{
-				MessageBox.Show($"{nameof(ConfigurationViewModel.ArtifactName)} can not be empty.", "Notice", MessageBoxButtons.OK, MessageBoxIcon.Error);
+				_uiService.DisplayError($"{nameof(ConfigurationViewModel.ArtifactName)} can not be empty.", "Error");
 				return Task.CompletedTask;
 			}
 
-			using (var dialog = new OpenFileDialog())
+			if (_fileDialogService.OpenFileDialog(out var path, "PNG-File|*.png|ICO-File|*.ico", checkFileExists: true))
 			{
-				dialog.CheckFileExists = true;
-				dialog.Multiselect = false;
-				dialog.Filter = "PNG-File|*.png|ICO-File|*.ico";
+				var targetName = GetSuggestedIconPath(ConfigurationViewModel.ArtifactName);
+				var targetFileInfo = new FileInfo(targetName);
+				if (targetFileInfo.Directory == null)
+					throw new Exception($"FileInfo.Directory unavailable.");
 
-				if (dialog.ShowDialog() == DialogResult.OK)
+				if (!targetFileInfo.Directory.Exists)
 				{
-					var targetName = GetSuggestedIconPath(ConfigurationViewModel.ArtifactName);
-					var targetFileInfo = new FileInfo(targetName);
-					if(targetFileInfo.Directory == null)
-						throw new Exception($"FileInfo.Directory unavailable.");
-
-					if (!targetFileInfo.Directory.Exists)
-					{
-						Log.Debug($"Creating foder for {targetName}.");
-						targetFileInfo.Directory.Create();
-					}
-					
-					Log.Debug($"Copying file from {dialog.FileName} to {targetName}.");
-					File.Copy(dialog.FileName, targetName, true);
-					AbsolutePath = targetName;
+					Log.Debug($"Creating foder for {targetName}.");
+					targetFileInfo.Directory.Create();
 				}
+
+				Log.Debug($"Copying file from {path} to {targetName}.");
+				File.Copy(path, targetName, true);
+
+				AbsolutePath = targetName;
 			}
 
 			return Task.CompletedTask;
@@ -199,6 +194,11 @@ namespace Generator.Shared.ViewModels
 		/// <inheritdoc />
 		public AbsolutePathIconViewModel(IconPackageReference model, ConfigurationViewModel configurationViewModel)
 		{
+			if(!ServiceLocator.TryGetService(out _fileDialogService))
+				throw new Exception($"Service {nameof(IFileDialogService)} is unavailable.");
+			if(!ServiceLocator.TryGetService(out _uiService))
+				throw new Exception($"Service {nameof(IUIService)} is unavailable.");
+
 			ConfigurationViewModel = configurationViewModel;
 
 			if (string.IsNullOrEmpty(model.Path) && !string.IsNullOrEmpty(configurationViewModel.ArtifactName))
