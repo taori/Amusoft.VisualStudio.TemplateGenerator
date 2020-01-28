@@ -49,10 +49,16 @@ jobs:
   steps:
 
   - task: PowerShell@2  
-    displayName: Get Projectversion from file
+    displayName: Version Update .Desktop
     inputs:
       filePath: 'build\csproj-version-to-pipeline.ps1'
       arguments: '$(patch) $(Build.SourcesDirectory)\src\Generator.Client.Desktop\Generator.Client.Desktop.csproj PackageVersion'
+
+  - task: PowerShell@2  
+    displayName: Version Update .CLI
+    inputs:
+      filePath: 'build\csproj-version-to-pipeline.ps1'
+      arguments: '$(patch) $(Build.SourcesDirectory)\src\Generator.Client.CommandLine\Generator.Client.CommandLine.csproj PackageVersionCLI'
 
   - task: NuGetToolInstaller@1
     inputs:
@@ -102,7 +108,7 @@ jobs:
       targetType: 'inline'
       script: |
         mkdir $(Build.ArtifactStagingDirectory)\nupkg
-        & dotnet pack $(Build.SourcesDirectory)\src\Generator.Client.CommandLine\Generator.Client.CommandLine.csproj -c $(buildConfiguration) -o $(Build.ArtifactStagingDirectory)\nupkg /p:Version=$(PackageVersion) /p:PackAsTool=true
+        & dotnet pack $(Build.SourcesDirectory)\src\Generator.Client.CommandLine\Generator.Client.CommandLine.csproj -c $(buildConfiguration) -o $(Build.ArtifactStagingDirectory)\nupkg /p:PackAsTool=true /p:VersionPrefix=$(PackageVersionCLI)
 
   - task: PowerShell@2
     condition: and(succeeded(), eq(variables['BUILD_IS_ALPHA'], 'True'))
@@ -111,7 +117,7 @@ jobs:
       targetType: 'inline'
       script: |
         mkdir $(Build.ArtifactStagingDirectory)\nupkg
-        & dotnet pack $(Build.SourcesDirectory)\src\Generator.Client.CommandLine\Generator.Client.CommandLine.csproj -c $(buildConfiguration) -o $(Build.ArtifactStagingDirectory)\nupkg /p:Version=$(PackageVersion) /p:PackAsTool=true /p:VersionSuffix=alpha
+        & dotnet pack $(Build.SourcesDirectory)\src\Generator.Client.CommandLine\Generator.Client.CommandLine.csproj -c $(buildConfiguration) -o $(Build.ArtifactStagingDirectory)\nupkg /p:PackAsTool=true /p:VersionPrefix=$(PackageVersionCLI) /p:VersionSuffix=alpha
 
   - task: CopyFiles@2
     condition: and(succeeded(), eq(variables['BUILD_PUBLISH_ARTIFACTS'],'True'))
