@@ -95,8 +95,23 @@ jobs:
         & dotnet publish $(Build.SourcesDirectory)\src\Generator.Client.CommandLine\Generator.Client.CommandLine.csproj -r win-x64 -f netcoreapp2.1 -c $(buildConfiguration) --self-contained true -o $(Build.ArtifactStagingDirectory)\cli-netcore2.1-standalone
         & dotnet publish $(Build.SourcesDirectory)\src\Generator.Client.CommandLine\Generator.Client.CommandLine.csproj -r win-x64 -f netcoreapp2.1 -c $(buildConfiguration) --self-contained false -o $(Build.ArtifactStagingDirectory)\cli-netcore2.1-shared
 
+  - task: PowerShell@2
+    condition: and(succeeded(), variables['BUILD_IS_RELEASE'])
+    displayName: dotnet pack release
+    inputs:
+      targetType: 'inline'
+      script: |
         mkdir $(Build.ArtifactStagingDirectory)\nupkg
-        & dotnet pack $(Build.SourcesDirectory)\src\Generator.Client.CommandLine\Generator.Client.CommandLine.csproj -c $(buildConfiguration) -o $(Build.ArtifactStagingDirectory)\nupkg /p:Version=$(PackageVersion)
+        & dotnet pack $(Build.SourcesDirectory)\src\Generator.Client.CommandLine\Generator.Client.CommandLine.csproj -c $(buildConfiguration) -o $(Build.ArtifactStagingDirectory)\nupkg /p:Version=$(PackageVersion) /p:PackAsTool=true
+
+  - task: PowerShell@2
+    condition: and(succeeded(), variables['BUILD_IS_ALPHA'])
+    displayName: dotnet pack alpha
+    inputs:
+      targetType: 'inline'
+      script: |
+        mkdir $(Build.ArtifactStagingDirectory)\nupkg
+        & dotnet pack $(Build.SourcesDirectory)\src\Generator.Client.CommandLine\Generator.Client.CommandLine.csproj -c $(buildConfiguration) -o $(Build.ArtifactStagingDirectory)\nupkg /p:Version=$(PackageVersion) /p:PackAsTool=true /p:VersionSuffix=alpha
 
   - task: CopyFiles@2
     condition: and(succeeded(), variables['BUILD_PUBLISH_ARTIFACTS'])
