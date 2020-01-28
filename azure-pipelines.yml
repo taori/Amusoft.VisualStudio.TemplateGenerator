@@ -124,7 +124,7 @@ jobs:
     condition: and(succeeded(), variables['BUILD_PUBLISH_ARTIFACTS'])
     inputs:
       artifactName: 'nupkg'
-      targetPath: '$(Build.ArtifactStagingDirectory)\nupkg\*.nupkg'
+      targetPath: '$(Build.ArtifactStagingDirectory)\nupkg'
 
   - task: PublishGitHubRelease@0
     enabled: true
