@@ -32,11 +32,11 @@ variables:
   - name: DOTNET_SKIP_FIRST_TIME_EXPERIENCE
     value: 1
   - name: BUILD_PUBLISH_ARTIFACTS
-    value: or(startsWith(variables['Build.SourceBranch'], 'refs/heads/releases/'), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
+    value: $[or(startsWith(variables['Build.SourceBranch'], 'refs/heads/releases/'), eq(variables['Build.SourceBranch'], 'refs/heads/master'))]
   - name: BUILD_IS_RELEASE
-    value: startsWith(variables['Build.SourceBranch'], 'refs/heads/releases/')
+    value: $[startsWith(variables['Build.SourceBranch'], 'refs/heads/releases/')]
   - name: BUILD_IS_ALPHA
-    value: eq(variables['Build.SourceBranch'], 'refs/heads/master')
+    value: $[eq(variables['Build.SourceBranch'], 'refs/heads/master')]
 
 pool:
   vmImage: 'windows-2019'
