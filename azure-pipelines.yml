@@ -48,15 +48,6 @@ jobs:
   condition: succeeded()
   steps:
 
-  - task: PowerShell@2
-    displayName: dump of build expressions
-    inputs:
-      targetType: 'inline'
-      script: |
-        Write-Host ${{ variables['BUILD_IS_RELEASE'] }}
-        Write-Host ${{ variables['BUILD_IS_ALPHA'] }}
-        Write-Host ${{ variables['BUILD_PUBLISH_ARTIFACTS'] }}
-
   - task: PowerShell@2  
     displayName: Get Projectversion from file
     inputs:
@@ -123,7 +114,7 @@ jobs:
         & dotnet pack $(Build.SourcesDirectory)\src\Generator.Client.CommandLine\Generator.Client.CommandLine.csproj -c $(buildConfiguration) -o $(Build.ArtifactStagingDirectory)\nupkg /p:Version=$(PackageVersion) /p:PackAsTool=true /p:VersionSuffix=alpha
 
   - task: CopyFiles@2
-    condition: and(succeeded(), variables['BUILD_PUBLISH_ARTIFACTS'])
+    condition: and(succeeded(), eq(variables['BUILD_PUBLISH_ARTIFACTS'],'True'))
     inputs:
       SourceFolder: '$(Build.SourcesDirectory)'
       Contents: |
@@ -131,7 +122,7 @@ jobs:
       TargetFolder: '$(Build.ArtifactStagingDirectory)'
 
   - task: PowerShell@2
-    condition: and(succeeded(), variables['BUILD_PUBLISH_ARTIFACTS'])
+    condition: and(succeeded(), eq(variables['BUILD_PUBLISH_ARTIFACTS'],'True'))
     displayName: zip artifacts
     inputs:
       targetType: 'inline'
@@ -139,13 +130,13 @@ jobs:
         7z a $(Build.ArtifactStagingDirectory)\TemplateGenerator_$(PackageVersion)_win64.zip $(Build.ArtifactStagingDirectory)\*
 
   - task: PublishPipelineArtifact@0
-    condition: and(succeeded(), variables['BUILD_PUBLISH_ARTIFACTS'])
+    condition: and(succeeded(), eq(variables['BUILD_PUBLISH_ARTIFACTS'],'True'))
     inputs:
       artifactName: 'drop'
       targetPath: '$(Build.ArtifactStagingDirectory)\TemplateGenerator_$(PackageVersion)_win64.zip'
 
   - task: PublishPipelineArtifact@0
-    condition: and(succeeded(), variables['BUILD_PUBLISH_ARTIFACTS'])
+    condition: and(succeeded(), eq(variables['BUILD_PUBLISH_ARTIFACTS'],'True'))
     inputs:
       artifactName: 'nupkg'
       targetPath: '$(Build.ArtifactStagingDirectory)\nupkg'
@@ -153,7 +144,7 @@ jobs:
   - task: PublishGitHubRelease@0
     enabled: true
     displayName: 'Publish-GitHub-Alpha'
-    condition: and(succeeded(), variables['BUILD_IS_ALPHA'])
+    condition: and(succeeded(), eq(variables['BUILD_IS_ALPHA'],'True'))
     inputs:
       applicationName: '$(GitHubApplicationName)'
       gitSourceOption: 'github'
@@ -170,7 +161,7 @@ jobs:
   - task: PublishGitHubRelease@0
     enabled: true
     displayName: 'Publish-GitHub-Release'
-    condition: and(succeeded(), variables['BUILD_IS_RELEASE'])
+    condition: and(succeeded(), eq(variables['BUILD_IS_RELEASE'],'True'))
     inputs:
       applicationName: '$(GitHubApplicationName)'
       gitSourceOption: 'github'
