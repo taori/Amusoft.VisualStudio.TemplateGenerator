@@ -31,16 +31,12 @@ variables:
     value: '$(gitAccessToken)'
   - name: DOTNET_SKIP_FIRST_TIME_EXPERIENCE
     value: 1
-
-  #patch: $[counter('versioncounter', 100)]
-  #buildPlatform: 'Any CPU'
-  #buildConfiguration: 'Release'
-  #GitHubApplicationName: 'Amusoft.VisualStudio.TemplateGenerator'
-  #GitHubRepoName: 'Amusoft.VisualStudio.TemplateGenerator'
-  #GitHubAssetsPattern : '$(Build.ArtifactStagingDirectory)\*.zip'
-  #GitHubAccessToken : '$($gitAccessToken)'
-  #DOTNET_SKIP_FIRST_TIME_EXPERIENCE: 1
-  
+  - name: BUILD_PUBLISH_ARTIFACTS
+    value: $[or(startsWith(variables['Build.SourceBranch'], 'refs/heads/releases/'), eq(variables['Build.SourceBranch'], 'refs/heads/master'))]
+  - name: BUILD_IS_RELEASE
+    value: $[startsWith(variables['Build.SourceBranch'], 'refs/heads/releases/')]
+  - name: BUILD_IS_ALPHA
+    value: $[eq(variables['Build.SourceBranch'], 'refs/heads/master')]
 
 pool:
   vmImage: 'windows-2019'
@@ -75,6 +71,7 @@ jobs:
       configuration: '$(buildConfiguration)'
 
   - task: VSTest@2
+    condition: succeeded()
     inputs:
       testSelector: 'testAssemblies'
       testAssemblyVer2: |
@@ -84,6 +81,7 @@ jobs:
       searchFolder: '$(System.DefaultWorkingDirectory)'
 
   - task: PowerShell@2
+    condition: and(succeeded(), variables['BUILD_PUBLISH_ARTIFACTS'])
     displayName: dotnet publish
     inputs:
       targetType: 'inline'
@@ -94,10 +92,14 @@ jobs:
         
         mkdir $(Build.ArtifactStagingDirectory)\cli-netcore2.1-standalone
         mkdir $(Build.ArtifactStagingDirectory)\cli-netcore2.1-shared
-        & dotnet publish $(Build.SourcesDirectory)\src\Generator.Client.CommandLine\Generator.Client.CommandLine.csproj -r win-x64 -f netcoreapp2.1 -c $(buildConfiguration) --self-contained -o $(Build.ArtifactStagingDirectory)\cli-netcore2.1-standalone
-        & dotnet publish $(Build.SourcesDirectory)\src\Generator.Client.CommandLine\Generator.Client.CommandLine.csproj -r win-x64 -f netcoreapp2.1 -c $(buildConfiguration) -o $(Build.ArtifactStagingDirectory)\cli-netcore2.1-shared
+        & dotnet publish $(Build.SourcesDirectory)\src\Generator.Client.CommandLine\Generator.Client.CommandLine.csproj -r win-x64 -f netcoreapp2.1 -c $(buildConfiguration) --self-contained true -o $(Build.ArtifactStagingDirectory)\cli-netcore2.1-standalone
+        & dotnet publish $(Build.SourcesDirectory)\src\Generator.Client.CommandLine\Generator.Client.CommandLine.csproj -r win-x64 -f netcoreapp2.1 -c $(buildConfiguration) --self-contained false -o $(Build.ArtifactStagingDirectory)\cli-netcore2.1-shared
+
+        mkdir $(Build.ArtifactStagingDirectory)\nupkg
+        & dotnet pack $(Build.SourcesDirectory)\src\Generator.Client.CommandLine\Generator.Client.CommandLine.csproj -c $(buildConfiguration) -o $(Build.ArtifactStagingDirectory)\nupkg /p:Version=$(PackageVersion)
 
   - task: CopyFiles@2
+    condition: and(succeeded(), variables['BUILD_PUBLISH_ARTIFACTS'])
     inputs:
       SourceFolder: '$(Build.SourcesDirectory)'
       Contents: |
@@ -105,6 +107,7 @@ jobs:
       TargetFolder: '$(Build.ArtifactStagingDirectory)'
 
   - task: PowerShell@2
+    condition: and(succeeded(), variables['BUILD_PUBLISH_ARTIFACTS'])
     displayName: zip artifacts
     inputs:
       targetType: 'inline'
@@ -112,14 +115,21 @@ jobs:
         7z a $(Build.ArtifactStagingDirectory)\TemplateGenerator_$(PackageVersion)_win64.zip $(Build.ArtifactStagingDirectory)\*
 
   - task: PublishPipelineArtifact@0
+    condition: and(succeeded(), variables['BUILD_PUBLISH_ARTIFACTS'])
     inputs:
       artifactName: 'drop'
       targetPath: '$(Build.ArtifactStagingDirectory)\TemplateGenerator_$(PackageVersion)_win64.zip'
 
+  - task: PublishPipelineArtifact@0
+    condition: and(succeeded(), variables['BUILD_PUBLISH_ARTIFACTS'])
+    inputs:
+      artifactName: 'nupkg'
+      targetPath: '$(Build.ArtifactStagingDirectory)\nupkg'
+
   - task: PublishGitHubRelease@0
     enabled: true
     displayName: 'Publish-GitHub-Alpha'
-    condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))  
+    condition: and(succeeded(), variables['BUILD_IS_ALPHA'])
     inputs:
       applicationName: '$(GitHubApplicationName)'
       gitSourceOption: 'github'
@@ -128,7 +138,7 @@ jobs:
       owner: 'taori'
       tagName: 'alpha-$(PackageVersion)'
       releaseName: 'alpha-$(PackageVersion)'
-      releaseBody: 'automated release from Azure DevOps'
+      releaseBody: 'Automated release from Azure DevOps'
       draft: false
       prerelease: true
       assetsPattern: '$(GitHubAssetsPattern)'
@@ -136,7 +146,7 @@ jobs:
   - task: PublishGitHubRelease@0
     enabled: true
     displayName: 'Publish-GitHub-Release'
-    condition: and(succeeded(), startsWith(variables['Build.SourceBranch'], 'refs/heads/releases/')) 
+    condition: and(succeeded(), variables['BUILD_IS_RELEASE'])
     inputs:
       applicationName: '$(GitHubApplicationName)'
       gitSourceOption: 'github'
@@ -145,7 +155,7 @@ jobs:
       owner: 'taori'
       tagName: 'release-$(PackageVersion)'
       releaseName: 'release-$(PackageVersion)'
-      releaseBody: 'automated release from Azure DevOps'
+      releaseBody: 'Automated release from Azure DevOps'
       draft: false
       prerelease: false
       assetsPattern: '$(GitHubAssetsPattern)'
