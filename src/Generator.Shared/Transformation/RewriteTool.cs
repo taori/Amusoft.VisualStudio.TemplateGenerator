@@ -30,7 +30,17 @@ namespace Generator.Shared.Transformation
 
 		public async Task<bool> ExecuteAsync(CancellationToken cancellationToken, IProgress<string> progress)
 		{
-			var viewModel = new ConfigurationViewModel(Configuration);
+			ConfigurationViewModel viewModel;
+			try
+			{
+				viewModel = new ConfigurationViewModel(Configuration);
+			}
+			catch (Exception e)
+			{
+				Log.Error(e);
+				return false;
+			}
+			
 			if (!viewModel.CanBuild())
 			{
 				Log.Error($"cannot build the configuration [{Configuration.Name}] because of validation errors.");

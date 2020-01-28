@@ -3,27 +3,20 @@
 	<PropertyGroup>
 		<OutputType>Exe</OutputType>
 		<TargetFrameworks>netcoreapp2.1</TargetFrameworks>
-		<RuntimeIdentifier>win-x64</RuntimeIdentifier>
+		<RuntimeIdentifiers>win-x64;linux-x64;osx-x64</RuntimeIdentifiers>
 		<PackageId>Amusoft.VisualStudio.TemplateGenerator.CommandLine</PackageId>
 		<Authors>Andreas Müller</Authors>
 		<Company />
 		<Product>Amusoft.VisualStudio.TemplateGenerator.CommandLine</Product>
 		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+		<ToolCommandName>amusoft-vs-templategenerator</ToolCommandName>
 		<Copyright>2020</Copyright>
 		<RepositoryType>git</RepositoryType>
 		<PackageTags>visual studio template generator</PackageTags>
 		<RepositoryUrl>https://github.com/taori/Amusoft.VisualStudio.TemplateGenerator.git</RepositoryUrl>
 		<PackageProjectUrl>https://github.com/taori/Amusoft.VisualStudio.TemplateGenerator.git</PackageProjectUrl>
+		<VersionPrefix>1.0.1</VersionPrefix>
 	</PropertyGroup>
-
-	<ItemGroup>
-		<Compile Remove="DependencyInjection\**" />
-		<Compile Remove="Test\**" />
-		<EmbeddedResource Remove="DependencyInjection\**" />
-		<EmbeddedResource Remove="Test\**" />
-		<None Remove="DependencyInjection\**" />
-		<None Remove="Test\**" />
-	</ItemGroup>
 
 	<ItemGroup>
 		<None Remove="NLog.config" />
@@ -38,7 +31,7 @@
 	<ItemGroup>
 		<PackageReference Include="CommandDotNet" Version="2.7.5" />
 		<PackageReference Include="JetBrains.Annotations" Version="2018.2.1" />
-		<PackageReference Include="NLog" Version="4.5.11" />
+		<PackageReference Include="NLog" Version="4.6.8" />
 		<PackageReference Include="System.Configuration.ConfigurationManager" Version="4.5.0" />
 	</ItemGroup>
 
