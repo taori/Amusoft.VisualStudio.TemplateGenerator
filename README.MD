@@ -2,8 +2,6 @@
 
 ## CI
 
-[![Build status](https://ci.appveyor.com/api/projects/status/e9147nfvdyl9d139?svg=true)](https://ci.appveyor.com/project/taori/amusoft-visualstudio-templategenerator)
-
 [![Build Status](https://dev.azure.com/taori/Amusoft.VisualStudio.TemplateGenerator/_apis/build/status/taori.Amusoft.VisualStudio.TemplateGenerator?branchName=master)](https://dev.azure.com/taori/Amusoft.VisualStudio.TemplateGenerator/_build/latest?definitionId=7&branchName=master)
 
 ## Download Release
