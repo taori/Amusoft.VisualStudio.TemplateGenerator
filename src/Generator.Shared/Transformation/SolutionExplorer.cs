@@ -8,7 +8,6 @@ using Generator.Shared.FileSystem;
 using Microsoft.Build.Construction;
 using Microsoft.Build.Definition;
 using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.MSBuild;
 using NLog;
 

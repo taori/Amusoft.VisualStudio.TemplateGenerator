@@ -3,6 +3,8 @@
 # All files
 [*]
 indent_style = tab
+dotnet_diagnostic.xUnit2015.severity = silent
+dotnet_diagnostic.NU1701.severity = silent
 
 # Xml files
 [*.xml]
@@ -26,6 +28,3 @@ dotnet_naming_style.end_in_async.word_separator =
 
 # CS0067: Das Ereignis "CloseOnEscapeBehavior.CanExecuteChanged" wird nie verwendet.
 dotnet_diagnostic.CS0067.severity = silent
-
-dotnet_diagnostic.xUnit2015.severity = silent
-dotnet_diagnostic.NU1701.severity = silent
