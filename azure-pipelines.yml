@@ -151,7 +151,7 @@ jobs:
       targetPath: '$(Build.ArtifactStagingDirectory)\nupkg'
 
   - task: PublishGitHubRelease@0
-    enabled: true
+    enabled: false
     displayName: 'Publish-GitHub-Alpha'
     condition: and(succeeded(), eq(variables['BUILD_IS_ALPHA'],'True'))
     inputs:
@@ -168,7 +168,7 @@ jobs:
       assetsPattern: '$(GitHubAssetsPattern)'
 
   - task: PublishGitHubRelease@0
-    enabled: true
+    enabled: false
     displayName: 'Publish-GitHub-Release'
     condition: and(succeeded(), eq(variables['BUILD_IS_RELEASE'],'True'))
     inputs:
