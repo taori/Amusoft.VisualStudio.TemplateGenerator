@@ -22,7 +22,8 @@ Write-Host "Path to project: $projectPath"
 # Read version from csproj
 [xml]$content = Get-Content $projectPath
 $version = Select-Xml -Path $projectPath -XPath //Project/PropertyGroup/PackageVersion | Select -ExpandProperty Node | Select -Expand '#text'
-$version = $version |?? Select-Xml -Path $projectPath -XPath //Project/PropertyGroup/VersionPrefix | Select -ExpandProperty Node | Select -Expand '#text'
+$versionPrefix = Select-Xml -Path $projectPath -XPath //Project/PropertyGroup/VersionPrefix | Select -ExpandProperty Node | Select -Expand '#text'
+$version = $version |?? $versionPrefix
 $version = "$version.$build"
 
 Write-Output "##vso[task.setvariable variable=$variableName;]$version"
