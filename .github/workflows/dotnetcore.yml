@@ -1,11 +1,11 @@
-name: .NET Core
+name: unit tests
 
-on: [push]
+on: [push, pull_request]
 
 jobs:
   build:
 
-    runs-on: ubuntu-latest
+    runs-on: [windows-latest]
 
     steps:
     - uses: actions/checkout@v2
@@ -16,4 +16,6 @@ jobs:
     - name: dotnet restore Generator.sln
       run: dotnet restore src/Generator.sln
     - name: dotnet build Generator.sln
-      run: dotnet build src/Generator.sln --configuration Release
+      run: dotnet build src/Generator.sln --no-restore -v m --configuration Release
+    - name: dotnet test Generator.sln
+      run: dotnet test src/Generator.sln --no-restore -v m
