@@ -13,5 +13,7 @@ jobs:
       uses: actions/setup-dotnet@v1
       with:
         dotnet-version: 2.2.108
-    - name: Build with dotnet
+    - name: dotnet restore Generator.sln
+      run: dotnet restore src/Generator.sln
+    - name: dotnet build Generator.sln
       run: dotnet build src/Generator.sln --configuration Release
