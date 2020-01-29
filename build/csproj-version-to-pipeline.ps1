@@ -2,6 +2,17 @@ $VerbosePreference="Continue"
 
 # see https://github.com/meziantou/Meziantou.Analyzer/build
 
+function NullCoalesc {
+    param (
+        [Parameter(ValueFromPipeline=$true)]$Value,
+        [Parameter(Position=0)]$Default
+    )
+
+    if ($Value) { $Value } else { $Default }
+}
+
+Set-Alias -Name "??" -Value NullCoalesc
+
 $build = $args[0]
 $projectPath = $args[1]
 $variableName = $args[2]
