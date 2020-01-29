@@ -12,7 +12,7 @@ jobs:
     - name: Setup .NET Core
       uses: actions/setup-dotnet@v1
       with:
-        dotnet-version: 2.2.108
+        dotnet-version: 3.1.100
     - name: dotnet restore Generator.sln
       run: dotnet restore src/Generator.sln
     - name: dotnet build Generator.sln
