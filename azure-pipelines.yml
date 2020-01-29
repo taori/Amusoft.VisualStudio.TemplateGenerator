@@ -138,7 +138,6 @@ jobs:
         7z a $(Build.ArtifactStagingDirectory)\TemplateGenerator_$(PackageVersion)_win64.zip $(Build.ArtifactStagingDirectory)\*
 
   - task: PublishPipelineArtifact@0
-    enabled: false
     condition: and(succeeded(), eq(variables['BUILD_PUBLISH_ARTIFACTS'],'True'))
     inputs:
       artifactName: 'drop'
