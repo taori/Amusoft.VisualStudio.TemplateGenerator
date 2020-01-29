@@ -8,7 +8,7 @@
 		<Authors>Andreas Müller</Authors>
 		<Company />
 		<Product>Amusoft.VisualStudio.TemplateGenerator.CommandLine</Product>
-		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+		<GeneratePackageOnBuild>false</GeneratePackageOnBuild>
 		<ToolCommandName>amusoft-vs-templategenerator</ToolCommandName>
 		<Copyright>2020</Copyright>
 		<RepositoryType>git</RepositoryType>
