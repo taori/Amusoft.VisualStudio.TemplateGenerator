@@ -49,13 +49,13 @@ jobs:
   steps:
 
   - task: PowerShell@2  
-    displayName: Version Update .Desktop
+    displayName: GetVersion .Desktop
     inputs:
       filePath: 'build\csproj-version-to-pipeline.ps1'
       arguments: '$(patch) $(Build.SourcesDirectory)\src\Generator.Client.Desktop\Generator.Client.Desktop.csproj PackageVersion'
 
   - task: PowerShell@2  
-    displayName: Version Update .CLI
+    displayName: GetVersion .CLI
     inputs:
       filePath: 'build\csproj-version-to-pipeline.ps1'
       arguments: '$(patch) $(Build.SourcesDirectory)\src\Generator.Client.CommandLine\Generator.Client.CommandLine.csproj PackageVersionCLI'
@@ -108,6 +108,7 @@ jobs:
       targetType: 'inline'
       script: |
         mkdir $(Build.ArtifactStagingDirectory)\nupkg
+        Write-Host $(PackageVersionCLI)
         & dotnet pack $(Build.SourcesDirectory)\src\Generator.Client.CommandLine\Generator.Client.CommandLine.csproj -c $(buildConfiguration) -o $(Build.ArtifactStagingDirectory)\nupkg /p:PackAsTool=true /p:VersionPrefix=$(PackageVersionCLI)
 
   - task: PowerShell@2
@@ -117,6 +118,7 @@ jobs:
       targetType: 'inline'
       script: |
         mkdir $(Build.ArtifactStagingDirectory)\nupkg
+        Write-Host $(PackageVersionCLI)
         & dotnet pack $(Build.SourcesDirectory)\src\Generator.Client.CommandLine\Generator.Client.CommandLine.csproj -c $(buildConfiguration) -o $(Build.ArtifactStagingDirectory)\nupkg /p:PackAsTool=true /p:VersionPrefix=$(PackageVersionCLI) /p:VersionSuffix=alpha
 
   - task: CopyFiles@2
@@ -136,6 +138,7 @@ jobs:
         7z a $(Build.ArtifactStagingDirectory)\TemplateGenerator_$(PackageVersion)_win64.zip $(Build.ArtifactStagingDirectory)\*
 
   - task: PublishPipelineArtifact@0
+    enabled: false
     condition: and(succeeded(), eq(variables['BUILD_PUBLISH_ARTIFACTS'],'True'))
     inputs:
       artifactName: 'drop'
