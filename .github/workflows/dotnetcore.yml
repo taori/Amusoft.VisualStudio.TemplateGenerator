@@ -1,4 +1,4 @@
-name: .NET Core
+name: unit tests
 
 on: [push]
 
@@ -16,4 +16,6 @@ jobs:
     - name: dotnet restore Generator.sln
       run: dotnet restore src/Generator.sln
     - name: dotnet build Generator.sln
-      run: dotnet build src/Generator.sln -v d --configuration Release
+      run: dotnet build src/Generator.sln --configuration Release
+    - name: dotnet test Generator.sln
+      run: dotnet test src/Generator.sln --no-build
