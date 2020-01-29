@@ -18,4 +18,4 @@ jobs:
     - name: dotnet build Generator.sln
       run: dotnet build src/Generator.sln --configuration Release
     - name: dotnet test Generator.sln
-      run: dotnet test src/Generator.sln --no-build
+      run: dotnet test src/Generator.sln
