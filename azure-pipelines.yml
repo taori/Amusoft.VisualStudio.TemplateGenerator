@@ -108,6 +108,7 @@ jobs:
       targetType: 'inline'
       script: |
         mkdir $(Build.ArtifactStagingDirectory)\nupkg
+        Write-Host $(PackageVersion)
         Write-Host $(PackageVersionCLI)
         & dotnet pack $(Build.SourcesDirectory)\src\Generator.Client.CommandLine\Generator.Client.CommandLine.csproj -c $(buildConfiguration) -o $(Build.ArtifactStagingDirectory)\nupkg /p:PackAsTool=true /p:VersionPrefix=$(PackageVersionCLI) /p:SymbolPackageFormat=snupkg --include-symbols --version-suffix=beta
 
@@ -118,6 +119,7 @@ jobs:
       targetType: 'inline'
       script: |
         mkdir $(Build.ArtifactStagingDirectory)\nupkg
+        Write-Host $(PackageVersion)
         Write-Host $(PackageVersionCLI)
         & dotnet pack $(Build.SourcesDirectory)\src\Generator.Client.CommandLine\Generator.Client.CommandLine.csproj -c $(buildConfiguration) -o $(Build.ArtifactStagingDirectory)\nupkg /p:PackAsTool=true /p:VersionPrefix=$(PackageVersionCLI) /p:SymbolPackageFormat=snupkg --include-symbols --version-suffix=alpha
 
