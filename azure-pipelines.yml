@@ -118,6 +118,7 @@ jobs:
     inputs:
       targetType: 'inline'
       script: |
+        dotnet --version
         mkdir $(Build.ArtifactStagingDirectory)\nupkg
         Write-Host $(PackageVersion)
         Write-Host $(PackageVersionCLI)
