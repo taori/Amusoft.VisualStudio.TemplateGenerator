@@ -109,7 +109,7 @@ jobs:
       script: |
         mkdir $(Build.ArtifactStagingDirectory)\nupkg
         Write-Host $(PackageVersionCLI)
-        & dotnet pack $(Build.SourcesDirectory)\src\Generator.Client.CommandLine\Generator.Client.CommandLine.csproj -c $(buildConfiguration) -o $(Build.ArtifactStagingDirectory)\nupkg /p:PackAsTool=true /p:Version=$(PackageVersionCLI) /p:SymbolPackageFormat=snupkg --include-symbols
+        & dotnet pack $(Build.SourcesDirectory)\src\Generator.Client.CommandLine\Generator.Client.CommandLine.csproj -c $(buildConfiguration) -o $(Build.ArtifactStagingDirectory)\nupkg /p:PackAsTool=true /p:VersionPrefix=$(PackageVersionCLI) /p:SymbolPackageFormat=snupkg --include-symbols --version-suffix=beta
 
   - task: PowerShell@2
     condition: and(succeeded(), eq(variables['BUILD_IS_ALPHA'], 'True'))
@@ -119,7 +119,7 @@ jobs:
       script: |
         mkdir $(Build.ArtifactStagingDirectory)\nupkg
         Write-Host $(PackageVersionCLI)
-        & dotnet pack $(Build.SourcesDirectory)\src\Generator.Client.CommandLine\Generator.Client.CommandLine.csproj -c $(buildConfiguration) -o $(Build.ArtifactStagingDirectory)\nupkg /p:PackAsTool=true /p:Version=$(PackageVersionCLI) /p:SymbolPackageFormat=snupkg --include-symbols --version-suffix=alpha
+        & dotnet pack $(Build.SourcesDirectory)\src\Generator.Client.CommandLine\Generator.Client.CommandLine.csproj -c $(buildConfiguration) -o $(Build.ArtifactStagingDirectory)\nupkg /p:PackAsTool=true /p:VersionPrefix=$(PackageVersionCLI) /p:SymbolPackageFormat=snupkg --include-symbols --version-suffix=alpha
 
   - task: CopyFiles@2
     condition: and(succeeded(), eq(variables['BUILD_PUBLISH_ARTIFACTS'],'True'))
