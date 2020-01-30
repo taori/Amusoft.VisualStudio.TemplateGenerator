@@ -20,6 +20,7 @@ namespace Generator.Client.Desktop
 		protected override void OnStartup(StartupEventArgs e)
 		{
 			CommandManagerDelegate.Instance = new WpfCommandManager();
+			MSBuildInitializer.Initialize();
 			ServiceLocatorInitializer.Initialize();
 			base.OnStartup(e);
 		}

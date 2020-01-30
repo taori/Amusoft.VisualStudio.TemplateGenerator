@@ -1,7 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFrameworks>net472;netstandard2.0</TargetFrameworks>
+		<!-- <TargetFrameworks>net472;netstandard2.0</TargetFrameworks> -->
+		<TargetFrameworks>net472</TargetFrameworks>
 		<LangVersion>latest</LangVersion>
 	</PropertyGroup>
 
@@ -32,9 +33,10 @@
 
 	<ItemGroup>
 	  <PackageReference Include="JetBrains.Annotations" Version="2018.2.1" />
-	  <PackageReference Include="Microsoft.Build" Version="16.4.0" />
-	  <PackageReference Include="Microsoft.Build.Framework" Version="16.4.0" />
-	  <PackageReference Include="Microsoft.Build.Utilities.Core" Version="16.4.0" />
+
+	  <PackageReference Include="Microsoft.Build" Version="15.9.20" ExcludeAssets="runtime" />
+	  <PackageReference Include="Microsoft.Build.Framework" Version="15.9.20" ExcludeAssets="runtime" />
+	  <PackageReference Include="Microsoft.Build.Utilities.Core" Version="15.9.20" ExcludeAssets="runtime" />
 	  <PackageReference Include="Microsoft.CodeAnalysis.Workspaces.Common" Version="3.4.0" />
 	  <PackageReference Include="Microsoft.CodeAnalysis.Workspaces.MSBuild" Version="3.4.0" />
 	  <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="2.2.0" />
@@ -45,6 +47,8 @@
 	  <PackageReference Include="System.IO" Version="4.3.0" />
 	  <PackageReference Include="System.IO.Compression.ZipFile" Version="4.3.0" />
 	  <PackageReference Include="System.Reactive" Version="4.1.2" />
+	  <PackageReference Include="Microsoft.Build.Locator" Version="1.2.6" />
+
 	</ItemGroup>
 
 </Project>

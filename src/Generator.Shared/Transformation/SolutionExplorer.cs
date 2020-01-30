@@ -61,7 +61,6 @@ namespace Generator.Shared.Transformation
 				throw new FileNotFoundException(projectFile);
 
 			var evaluationProject = GetEvaluationProject(projectFile);
-			//			var props = evaluationProject.Properties.Where(d => d.EvaluatedValue.Contains("ViewModels")).ToArray();
 			return evaluationProject.GetPropertyValue("RootNamespace") ?? string.Empty;
 		}
 
@@ -150,7 +149,8 @@ namespace Generator.Shared.Transformation
 
 			var matchingProject = Microsoft.Build.Evaluation.ProjectCollection.GlobalProjectCollection.LoadedProjects.FirstOrDefault(d => string.Equals(d.FullPath,projectFilePath, StringComparison.OrdinalIgnoreCase) );
 
-			return matchingProject ?? Microsoft.Build.Evaluation.Project.FromFile(projectFilePath, new ProjectOptions());
+			var projectOptions = new ProjectOptions();
+			return matchingProject ?? Microsoft.Build.Evaluation.Project.FromFile(projectFilePath, projectOptions);
 		}
 
 		public IEnumerable<string> GetAllProjectFiles()

@@ -17,6 +17,7 @@ namespace Generator.Client.CommandLine
 		{
 			try
 			{
+				MSBuildInitializer.Initialize();
 				ServiceLocatorInitializer.Initialize();
 #if DEBUG
 				if (Debugger.IsAttached)
