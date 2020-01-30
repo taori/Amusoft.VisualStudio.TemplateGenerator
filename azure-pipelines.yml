@@ -148,37 +148,3 @@ jobs:
     inputs:
       artifactName: 'nupkg'
       targetPath: '$(Build.ArtifactStagingDirectory)\nupkg'
-
-  - task: PublishGitHubRelease@0
-    enabled: false
-    displayName: 'Publish-GitHub-Alpha'
-    condition: and(succeeded(), eq(variables['BUILD_IS_ALPHA'],'True'))
-    inputs:
-      applicationName: '$(GitHubApplicationName)'
-      gitSourceOption: 'github'
-      token: '$(GitHubAccessToken)'
-      repo: '$(GitHubRepoName)'
-      owner: 'taori'
-      tagName: 'alpha-$(PackageVersion)'
-      releaseName: 'alpha-$(PackageVersion)'
-      releaseBody: 'Automated release from Azure DevOps'
-      draft: false
-      prerelease: true
-      assetsPattern: '$(GitHubAssetsPattern)'
-
-  - task: PublishGitHubRelease@0
-    enabled: false
-    displayName: 'Publish-GitHub-Release'
-    condition: and(succeeded(), eq(variables['BUILD_IS_RELEASE'],'True'))
-    inputs:
-      applicationName: '$(GitHubApplicationName)'
-      gitSourceOption: 'github'
-      token: '$(GitHubAccessToken)'
-      repo: '$(GitHubRepoName)'
-      owner: 'taori'
-      tagName: 'release-$(PackageVersion)'
-      releaseName: 'release-$(PackageVersion)'
-      releaseBody: 'Automated release from Azure DevOps'
-      draft: false
-      prerelease: false
-      assetsPattern: '$(GitHubAssetsPattern)'
