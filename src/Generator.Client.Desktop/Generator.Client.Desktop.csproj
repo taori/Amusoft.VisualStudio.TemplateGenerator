@@ -8,7 +8,7 @@
 		<UseWPF>true</UseWPF>
 		<LangVersion>latest</LangVersion>
 		<ApplicationManifest>Application.manifest</ApplicationManifest>
-		<PackageVersion>1.1.1</PackageVersion>
+		<VersionPrefix>1.1.1</VersionPrefix>
 		<Authors>Andreas Müller</Authors>
 		<Product>Multi-Project template generator</Product>
 	</PropertyGroup>
