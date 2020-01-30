@@ -109,7 +109,7 @@ jobs:
       script: |
         mkdir $(Build.ArtifactStagingDirectory)\nupkg
         Write-Host $(PackageVersionCLI)
-        & dotnet pack $(Build.SourcesDirectory)\src\Generator.Client.CommandLine\Generator.Client.CommandLine.csproj -c $(buildConfiguration) -o $(Build.ArtifactStagingDirectory)\nupkg /p:PackAsTool=true /p:VersionPrefix=$(PackageVersionCLI)
+        & dotnet pack $(Build.SourcesDirectory)\src\Generator.Client.CommandLine\Generator.Client.CommandLine.csproj -c $(buildConfiguration) -o $(Build.ArtifactStagingDirectory)\nupkg /p:PackAsTool=true /p:VersionPrefix=$(PackageVersionCLI) /p:SymbolPackageFormat=snupkg --include-symbols --version-suffix=beta
 
   - task: PowerShell@2
     condition: and(succeeded(), eq(variables['BUILD_IS_ALPHA'], 'True'))
@@ -119,7 +119,7 @@ jobs:
       script: |
         mkdir $(Build.ArtifactStagingDirectory)\nupkg
         Write-Host $(PackageVersionCLI)
-        & dotnet pack $(Build.SourcesDirectory)\src\Generator.Client.CommandLine\Generator.Client.CommandLine.csproj -c $(buildConfiguration) -o $(Build.ArtifactStagingDirectory)\nupkg /p:PackAsTool=true /p:VersionPrefix=$(PackageVersionCLI) /p:VersionSuffix=alpha
+        & dotnet pack $(Build.SourcesDirectory)\src\Generator.Client.CommandLine\Generator.Client.CommandLine.csproj -c $(buildConfiguration) -o $(Build.ArtifactStagingDirectory)\nupkg /p:PackAsTool=true /p:VersionPrefix=$(PackageVersionCLI) /p:SymbolPackageFormat=snupkg --include-symbols --version-suffix=alpha
 
   - task: CopyFiles@2
     condition: and(succeeded(), eq(variables['BUILD_PUBLISH_ARTIFACTS'],'True'))
@@ -138,7 +138,6 @@ jobs:
         7z a $(Build.ArtifactStagingDirectory)\TemplateGenerator_$(PackageVersion)_win64.zip $(Build.ArtifactStagingDirectory)\*
 
   - task: PublishPipelineArtifact@0
-    enabled: false
     condition: and(succeeded(), eq(variables['BUILD_PUBLISH_ARTIFACTS'],'True'))
     inputs:
       artifactName: 'drop'
@@ -149,37 +148,3 @@ jobs:
     inputs:
       artifactName: 'nupkg'
       targetPath: '$(Build.ArtifactStagingDirectory)\nupkg'
-
-  - task: PublishGitHubRelease@0
-    enabled: true
-    displayName: 'Publish-GitHub-Alpha'
-    condition: and(succeeded(), eq(variables['BUILD_IS_ALPHA'],'True'))
-    inputs:
-      applicationName: '$(GitHubApplicationName)'
-      gitSourceOption: 'github'
-      token: '$(GitHubAccessToken)'
-      repo: '$(GitHubRepoName)'
-      owner: 'taori'
-      tagName: 'alpha-$(PackageVersion)'
-      releaseName: 'alpha-$(PackageVersion)'
-      releaseBody: 'Automated release from Azure DevOps'
-      draft: false
-      prerelease: true
-      assetsPattern: '$(GitHubAssetsPattern)'
-
-  - task: PublishGitHubRelease@0
-    enabled: true
-    displayName: 'Publish-GitHub-Release'
-    condition: and(succeeded(), eq(variables['BUILD_IS_RELEASE'],'True'))
-    inputs:
-      applicationName: '$(GitHubApplicationName)'
-      gitSourceOption: 'github'
-      token: '$(GitHubAccessToken)'
-      repo: '$(GitHubRepoName)'
-      owner: 'taori'
-      tagName: 'release-$(PackageVersion)'
-      releaseName: 'release-$(PackageVersion)'
-      releaseBody: 'Automated release from Azure DevOps'
-      draft: false
-      prerelease: false
-      assetsPattern: '$(GitHubAssetsPattern)'
