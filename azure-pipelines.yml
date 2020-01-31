@@ -3,10 +3,7 @@
 trigger:
  branches:
    include:
-    - master
-    - features/*
-    - feature/*
-    - releases/*
+    - dev/*
  paths:
    exclude:
     - docs/*
@@ -17,7 +14,7 @@ variables:
   - group: GitRelease
 
   - name: patch
-    value: $[counter('versioncounter', 100)]
+    value: $[counter('versioncounter', 1)]
   - name: buildPlatform
     value: 'Any CPU'
   - name: buildConfiguration
@@ -32,12 +29,6 @@ variables:
     value: '$(gitAccessToken)'
   - name: DOTNET_SKIP_FIRST_TIME_EXPERIENCE
     value: 1
-  - name: BUILD_PUBLISH_ARTIFACTS
-    value: $[or(startsWith(variables['Build.SourceBranch'], 'refs/heads/releases/'), eq(variables['Build.SourceBranch'], 'refs/heads/master'))]
-  - name: BUILD_IS_RELEASE
-    value: $[startsWith(variables['Build.SourceBranch'], 'refs/heads/releases/')]
-  - name: BUILD_IS_ALPHA
-    value: $[eq(variables['Build.SourceBranch'], 'refs/heads/master')]
 
 pool:
   vmImage: 'windows-2019'
@@ -88,7 +79,7 @@ jobs:
       searchFolder: '$(System.DefaultWorkingDirectory)'
 
   - task: PowerShell@2
-    condition: and(succeeded(), eq(variables['BUILD_PUBLISH_ARTIFACTS'], 'True'))
+    condition: and(succeeded())
     displayName: dotnet publish
     inputs:
       targetType: 'inline'
@@ -103,19 +94,8 @@ jobs:
         & dotnet publish $(Build.SourcesDirectory)\src\Generator.Client.CommandLine\Generator.Client.CommandLine.csproj -r win-x64 -f netcoreapp2.1 -c $(buildConfiguration) --self-contained false -o $(Build.ArtifactStagingDirectory)\cli-netcore2.1-shared
 
   - task: PowerShell@2
-    condition: and(succeeded(), eq(variables['BUILD_IS_RELEASE'], 'True'))
-    displayName: dotnet pack release
-    inputs:
-      targetType: 'inline'
-      script: |
-        mkdir $(Build.ArtifactStagingDirectory)\nupkg
-        Write-Host $(PackageVersion)
-        Write-Host $(PackageVersionCLI)
-        & dotnet pack $(Build.SourcesDirectory)\src\Generator.Client.CommandLine\Generator.Client.CommandLine.csproj -c $(buildConfiguration) -o $(Build.ArtifactStagingDirectory)\nupkg /p:PackAsTool=true /p:VersionPrefix=$(PackageVersionCLI) /p:SymbolPackageFormat=snupkg --include-symbols --version-suffix=beta
-
-  - task: PowerShell@2
-    condition: and(succeeded(), eq(variables['BUILD_IS_ALPHA'], 'True'))
-    displayName: dotnet pack alpha
+    condition: and(succeeded())
+    displayName: dotnet pack dev
     inputs:
       targetType: 'inline'
       script: |
@@ -126,10 +106,9 @@ jobs:
         $commandSample = "dotnet pack $(Build.SourcesDirectory)\src\Generator.Client.CommandLine\Generator.Client.CommandLine.csproj -c $(buildConfiguration) -o $(Build.ArtifactStagingDirectory)\nupkg /p:PackAsTool=true /p:VersionPrefix=$(PackageVersionCLI) /p:SymbolPackageFormat=snupkg --include-symbols --version-suffix=alpha"
         Write-Host $commandSample
         Invoke-Expression $commandSample
-        & dotnet pack $(Build.SourcesDirectory)\src\Generator.Client.CommandLine\Generator.Client.CommandLine.csproj -c $(buildConfiguration) -o $(Build.ArtifactStagingDirectory)\nupkg /p:PackAsTool=true /p:VersionPrefix=$(PackageVersionCLI) /p:SymbolPackageFormat=snupkg --include-symbols --version-suffix=alpha
 
   - task: CopyFiles@2
-    condition: and(succeeded(), eq(variables['BUILD_PUBLISH_ARTIFACTS'],'True'))
+    condition: and(succeeded())
     inputs:
       SourceFolder: '$(Build.SourcesDirectory)'
       Contents: |
@@ -137,7 +116,7 @@ jobs:
       TargetFolder: '$(Build.ArtifactStagingDirectory)'
 
   - task: PowerShell@2
-    condition: and(succeeded(), eq(variables['BUILD_PUBLISH_ARTIFACTS'],'True'))
+    condition: and(succeeded())
     displayName: zip artifacts
     inputs:
       targetType: 'inline'
@@ -145,13 +124,13 @@ jobs:
         7z a $(Build.ArtifactStagingDirectory)\TemplateGenerator_$(PackageVersion)_win64.zip $(Build.ArtifactStagingDirectory)\*
 
   - task: PublishPipelineArtifact@0
-    condition: and(succeeded(), eq(variables['BUILD_PUBLISH_ARTIFACTS'],'True'))
+    condition: and(succeeded())
     inputs:
       artifactName: 'drop'
       targetPath: '$(Build.ArtifactStagingDirectory)\TemplateGenerator_$(PackageVersion)_win64.zip'
 
   - task: PublishPipelineArtifact@0
-    condition: and(succeeded(), eq(variables['BUILD_PUBLISH_ARTIFACTS'],'True'))
+    condition: and(succeeded())
     inputs:
       artifactName: 'nupkg'
       targetPath: '$(Build.ArtifactStagingDirectory)\nupkg'
