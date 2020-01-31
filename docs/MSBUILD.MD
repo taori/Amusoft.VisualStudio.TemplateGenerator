@@ -1,0 +1,1 @@
+https://docs.microsoft.com/de-de/visualstudio/msbuild/updating-an-existing-application?view=vs-2019#use-microsoftbuildlocator
