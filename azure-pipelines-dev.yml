@@ -79,7 +79,7 @@ jobs:
       searchFolder: '$(System.DefaultWorkingDirectory)'
 
   - task: PowerShell@2
-    condition: and(succeeded())
+    condition: succeeded()
     displayName: dotnet publish
     inputs:
       targetType: 'inline'
@@ -94,7 +94,7 @@ jobs:
         & dotnet publish $(Build.SourcesDirectory)\src\Generator.Client.CommandLine\Generator.Client.CommandLine.csproj -r win-x64 -f netcoreapp2.1 -c $(buildConfiguration) --self-contained false -o $(Build.ArtifactStagingDirectory)\cli-netcore2.1-shared
 
   - task: PowerShell@2
-    condition: and(succeeded())
+    condition: succeeded()
     displayName: dotnet pack dev
     inputs:
       targetType: 'inline'
@@ -108,7 +108,7 @@ jobs:
         Invoke-Expression $commandSample
 
   - task: CopyFiles@2
-    condition: and(succeeded())
+    condition: succeeded()
     inputs:
       SourceFolder: '$(Build.SourcesDirectory)'
       Contents: |
@@ -116,7 +116,7 @@ jobs:
       TargetFolder: '$(Build.ArtifactStagingDirectory)'
 
   - task: PowerShell@2
-    condition: and(succeeded())
+    condition: succeeded()
     displayName: zip artifacts
     inputs:
       targetType: 'inline'
@@ -124,13 +124,13 @@ jobs:
         7z a $(Build.ArtifactStagingDirectory)\TemplateGenerator_$(PackageVersion)_win64.zip $(Build.ArtifactStagingDirectory)\*
 
   - task: PublishPipelineArtifact@0
-    condition: and(succeeded())
+    condition: succeeded()
     inputs:
       artifactName: 'drop'
       targetPath: '$(Build.ArtifactStagingDirectory)\TemplateGenerator_$(PackageVersion)_win64.zip'
 
   - task: PublishPipelineArtifact@0
-    condition: and(succeeded())
+    condition: succeeded()
     inputs:
       artifactName: 'nupkg'
       targetPath: '$(Build.ArtifactStagingDirectory)\nupkg'
