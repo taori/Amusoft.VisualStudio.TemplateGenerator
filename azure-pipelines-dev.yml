@@ -1,0 +1,136 @@
+# https://aka.ms/yaml
+
+trigger:
+ branches:
+   include:
+    - dev/*
+ paths:
+   exclude:
+    - docs/*
+    - README.md
+    - azure-pipelines.yml
+
+variables:
+  - group: GitRelease
+
+  - name: patch
+    value: $[counter('versioncounter', 1)]
+  - name: buildPlatform
+    value: 'Any CPU'
+  - name: buildConfiguration
+    value: 'Release'
+  - name: GitHubApplicationName
+    value: 'Amusoft.VisualStudio.TemplateGenerator'
+  - name: GitHubRepoName
+    value: 'Amusoft.VisualStudio.TemplateGenerator'
+  - name: GitHubAssetsPattern
+    value: '$(Build.ArtifactStagingDirectory)\*.zip'
+  - name: GitHubAccessToken
+    value: '$(gitAccessToken)'
+  - name: DOTNET_SKIP_FIRST_TIME_EXPERIENCE
+    value: 1
+    
+pool:
+  vmImage: 'windows-2019'
+
+jobs:
+
+- job:
+  displayName: Build
+  condition: succeeded()
+  steps:
+
+  - task: PowerShell@2  
+    displayName: GetVersion .Desktop
+    inputs:
+      filePath: 'build\csproj-version-to-pipeline.ps1'
+      arguments: '$(patch) $(Build.SourcesDirectory)\src\Generator.Client.Desktop\Generator.Client.Desktop.csproj PackageVersion'
+
+  - task: PowerShell@2  
+    displayName: GetVersion .CLI
+    inputs:
+      filePath: 'build\csproj-version-to-pipeline.ps1'
+      arguments: '$(patch) $(Build.SourcesDirectory)\src\Generator.Client.CommandLine\Generator.Client.CommandLine.csproj PackageVersionCLI'
+
+  - task: NuGetToolInstaller@1
+    inputs:
+      versionSpec: '4.x'
+
+  - task: NuGetCommand@2
+    inputs:
+      command: 'restore'
+      restoreSolution: '**/*.sln'
+      feedsToUse: 'select'
+
+  - task: VSBuild@1
+    inputs:
+      solution: '**\*.sln'
+      platform: '$(buildPlatform)'
+      configuration: '$(buildConfiguration)'
+
+  - task: VSTest@2
+    condition: succeeded()
+    inputs:
+      testSelector: 'testAssemblies'
+      testAssemblyVer2: |
+        **\*test*.dll
+        !**\*TestAdapter.dll
+        !**\obj\**
+      searchFolder: '$(System.DefaultWorkingDirectory)'
+
+  - task: PowerShell@2
+    condition: and(succeeded())
+    displayName: dotnet publish
+    inputs:
+      targetType: 'inline'
+      script: |
+        mkdir $(Build.ArtifactStagingDirectory)\desktop
+        & dotnet build $(Build.SourcesDirectory)\src\Generator.Client.Desktop\Generator.Client.Desktop.csproj -r win-x64 -c $(buildConfiguration)
+        & dotnet publish $(Build.SourcesDirectory)\src\Generator.Client.Desktop\Generator.Client.Desktop.csproj -r win-x64 -c $(buildConfiguration) --self-contained --no-build -o $(Build.ArtifactStagingDirectory)\desktop
+        
+        mkdir $(Build.ArtifactStagingDirectory)\cli-netcore2.1-standalone
+        mkdir $(Build.ArtifactStagingDirectory)\cli-netcore2.1-shared
+        & dotnet publish $(Build.SourcesDirectory)\src\Generator.Client.CommandLine\Generator.Client.CommandLine.csproj -r win-x64 -f netcoreapp2.1 -c $(buildConfiguration) --self-contained true -o $(Build.ArtifactStagingDirectory)\cli-netcore2.1-standalone
+        & dotnet publish $(Build.SourcesDirectory)\src\Generator.Client.CommandLine\Generator.Client.CommandLine.csproj -r win-x64 -f netcoreapp2.1 -c $(buildConfiguration) --self-contained false -o $(Build.ArtifactStagingDirectory)\cli-netcore2.1-shared
+
+  - task: PowerShell@2
+    condition: and(succeeded())
+    displayName: dotnet pack dev
+    inputs:
+      targetType: 'inline'
+      script: |
+        dotnet --version
+        mkdir $(Build.ArtifactStagingDirectory)\nupkg
+        Write-Host $(PackageVersion)
+        Write-Host $(PackageVersionCLI)
+        $commandSample = "dotnet pack $(Build.SourcesDirectory)\src\Generator.Client.CommandLine\Generator.Client.CommandLine.csproj -c $(buildConfiguration) -o $(Build.ArtifactStagingDirectory)\nupkg /p:PackAsTool=true /p:VersionPrefix=$(PackageVersionCLI) /p:SymbolPackageFormat=snupkg --include-symbols --version-suffix=alpha"
+        Write-Host $commandSample
+        Invoke-Expression $commandSample
+
+  - task: CopyFiles@2
+    condition: and(succeeded())
+    inputs:
+      SourceFolder: '$(Build.SourcesDirectory)'
+      Contents: |
+        **/*.md
+      TargetFolder: '$(Build.ArtifactStagingDirectory)'
+
+  - task: PowerShell@2
+    condition: and(succeeded())
+    displayName: zip artifacts
+    inputs:
+      targetType: 'inline'
+      script: |
+        7z a $(Build.ArtifactStagingDirectory)\TemplateGenerator_$(PackageVersion)_win64.zip $(Build.ArtifactStagingDirectory)\*
+
+  - task: PublishPipelineArtifact@0
+    condition: and(succeeded())
+    inputs:
+      artifactName: 'drop'
+      targetPath: '$(Build.ArtifactStagingDirectory)\TemplateGenerator_$(PackageVersion)_win64.zip'
+
+  - task: PublishPipelineArtifact@0
+    condition: and(succeeded())
+    inputs:
+      artifactName: 'nupkg'
+      targetPath: '$(Build.ArtifactStagingDirectory)\nupkg'
