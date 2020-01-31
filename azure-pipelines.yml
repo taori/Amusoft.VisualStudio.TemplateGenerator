@@ -3,14 +3,15 @@
 trigger:
  branches:
    include:
-     - master
-     - features/*
-     - feature/*
-     - releases/*
+    - master
+    - features/*
+    - feature/*
+    - releases/*
  paths:
    exclude:
-     - README.md
-     - azure-pipelines.yml
+    - docs/*
+    - README.md
+    - azure-pipelines.yml
 
 variables:
   - group: GitRelease
