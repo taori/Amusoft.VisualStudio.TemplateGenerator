@@ -11,7 +11,7 @@ trigger:
    exclude:
     - docs/*
     - README.md
-    - azure-pipelines.yml
+    - '*.yml'
 
 variables:
   - group: GitRelease
