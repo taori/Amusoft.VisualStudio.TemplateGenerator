@@ -12,8 +12,7 @@ namespace Generator.Shared.DependencyInjection
 	{
 		public static void Initialize()
 		{
-			var options = new VisualStudioInstanceQueryOptions(){ DiscoveryTypes = DiscoveryType.VisualStudioSetup};
-			MSBuildLocator.RegisterInstance(MSBuildLocator.QueryVisualStudioInstances(options).FirstOrDefault());
+			MSBuildLocator.RegisterInstance(MSBuildLocator.RegisterDefaults());
 		}
 	}
 }
