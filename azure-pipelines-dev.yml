@@ -5,11 +5,9 @@ trigger:
    include:
     - dev/*
  paths:
-   exclude:
-    - docs/*
-    - README.md
-    - '*.yml'
-
+  include:
+    - src/*
+    
 variables:
   - group: GitRelease
 
