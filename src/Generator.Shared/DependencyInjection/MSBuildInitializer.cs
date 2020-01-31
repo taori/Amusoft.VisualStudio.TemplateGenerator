@@ -12,7 +12,7 @@ namespace Generator.Shared.DependencyInjection
 	{
 		public static void Initialize()
 		{
-			MSBuildLocator.RegisterInstance(MSBuildLocator.RegisterDefaults());
+			MSBuildLocator.RegisterDefaults();
 		}
 	}
 }
