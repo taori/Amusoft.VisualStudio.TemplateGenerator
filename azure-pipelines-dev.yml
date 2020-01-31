@@ -101,7 +101,7 @@ jobs:
         mkdir $(Build.ArtifactStagingDirectory)\nupkg
         Write-Host $(PackageVersion)
         Write-Host $(PackageVersionCLI)
-        $commandSample = "dotnet pack $(Build.SourcesDirectory)\src\Generator.Client.CommandLine\Generator.Client.CommandLine.csproj -c $(buildConfiguration) -o $(Build.ArtifactStagingDirectory)\nupkg /p:PackAsTool=true /p:VersionPrefix=$(PackageVersionCLI) /p:SymbolPackageFormat=snupkg --include-symbols --version-suffix=alpha"
+        $commandSample = "dotnet pack $(Build.SourcesDirectory)\src\Generator.Client.CommandLine\Generator.Client.CommandLine.csproj -c $(buildConfiguration) -o $(Build.ArtifactStagingDirectory)\nupkg /p:PackAsTool=true /p:VersionPrefix=$(PackageVersionCLI) /p:VersionSuffix=dev /p:SymbolPackageFormat=snupkg --include-symbols"
         Write-Host $commandSample
         Invoke-Expression $commandSample
 
