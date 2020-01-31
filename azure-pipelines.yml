@@ -8,10 +8,8 @@ trigger:
     - feature/*
     - releases/*
  paths:
-   exclude:
-    - docs/*
-    - README.md
-    - '*.yml'
+    include:
+      - src/*
 
 variables:
   - group: GitRelease
