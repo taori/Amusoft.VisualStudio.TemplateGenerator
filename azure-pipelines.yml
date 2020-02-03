@@ -38,7 +38,8 @@ variables:
     value: $[eq(variables['Build.SourceBranch'], 'refs/heads/master')]
 
 pool:
-  vmImage: 'windows-2019'
+  vmImage: 'ubuntu-latest'
+  #vmImage: 'windows-2019'
 
 jobs:
 
