@@ -89,6 +89,27 @@ jobs:
         !**\obj\**
       searchFolder: '$(System.DefaultWorkingDirectory)'
 
+  - task: DotNetCoreCLI@2
+    displayName: dotnet restore
+    inputs:
+      command: 'restore'
+      projects: '**/*.csproj'
+      feedsToUse: 'select'
+
+  - task: DotNetCoreCLI@2
+    displayName: dotnet build
+    inputs:
+      command: 'build'
+      projects: '**/*.csproj'
+      feedsToUse: 'select'
+      
+  - task: DotNetCoreCLI@2
+    displayName: dotnet test
+    inputs:
+      command: 'test'
+      projects: '**/*.csproj'
+      feedsToUse: 'select'
+
   - task: PowerShell@2
     condition: and(succeeded(), eq(variables['BUILD_PUBLISH_ARTIFACTS'], 'True'))
     displayName: dotnet publish
