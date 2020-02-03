@@ -159,7 +159,7 @@ jobs:
       configuration: '$(buildConfiguration)'
       packDirectory: '$(Build.ArtifactStagingDirectory)\nupkg'
       includesymbols: true
-      versioningScheme: 'byBuildNumber'
+      versioningScheme: 'off'
       buildProperties: 'PackAsTool=True;VersionPrefix=9.8.7.6;SymbolPackageFormat=snupkg;VersionSuffix=alpha'
       verbosityPack: 'Minimal'
 #$(buildConfiguration) -o  p:VersionPrefix=$(PackageVersionCLI) "
