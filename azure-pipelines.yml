@@ -38,7 +38,6 @@ variables:
     value: $[eq(variables['Build.SourceBranch'], 'refs/heads/master')]
 
 pool:
-  #vmImage: 'ubuntu-latest'
   vmImage: 'windows-2019'
 
 jobs:
@@ -70,6 +69,18 @@ jobs:
       projects: '**/*.csproj'
       feedsToUse: 'select'
 
+  - task: PowerShell@2  
+    displayName: GetVersion .Desktop
+    inputs:
+      filePath: 'build\csproj-version-to-pipeline.ps1'
+      arguments: '$(patch) $(Build.SourcesDirectory)\src\Generator.Client.Desktop\Generator.Client.Desktop.csproj PackageVersion'
+
+  - task: PowerShell@2  
+    displayName: GetVersion .CLI
+    inputs:
+      filePath: 'build\csproj-version-to-pipeline.ps1'
+      arguments: '$(patch) $(Build.SourcesDirectory)\src\Generator.Client.CommandLine\Generator.Client.CommandLine.csproj PackageVersionCLI'
+
   - task: DotNetCoreCLI@2
     displayName: dotnet pack
     inputs:
@@ -82,18 +93,6 @@ jobs:
       buildProperties: 'PackAsTool=True;VersionPrefix=9.8.7.6;SymbolPackageFormat=snupkg;VersionSuffix=alpha'
       verbosityPack: 'Minimal'
 #$(buildConfiguration) -o  p:VersionPrefix=$(PackageVersionCLI) "
-
-  - task: PowerShell@2  
-    displayName: GetVersion .Desktop
-    inputs:
-      filePath: 'build\csproj-version-to-pipeline.ps1'
-      arguments: '$(patch) $(Build.SourcesDirectory)\src\Generator.Client.Desktop\Generator.Client.Desktop.csproj PackageVersion'
-
-  - task: PowerShell@2  
-    displayName: GetVersion .CLI
-    inputs:
-      filePath: 'build\csproj-version-to-pipeline.ps1'
-      arguments: '$(patch) $(Build.SourcesDirectory)\src\Generator.Client.CommandLine\Generator.Client.CommandLine.csproj PackageVersionCLI'
 
   - task: PowerShell@2
     condition: and(succeeded(), eq(variables['BUILD_PUBLISH_ARTIFACTS'], 'True'))
