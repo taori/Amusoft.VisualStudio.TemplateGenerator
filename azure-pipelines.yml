@@ -144,12 +144,12 @@ jobs:
       script: |
         dotnet --version
         mkdir $(Build.ArtifactStagingDirectory)\nupkg
-        Write-Host $(PackageVersion)
         Write-Host $(PackageVersionCLI)
-        $commandSample = "dotnet pack $(Build.SourcesDirectory)\src\Generator.Client.CommandLine\Generator.Client.CommandLine.csproj -c $(buildConfiguration) -o $(Build.ArtifactStagingDirectory)\nupkg /p:PackAsTool=true /p:VersionPrefix=$(PackageVersionCLI) /p:SymbolPackageFormat=snupkg /p:IncludeSymbols=True --version-suffix=alpha"
+        $commandSample = "dotnet pack $(Build.SourcesDirectory)\src\Generator.Client.CommandLine\Generator.Client.CommandLine.csproj -c $(buildConfiguration) -o $(Build.ArtifactStagingDirectory)\nupkg /p:PackAsTool=true /p:VersionPrefix=$(PackageVersionCLI) /p:SymbolPackageFormat=snupkg /p:IncludeSymbols=True /p:VersionSuffix=alpha"
         Write-Host $commandSample
         Invoke-Expression $commandSample
-        #& dotnet pack $(Build.SourcesDirectory)\src\Generator.Client.CommandLine\Generator.Client.CommandLine.csproj -c $(buildConfiguration) -o $(Build.ArtifactStagingDirectory)\nupkg /p:PackAsTool=true /p:VersionPrefix=$(PackageVersionCLI) /p:SymbolPackageFormat=snupkg /p:IncludeSymbols=True --version-suffix=alpha
+
+        & dotnet pack $(Build.SourcesDirectory)\src\Generator.Client.CommandLine\Generator.Client.CommandLine.csproj -c $(buildConfiguration) -o $(Agent.TempDirectory)\nupkg /p:PackAsTool=true /p:VersionPrefix=9.8.7 /p:SymbolPackageFormat=snupkg /p:IncludeSymbols=True /p:VersionSuffix=alpha
 
   - task: CopyFiles@2
     condition: and(succeeded(), eq(variables['BUILD_PUBLISH_ARTIFACTS'],'True'))
