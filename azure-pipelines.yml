@@ -111,6 +111,19 @@ jobs:
       projects: '**/*.csproj'
       feedsToUse: 'select'
 
+  - task: DotNetCoreCLI@2
+    displayName: dotnet pack
+    inputs:
+      command: 'pack'
+      packagesToPack: '**/*CommandLine.csproj'
+      configuration: '$(buildConfiguration)'
+      packDirectory: '$(Build.ArtifactStagingDirectory)\nupkg'
+      includesymbols: true
+      versioningScheme: 'off'
+      buildProperties: 'PackAsTool=True;VersionPrefix=9.8.7.6;SymbolPackageFormat=snupkg;VersionSuffix=alpha'
+      verbosityPack: 'Minimal'
+#$(buildConfiguration) -o  p:VersionPrefix=$(PackageVersionCLI) "
+
   - task: PowerShell@2
     condition: and(succeeded(), eq(variables['BUILD_PUBLISH_ARTIFACTS'], 'True'))
     displayName: dotnet publish
@@ -151,18 +164,7 @@ jobs:
         Invoke-Expression $commandSample
 
         & dotnet pack $(Build.SourcesDirectory)\src\Generator.Client.CommandLine\Generator.Client.CommandLine.csproj -c $(buildConfiguration) -o $(Agent.TempDirectory)\nupkg /p:PackAsTool=true /p:VersionPrefix=9.8.7 /p:SymbolPackageFormat=snupkg /p:IncludeSymbols=True /p:VersionSuffix=alpha
-  - task: DotNetCoreCLI@2
-    displayName: dotnet pack
-    inputs:
-      command: 'pack'
-      packagesToPack: '**/*CommandLine.csproj'
-      configuration: '$(buildConfiguration)'
-      packDirectory: '$(Build.ArtifactStagingDirectory)\nupkg'
-      includesymbols: true
-      versioningScheme: 'off'
-      buildProperties: 'PackAsTool=True;VersionPrefix=9.8.7.6;SymbolPackageFormat=snupkg;VersionSuffix=alpha'
-      verbosityPack: 'Minimal'
-#$(buildConfiguration) -o  p:VersionPrefix=$(PackageVersionCLI) "
+
   - task: CopyFiles@2
     condition: and(succeeded(), eq(variables['BUILD_PUBLISH_ARTIFACTS'],'True'))
     inputs:
