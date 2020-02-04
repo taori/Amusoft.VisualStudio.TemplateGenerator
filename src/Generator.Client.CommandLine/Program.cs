@@ -11,9 +11,9 @@ using NLog.Config;
 
 namespace Generator.Client.CommandLine
 {
-	class Program
+	public class Program
 	{
-		static int Main(string[] args)
+		private static int Main(string[] args)
 		{
 			try
 			{
@@ -28,13 +28,16 @@ namespace Generator.Client.CommandLine
 						Console.WriteLine("Waiting for user input.");
 						input = Console.ReadLine();
 						if (string.IsNullOrEmpty(input))
+						{
 							return 0;
+						}
 
 						Console.Clear();
-						var userArgs = input.Split(new []{' '}, StringSplitOptions.RemoveEmptyEntries);
+						var userArgs = input.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
 						var code = RunApplication(userArgs);
 						Console.WriteLine(code);
-					} while (input != "exit");
+					}
+					while (input != "exit");
 
 					return 0;
 				}
