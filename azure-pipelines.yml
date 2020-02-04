@@ -92,7 +92,7 @@ jobs:
       packDirectory: '$(Build.ArtifactStagingDirectory)\nupkg'
       includesymbols: true
       versioningScheme: 'off'
-      buildProperties: 'PackAsTool=True;SymbolPackageFormat=snupkg'
+      buildProperties: 'PackAsTool=True;SymbolPackageFormat=snupkg;VersionSuffix=alpha'
       verbosityPack: 'Minimal'
 
   - task: PowerShell@2
