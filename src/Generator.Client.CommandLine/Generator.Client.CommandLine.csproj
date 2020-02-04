@@ -15,7 +15,7 @@
 		<PackageTags>visual studio template generator</PackageTags>
 		<RepositoryUrl>https://github.com/taori/Amusoft.VisualStudio.TemplateGenerator.git</RepositoryUrl>
 		<PackageProjectUrl>https://github.com/taori/Amusoft.VisualStudio.TemplateGenerator.git</PackageProjectUrl>
-		<VersionPrefix>1.1.0</VersionPrefix>
+		<VersionPrefix>1.1.1</VersionPrefix>
 	</PropertyGroup>
 
 	<ItemGroup>
