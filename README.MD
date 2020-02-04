@@ -1,5 +1,10 @@
 # Visual Studio Multi project template generator
 
+## NuGet
+
+[![NuGet Badge](https://buildstats.info/nuget/Amusoft.VisualStudio.TemplateGenerator.CommandLine)](https://www.nuget.org/packages/Amusoft.VisualStudio.TemplateGenerator.CommandLine/)
+[![NuGet Badge](https://buildstats.info/nuget/Amusoft.VisualStudio.TemplateGenerator.CommandLine?includePreReleases=true)](https://www.nuget.org/packages/Amusoft.VisualStudio.TemplateGenerator.CommandLine/)
+
 ## CI
 
 [![Build Status](https://dev.azure.com/taori/Amusoft.VisualStudio.TemplateGenerator/_apis/build/status/taori.Amusoft.VisualStudio.TemplateGenerator?branchName=master)](https://dev.azure.com/taori/Amusoft.VisualStudio.TemplateGenerator/_build/latest?definitionId=7&branchName=master)
