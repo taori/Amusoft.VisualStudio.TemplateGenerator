@@ -27,7 +27,6 @@ namespace Generator.Client.CommandLine
 			Syntax = "build [configName] [option: -s pathToStorage]")]
 		public async Task<int> Build(
 			[Argument(
-				Name = "config",
 				Description = "id or name of the configuration to build.")]
 			string configurationId,
 			[Option(
@@ -78,8 +77,7 @@ namespace Generator.Client.CommandLine
 			[ApplicationMetadata(Description = "Renames the configuration if it can be found through the given id.")]
 			public async Task<int> Rename(
 				[Argument(
-					Description =
-						"id of configuration which can be the position of the configuration, its guid, or the configuration name")]
+					Description = "id of configuration which can be the position of the configuration, its guid, or the configuration name")]
 				string id,
 				[Argument(
 					Description = "new name of the configuration")]
@@ -135,11 +133,10 @@ namespace Generator.Client.CommandLine
 					return 0;
 				}
 
-				[ApplicationMetadata(Description = "Renames the configuration if it can be found through the given id.")]
-				public async Task<int> Detail(
+				[ApplicationMetadata(Description = "Gets the json of a configuration identified by the given ID")]
+				public async Task<int> Json(
 					[Argument(
-						Description =
-							"id of configuration which can be the position of the configuration, its guid, or the configuration name")]
+						Description = "id of configuration which can be the position of the configuration, its guid, or the configuration name")]
 					string id,
 					[Option(
 						Description = "Path to storage.",
