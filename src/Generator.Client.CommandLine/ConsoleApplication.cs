@@ -11,6 +11,7 @@ using CommandDotNet;
 using CommandDotNet.Attributes;
 using Generator.Shared.Template;
 using Generator.Shared.Transformation;
+using Newtonsoft.Json;
 using NLog;
 
 namespace Generator.Client.CommandLine
@@ -71,32 +72,9 @@ namespace Generator.Client.CommandLine
 		}
 
 		[SubCommand]
-		[ApplicationMetadata(Description = "Entry point for configurations")]
+		[ApplicationMetadata(Description = "Entry point for configurations.")]
 		public class Configuration
 		{
-			[ApplicationMetadata(Description = "Retrieves a list of all configurations contained in the storage.")]
-			public async Task<int> GetAll(
-				[Option(
-					Description = "Path to storage.",
-					ShortName = "s",
-					LongName = "storage")]
-				string storage = null)
-			{
-				if (!ConsoleUtils.TryGetManager(storage, out var manager))
-				{
-					return 1;
-				}
-
-				var configurations = await manager.LoadStorageContentAsync();
-				for (var index = 0; index < configurations.Length; index++)
-				{
-					var configuration = configurations[index];
-					Console.WriteLine($"(#{index + 1:00}): {configuration.ConfigurationName}");
-				}
-
-				return 0;
-			}
-
 			[ApplicationMetadata(Description = "Renames the configuration if it can be found through the given id.")]
 			public async Task<int> Rename(
 				[Argument(
@@ -127,6 +105,65 @@ namespace Generator.Client.CommandLine
 				{
 					Log.Error(e.Message);
 					return 2;
+				}
+			}
+
+			[SubCommand]
+			[ApplicationMetadata(Description = "Get actions.")]
+			public class Get
+			{
+				[ApplicationMetadata(Description = "Retrieves a list of all configurations contained in the storage.")]
+				public async Task<int> All(
+					[Option(
+						Description = "Path to storage.",
+						ShortName = "s",
+						LongName = "storage")]
+					string storage = null)
+				{
+					if (!ConsoleUtils.TryGetManager(storage, out var manager))
+					{
+						return 1;
+					}
+
+					var configurations = await manager.LoadStorageContentAsync();
+					for (var index = 0; index < configurations.Length; index++)
+					{
+						var configuration = configurations[index];
+						Console.WriteLine($"(#{index + 1:00}): {configuration.ConfigurationName}");
+					}
+
+					return 0;
+				}
+
+				[ApplicationMetadata(Description = "Renames the configuration if it can be found through the given id.")]
+				public async Task<int> Detail(
+					[Argument(
+						Description =
+							"id of configuration which can be the position of the configuration, its guid, or the configuration name")]
+					string id,
+					[Option(
+						Description = "Path to storage.",
+						ShortName = "s",
+						LongName = "storage")]
+					string storage = null)
+				{
+					if (!ConsoleUtils.TryGetManager(storage, out var manager))
+					{
+						return 1;
+					}
+
+					try
+					{
+						var configuration = await manager.GetConfigurationByIdAsync(id);
+						var serialized = JsonConvert.SerializeObject(configuration, Formatting.Indented);
+						Console.WriteLine(serialized);
+						return 0;
+					}
+					catch (Exception e)
+					{
+						Log.Error(e.Message);
+						return 2;
+					}
 				}
 			}
 		}

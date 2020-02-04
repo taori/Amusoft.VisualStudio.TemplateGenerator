@@ -18,7 +18,8 @@ namespace Generator.Client.CommandLine
 			where TApplication : class
 		{
 			var settings = new AppSettings();
-			settings.Case = Case.LowerCase;
+			settings.Case = Case.CamelCase;
+			settings.Help.UsageAppNameStyle = UsageAppNameStyle.GlobalTool;
 			settings.Help.TextStyle = HelpTextStyle.Detailed;
 			var runner = new AppRunner<TApplication>(settings);
 			return runner;
