@@ -80,7 +80,7 @@ jobs:
       packDirectory: '$(Build.ArtifactStagingDirectory)\nupkg'
       includesymbols: true
       versioningScheme: 'off'
-      buildProperties: 'PackAsTool=True;SymbolPackageFormat=snupkg;VersionSuffix=alpha'
+      buildProperties: 'PackAsTool=True;SymbolPackageFormat=snupkg'
       verbosityPack: 'Minimal'
 
   - task: DotNetCoreCLI@2
