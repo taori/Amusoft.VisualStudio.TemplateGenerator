@@ -106,6 +106,36 @@ namespace Generator.Client.CommandLine
 				}
 			}
 
+			[ApplicationMetadata(Description = "Saves the local configuration to the specified location.")]
+			public async Task<int> Export(
+				[Argument(
+					Description = "export path")]
+				string newPath)
+			{
+				if (!ConsoleUtils.TryGetManager(null, out var manager))
+				{
+					Log.Error($"Failed to obtain local storage manager.");
+					return 1;
+				}
+
+				try
+				{
+					var configurations = await manager.LoadStorageContentAsync();
+					if (!await manager.SaveConfigurationsAsync(configurations, newPath))
+					{
+						Log.Error($"Failed to save configurations to path [{newPath}].");
+						return 3;
+					}
+
+					return 0;
+				}
+				catch (Exception e)
+				{
+					Log.Error(e.Message);
+					return 2;
+				}
+			}
+
 			[SubCommand]
 			[ApplicationMetadata(Description = "Get actions.")]
 			public class Get
@@ -161,6 +191,39 @@ namespace Generator.Client.CommandLine
 						Log.Error(e.Message);
 						return 2;
 					}
+				}
+			}
+
+			[SubCommand]
+			[ApplicationMetadata(Description = "Import actions.")]
+			public class Import
+			{
+				[ApplicationMetadata(Description = "Updates the local storage from a given path.")]
+				public async Task<int> FromFile(
+					[Argument(
+						Description = "Path to storage file.")]
+					string storagePath)
+				{
+					if (!ConsoleUtils.TryGetManager(null, out var currentManager))
+					{
+						Log.Error("Failed to obtain local manager instance.");
+						return 1;
+					}
+
+					if (!ConsoleUtils.TryGetManager(storagePath, out var remoteManager))
+					{
+						Log.Error($"Failed to obtain remote manager instance using path [{storagePath}].");
+						return 2;
+					}
+
+					var remoteContents = await remoteManager.LoadStorageContentAsync();
+					if (!await currentManager.SaveConfigurationsAsync(remoteContents))
+					{
+						Log.Error($"Failed to update local manager instance.");
+						return 3;
+					}
+
+					return 0;
 				}
 			}
 		}
