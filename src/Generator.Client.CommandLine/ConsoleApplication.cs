@@ -11,20 +11,25 @@ using NLog;
 
 namespace Generator.Client.CommandLine
 {
+	[ApplicationMetadata(
+		Name = "amusoft.vs.tg")]
 	public class ConsoleApplication
 	{
 		private static readonly ILogger Log = LogManager.GetLogger(nameof(ConsoleApplication));
 
 		[ApplicationMetadata(
-			Description = "Tries to build a template according the the specified configuration",
+			Description = "Tries to build a template according the the specified configuration.",
 			Syntax = "build [configName] [option: -s pathToStorage]"
 		)]
 		public async Task<int> Build(
 			[Argument(
 				Name = "config",
-				Description = "Name of configuration within configuration store")]
+				Description = "id or name of the configuration to build.")]
 			string configurationId,
-			[Option(ShortName = "s")]
+			[Option(
+				Description = "Path to storage.",
+				ShortName = "s",
+				LongName = "storage")]
 			string storage = null
 			)
 		{
@@ -58,14 +63,17 @@ namespace Generator.Client.CommandLine
 				return 1;
 			}
 		}
-
+		
 		[SubCommand]
-		[ApplicationMetadata(Description = "Entry point for obtaining information")]
-		public class Get
+		[ApplicationMetadata(Description = "Entry point for configurations")]
+		public class Configuration
 		{
 			[ApplicationMetadata(Description = "Retrieves a list of all configurations contained in the storage.")]
-			public async Task<int> Configurations(
-				[Option(ShortName = "s")]
+			public async Task<int> GetAll(
+				[Option(
+					Description = "Path to storage.",
+					ShortName = "s",
+					LongName = "storage")]
 				string storage = null)
 			{
 				if (!ConsoleUtils.TryGetManager(storage, out var manager))
@@ -74,24 +82,24 @@ namespace Generator.Client.CommandLine
 				for (var index = 0; index < configurations.Length; index++)
 				{
 					var configuration = configurations[index];
-					Console.WriteLine($"(#{index+1:00}): {configuration.ConfigurationName}");
+					Console.WriteLine($"(#{index + 1:00}): {configuration.ConfigurationName}");
 				}
 
 				return 0;
 			}
-		}
 
-		[SubCommand]
-		[ApplicationMetadata(Description = "Entry point for modifying configurations")]
-		public class Configuration
-		{
 			[ApplicationMetadata(Description = "Renames the configuration if it can be found through the given id.")]
 			public async Task<int> Rename(
-				[Argument(Description = "id of configuration which can be the position of the configuration, its guid, or the configuration name")]
+				[Argument(
+					Description = "id of configuration which can be the position of the configuration, its guid, or the configuration name")]
 				string id, 
-				[Argument(Description = "new name of the configuration")]
+				[Argument(
+					Description = "new name of the configuration")]
 				string newName,
-				[Option(ShortName = "s")]
+				[Option(
+					Description = "Path to storage.",
+					ShortName = "s", 
+					LongName = "storage")]
 				string storage = null)
 			{
 				if (!ConsoleUtils.TryGetManager(storage, out var manager))

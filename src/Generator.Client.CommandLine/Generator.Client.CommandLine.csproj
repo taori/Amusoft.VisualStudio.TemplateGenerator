@@ -9,13 +9,13 @@
 		<Company />
 		<Product>Amusoft.VisualStudio.TemplateGenerator.CommandLine</Product>
 		<GeneratePackageOnBuild>false</GeneratePackageOnBuild>
-		<ToolCommandName>amusoft-vs-templategenerator</ToolCommandName>
+		<ToolCommandName>amusoft.vs.tg</ToolCommandName>
 		<Copyright>2020</Copyright>
 		<RepositoryType>git</RepositoryType>
 		<PackageTags>visual studio template generator</PackageTags>
 		<RepositoryUrl>https://github.com/taori/Amusoft.VisualStudio.TemplateGenerator.git</RepositoryUrl>
 		<PackageProjectUrl>https://github.com/taori/Amusoft.VisualStudio.TemplateGenerator.git</PackageProjectUrl>
-		<VersionPrefix>1.1.0</VersionPrefix>
+		<VersionPrefix>2.0.0</VersionPrefix>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -29,7 +29,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="CommandDotNet" Version="2.7.5" />
+		<PackageReference Include="CommandDotNet" Version="2.8.2" />
 		<PackageReference Include="JetBrains.Annotations" Version="2018.2.1" />
 		<PackageReference Include="NLog" Version="4.6.8" />
 		<PackageReference Include="System.Configuration.ConfigurationManager" Version="4.5.0" />
