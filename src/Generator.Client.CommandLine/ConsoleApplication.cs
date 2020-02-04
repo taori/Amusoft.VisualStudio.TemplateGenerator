@@ -1,4 +1,8 @@
-﻿using System;
+﻿// Copyright (c) 2020 Andreas Müller
+// This file is a part of Amusoft.VisualStudio.TemplateGenerator and is licensed under Apache 2.0
+// See https://github.com/taori/Amusoft.VisualStudio.TemplateGenerator/blob/master/LICENSE for details
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -19,8 +23,7 @@ namespace Generator.Client.CommandLine
 
 		[ApplicationMetadata(
 			Description = "Tries to build a template according the the specified configuration.",
-			Syntax = "build [configName] [option: -s pathToStorage]"
-		)]
+			Syntax = "build [configName] [option: -s pathToStorage]")]
 		public async Task<int> Build(
 			[Argument(
 				Name = "config",
@@ -30,11 +33,12 @@ namespace Generator.Client.CommandLine
 				Description = "Path to storage.",
 				ShortName = "s",
 				LongName = "storage")]
-			string storage = null
-			)
+			string storage = null)
 		{
 			if (!ConsoleUtils.TryGetManager(storage, out var manager))
+			{
 				return 3;
+			}
 
 			Log.Info($"Trying to build [{configurationId}].");
 
@@ -54,7 +58,9 @@ namespace Generator.Client.CommandLine
 			try
 			{
 				Log.Info($"Executing build tool.");
-				var result = await rewriteTool.ExecuteAsync(CancellationToken.None, new Progress<string>(message => Console.WriteLine(message)));
+				var result = await rewriteTool.ExecuteAsync(
+					CancellationToken.None,
+					new Progress<string>(message => Console.WriteLine(message)));
 				return result ? 0 : 4;
 			}
 			catch (Exception e)
@@ -63,7 +69,7 @@ namespace Generator.Client.CommandLine
 				return 1;
 			}
 		}
-		
+
 		[SubCommand]
 		[ApplicationMetadata(Description = "Entry point for configurations")]
 		public class Configuration
@@ -77,7 +83,10 @@ namespace Generator.Client.CommandLine
 				string storage = null)
 			{
 				if (!ConsoleUtils.TryGetManager(storage, out var manager))
+				{
 					return 1;
+				}
+
 				var configurations = await manager.LoadStorageContentAsync();
 				for (var index = 0; index < configurations.Length; index++)
 				{
@@ -91,19 +100,23 @@ namespace Generator.Client.CommandLine
 			[ApplicationMetadata(Description = "Renames the configuration if it can be found through the given id.")]
 			public async Task<int> Rename(
 				[Argument(
-					Description = "id of configuration which can be the position of the configuration, its guid, or the configuration name")]
-				string id, 
+					Description =
+						"id of configuration which can be the position of the configuration, its guid, or the configuration name")]
+				string id,
 				[Argument(
 					Description = "new name of the configuration")]
 				string newName,
 				[Option(
 					Description = "Path to storage.",
-					ShortName = "s", 
+					ShortName = "s",
 					LongName = "storage")]
 				string storage = null)
 			{
 				if (!ConsoleUtils.TryGetManager(storage, out var manager))
+				{
 					return 1;
+				}
+
 				try
 				{
 					var configuration = await manager.GetConfigurationByIdAsync(id);

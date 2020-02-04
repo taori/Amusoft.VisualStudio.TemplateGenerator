@@ -3,7 +3,7 @@
 # All files
 [*]
 indent_style = tab
-dotnet_diagnostic.xUnit2015.severity = silent
+dotnet_diagnostic.xUnit2015.severity = none
 dotnet_diagnostic.NU1701.severity = silent
 
 # Xml files
@@ -28,3 +28,15 @@ dotnet_naming_style.end_in_async.word_separator =
 
 # CS0067: Das Ereignis "CloseOnEscapeBehavior.CanExecuteChanged" wird nie verwendet.
 dotnet_diagnostic.CS0067.severity = silent
+
+# SA1200: Using directives should be placed correctly
+dotnet_diagnostic.SA1200.severity = suggestion
+
+# SA1027: Use tabs correctly
+dotnet_diagnostic.SA1027.severity = silent
+
+# SA1600: Elements should be documented
+dotnet_diagnostic.SA1600.severity = suggestion
+
+# SA1633: File should have header
+dotnet_diagnostic.SA1633.severity = none

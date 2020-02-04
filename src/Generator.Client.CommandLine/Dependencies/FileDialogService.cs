@@ -6,7 +6,11 @@ namespace Generator.Client.CommandLine.Dependencies
 	public class FileDialogService : IFileDialogService
 	{
 		/// <inheritdoc />
-		public bool OpenFileDialog(out string path, string filter, bool @readonly = false, bool multiSelect = false,
+		public bool OpenFileDialog(
+			out string path,
+			string filter,
+			bool @readonly = false,
+			bool multiSelect = false,
 			bool checkFileExists = false)
 		{
 			throw new System.NotImplementedException();
