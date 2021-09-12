@@ -12,6 +12,7 @@
 		<ToolCommandName>amusoft.vs.tg</ToolCommandName>
 		<Copyright>2020</Copyright>
 		<RepositoryType>git</RepositoryType>
+		<PackageIcon>packageIcon.png</PackageIcon>
 		<PackageTags>visual studio template generator</PackageTags>
 		<RepositoryUrl>https://github.com/taori/Amusoft.VisualStudio.TemplateGenerator.git</RepositoryUrl>
 		<PackageProjectUrl>https://github.com/taori/Amusoft.VisualStudio.TemplateGenerator.git</PackageProjectUrl>
@@ -20,6 +21,10 @@
 
 	<ItemGroup>
 		<None Remove="NLog.config" />
+	</ItemGroup>
+	 
+	<ItemGroup>
+		<None Include="packageIcon.png" Pack="true" PackagePath="\" />		
 	</ItemGroup>
 
 	<ItemGroup>
